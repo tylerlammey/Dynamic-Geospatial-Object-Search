@@ -1,0 +1,40 @@
+# Project data and generated outputs
+imagery/
+data/
+output/
+models/*.pt
+hf-cache/
+model-cache/
+
+# Python environments and bytecode
+.venv/
+.venv-tmp/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python tooling and test artifacts
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+.hypothesis/
+
+# Local configuration and IDE settings
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini

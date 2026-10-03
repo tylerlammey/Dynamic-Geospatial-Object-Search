@@ -1,0 +1,13 @@
+# Install ROCm-enabled PyTorch separately; see docs/rx-9070xt-embedding-setup.md.
+# The ordinary PyPI torch package is CPU-only on Windows and will not use an
+# AMD Radeon GPU.
+
+numpy>=2.0,<3
+huggingface-hub>=0.26,<1
+open-clip-torch>=2.30,<4
+pillow>=10.0,<13
+pyarrow>=17,<23
+pyproj>=3.6,<4
+rasterio>=1.4,<2
+shapely>=2.0,<3
+tqdm>=4.66,<5

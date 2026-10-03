@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use GeoRSCLIP embeddings produced by this project, please cite the original GeoRSCLIP work."
+type: article
+title: "RS5M and GeoRSCLIP: A Large-Scale Vision-Language Dataset and a Large Vision-Language Model for Remote Sensing"
+short-title: "RS5M and GeoRSCLIP"
+authors:
+  - family-names: Zhang
+    given-names: Zilun
+  - family-names: Zhao
+    given-names: Tiancheng
+  - family-names: Guo
+    given-names: Yulong
+  - family-names: Yin
+    given-names: Jianwei
+year: 2024
+journal: "IEEE Transactions on Geoscience and Remote Sensing"
+volume: 62
+pages: "1-23"
+doi: "10.1109/TGRS.2024.3449154"
+url: "https://doi.org/10.1109/TGRS.2024.3449154"
+keywords:
+  - remote sensing
+  - vision-language model
+  - GeoRSCLIP
