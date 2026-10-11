@@ -16,9 +16,13 @@ repository deliberately keeps heavy source data and derived results out of Git.
 src/geospatial_search/
   embed_georsclip.py  # chip planning, RGB extraction, embedding generation
   search_text.py      # text encoding, exact similarity search, PNG rendering
+  download_nys_naip.py # resumable statewide 2022 NAIP RGB acquisition
 docs/
   rx-9070xt-embedding-setup.md       # Windows + ROCm setup and runbook
   georsclip-embedding-search-design.md # architecture and longer-term design
+  nys-naip-download.md             # statewide downloader operating guide
+scripts/              # Windows download launcher and progress monitor
+tests/                # synthetic offline downloader contract tests
 imagery/              # local source JP2 rasters and sidecars; ignored
 data/                 # local embeddings, manifests, and rendered results; ignored
 requirements.txt      # Python dependencies other than ROCm PyTorch
@@ -103,9 +107,15 @@ it; use `git rm --cached <path>` only after confirming the target.
   mapped vectors and creates a new timestamped folder under `data/search-results`.
 - Result previews reopen the original JP2 and use each metadata row's pixel
   window. Metadata coordinates are meaningful only with their CRS.
-- Current implementation has no automated test suite, build configuration, or
-  package metadata. Add tests before changing chip planning, RGB conversion,
+- Downloader tests run with `PYTHONPATH=src` and
+  `python -m unittest discover -s tests -v`; use synthetic imagery only. The
+  embedding/search implementation has no automated test suite, build configuration,
+  or package metadata. Add tests before changing chip planning, RGB conversion,
   vector/metadata alignment, or ranking behavior.
+- The NYS downloader writes only under its selected job folder (default
+  `data/nys-naip-2022-rgb-060m`) and shares the original data-local worker lock.
+  Do not move/delete files or restart an active job while preparing source changes.
+  Statewide TIFF/multiple-CRS embedding integration is still outstanding.
 
 ## Change guardrails
 

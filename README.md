@@ -78,6 +78,21 @@ By default, results are written to a new timestamped directory under
 `data/search-results/` containing labelled ranking PNGs, a contact sheet, and
 `results.json`.
 
+## Download New York State imagery
+
+A separate resumable downloader acquires all 3,805 New York 2022 NAIP tiles as
+RGB GeoTIFFs at native 0.6 m/pixel, with four workers, progress/ETA, provenance,
+and a 300 GB folder cap. It keeps every generated file under ignored `data/`:
+
+```powershell
+.\scripts\download-nys-naip.ps1
+```
+
+See the [New York State download guide](docs/nys-naip-download.md) for dependencies,
+the pilot, background operation, pause/resume, storage estimates, and tests.
+The current Albany embedder needs TIFF and statewide scaling changes before
+using this collection for embeddings.
+
 ## Repository policy
 
 Source imagery, downloaded model files, local caches, embeddings, GeoParquet

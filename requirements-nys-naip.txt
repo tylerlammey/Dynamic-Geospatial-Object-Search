@@ -1,0 +1,4 @@
+# CPU-only acquisition; no model checkpoint or PyTorch installation required.
+affine>=2.4,<3
+numpy>=2.0,<3
+rasterio>=1.4,<2
