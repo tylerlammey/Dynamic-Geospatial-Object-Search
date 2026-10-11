@@ -1,372 +1,411 @@
-"""Create GeoRSCLIP embeddings for georeferenced RGB chips from JP2 imagery.
-
-The source rasters are never modified. This program emits a GeoParquet manifest
-and a normalized float16 NumPy matrix whose row number is `embedding_id`.
-"""
-
+"""Stream NYS GeoTIFF chips into resumable, atomic GeoRSCLIP embedding bundles."""
 from __future__ import annotations
 
 import argparse
-import hashlib
-import json
-import logging
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
+from importlib.metadata import version
+from itertools import islice
+import json
 from pathlib import Path
-from typing import Iterator
+from queue import Empty, Full, Queue
+import threading
+import time
 
 import numpy as np
-import open_clip
-import pyarrow as pa
-import pyarrow.parquet as pq
 import rasterio
-import torch
-import torch.nn.functional as F
-from PIL import Image
-from pyproj import CRS
-from rasterio.warp import transform_bounds
-from rasterio.windows import Window, bounds as window_bounds
-from shapely import to_wkb
-from shapely.geometry import box
 from tqdm import tqdm
-from huggingface_hub import hf_hub_download
 
-LOG = logging.getLogger("geospatial_search.embed")
-
-
-@dataclass(frozen=True)
-class Chip:
-    source_path: Path
-    source_uri: str
-    source_tile_id: str
-    x: int
-    y: int
-    width: int
-    height: int
-    stride: int
-    native_bounds: tuple[float, float, float, float]
-    wgs84_bounds: tuple[float, float, float, float]
-    crs_wkt: str
-
-    @property
-    def chip_id(self) -> str:
-        return (
-            f"{self.source_tile_id}/s{self.width}_st{self.stride}"
-            f"/x{self.x:07d}_y{self.y:07d}"
-        )
+from .bundles import discard_staging, publish_bundle, validate_bundle
+from .download_nys_naip import Budget, PauseRequested, job_lock, sha256
+from .embedding_control import gpu_access
+from .model import encode_images, fingerprint, load_config, load_model
+from .paths import CONFIG, EMBEDDINGS, JOB, contained
+from .tiling import Footprints, Grid, Source, load_inventory, read_rgb, summarize, validate_source
 
 
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(4 * 1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
+def utc_now():
+    return datetime.now(timezone.utc).isoformat()
 
 
-def axis_starts(length: int, chip_size: int, stride: int) -> list[int]:
-    """Return starts which cover the final source pixel without padded chips."""
-    if length < chip_size:
-        return []
-    starts = list(range(0, length - chip_size + 1, stride))
-    final_start = length - chip_size
-    if starts[-1] != final_start:
-        starts.append(final_start)
-    return starts
+def duration(seconds):
+    if seconds is None:
+        return 'estimating'
+    seconds = max(0,int(seconds))
+    hours,remainder = divmod(seconds,3600)
+    minutes,seconds = divmod(remainder,60)
+    return f'{hours:02d}:{minutes:02d}:{seconds:02d}'
 
 
-def plan_chips(
-    imagery_dir: Path, chip_size: int, stride: int
-) -> tuple[list[Chip], str]:
-    """Plan full-size chips and footprints before allocating vector storage."""
-    if chip_size <= 0 or stride <= 0:
-        raise ValueError("chip_size and stride must be positive")
-    paths = sorted(path for path in imagery_dir.rglob("*") if path.suffix.lower() == ".jp2")
-    if not paths:
-        raise FileNotFoundError(f"No .jp2 files found under {imagery_dir}")
-
-    chips: list[Chip] = []
-    collection_crs: str | None = None
-    for source_path in tqdm(paths, desc="Planning chips", unit="tile"):
-        with rasterio.open(source_path) as dataset:
-            if dataset.count < 3:
-                raise ValueError(f"{source_path} has {dataset.count} bands; RGB requires 3")
-            if dataset.crs is None:
-                raise ValueError(f"{source_path} has no coordinate reference system")
-            crs_wkt = dataset.crs.to_wkt()
-            if collection_crs is None:
-                collection_crs = crs_wkt
-            elif collection_crs != crs_wkt:
-                raise ValueError("All inputs in one run must use the same CRS")
-
-            xs = axis_starts(dataset.width, chip_size, stride)
-            ys = axis_starts(dataset.height, chip_size, stride)
-            if not xs or not ys:
-                LOG.warning("Skipping %s because it is smaller than one chip", source_path)
-                continue
-            source_uri = source_path.relative_to(imagery_dir).as_posix()
-            for y in ys:
-                for x in xs:
-                    window = Window(x, y, chip_size, chip_size)
-                    native = tuple(float(v) for v in window_bounds(window, dataset.transform))
-                    wgs84 = tuple(
-                        float(v)
-                        for v in transform_bounds(
-                            dataset.crs, "EPSG:4326", *native, densify_pts=21
-                        )
-                    )
-                    chips.append(
-                        Chip(
-                            source_path=source_path,
-                            source_uri=source_uri,
-                            source_tile_id=source_path.stem,
-                            x=x,
-                            y=y,
-                            width=chip_size,
-                            height=chip_size,
-                            stride=stride,
-                            native_bounds=native,
-                            wgs84_bounds=wgs84,
-                            crs_wkt=crs_wkt,
-                        )
-                    )
-    if not chips or collection_crs is None:
-        raise RuntimeError("No full-size chips were planned")
-    return chips, collection_crs
+def progress_metrics(total, processed, elapsed, session_elapsed, rate, state):
+    if total < 0 or not 0 <= processed <= total:
+        raise ValueError('Progress must be bounded by the candidate inventory')
+    eta = 0.0 if state == 'complete' else (total-processed)/rate if rate and state == 'running' else None
+    return {'percent_complete':100*processed/total if total else 100.0,
+            'elapsed_seconds':max(0,elapsed),'elapsed_hms':duration(elapsed),
+            'session_elapsed_seconds':max(0,session_elapsed),
+            'candidates_per_second':rate,'eta_seconds':eta,'eta_hms':duration(eta)}
 
 
-def to_uint8(rgb: np.ndarray) -> np.ndarray:
-    """Convert band-first pixels to HWC uint8 without per-chip contrast changes."""
-    if rgb.ndim != 3 or rgb.shape[0] != 3:
-        raise ValueError(f"Expected a 3xHxW RGB array, received {rgb.shape}")
-    if rgb.dtype == np.uint8:
-        converted = rgb
-    elif np.issubdtype(rgb.dtype, np.integer):
-        info = np.iinfo(rgb.dtype)
-        converted = np.clip(rgb.astype(np.float32), 0, info.max) * (255.0 / info.max)
-        converted = converted.astype(np.uint8)
-    else:
-        max_value = 1.0 if float(np.nanmax(rgb)) <= 1.0 else 255.0
-        converted = np.clip(rgb, 0, max_value) * (255.0 / max_value)
-        converted = converted.astype(np.uint8)
-    return np.moveaxis(converted, 0, -1)
+@dataclass
+class Failure:
+    error: BaseException
 
 
-def chip_batches(chips: list[Chip], batch_size: int) -> Iterator[list[Chip]]:
-    for start in range(0, len(chips), batch_size):
-        yield chips[start : start + batch_size]
+def put(queue, value, stop):
+    while not stop.is_set():
+        try:
+            queue.put(value,timeout=.2)
+            return
+        except Full:
+            pass
 
 
-def read_chip(dataset: rasterio.io.DatasetReader, chip: Chip) -> Image.Image:
-    window = Window(chip.x, chip.y, chip.width, chip.height)
-    # Provider documentation defines bands 1/2/3 as natural-color RGB.
-    rgb = dataset.read(indexes=(1, 2, 3), window=window, boundless=False)
-    return Image.fromarray(to_uint8(rgb), mode="RGB")
+def prepare_source(source: Source, grid: Grid, config: dict, preprocess, queue: Queue,
+                   stop: threading.Event, run_fingerprint: str, model_contract: dict, max_chips=None):
+    """One reader per TIFF, bounded prefetch, CPU transforms only."""
+    import torch
+    try:
+        before = (source.path.stat().st_size,source.path.stat().st_mtime_ns)
+        if sha256(source.path) != source.sha256:
+            raise ValueError(f'Source checksum failed: {source.uri}')
+        scanned = skipped = 0
+        images,rows = [],[]
+        with rasterio.Env(GDAL_PAM_ENABLED=False):
+            with rasterio.open(source.path) as dataset:
+                validate_source(dataset,source)
+                footprints = Footprints(dataset,grid.size)
+                windows = grid.windows(source.width,source.height)
+                if max_chips:
+                    windows = islice(windows,max_chips)
+                for window in windows:
+                    if stop.is_set():
+                        return
+                    scanned += 1
+                    mask = dataset.dataset_mask(window=window)
+                    fraction = float(np.count_nonzero(mask)/mask.size)
+                    if fraction < grid.min_valid_fraction:
+                        skipped += 1
+                        continue
+                    images.append(preprocess(read_rgb(dataset,window)))
+                    rows.append({'dataset_id':config['dataset_id'],
+                        'chip_id':f"{config['dataset_id']}/{source.uri}/{grid.scale_id}/x{int(window.col_off):07d}_y{int(window.row_off):07d}",
+                        'source_uri':source.uri,'source_tile_id':source.path.stem,'source_sha256':source.sha256,
+                        'pixel_x':int(window.col_off),'pixel_y':int(window.row_off),
+                        'pixel_width':grid.size,'pixel_height':grid.size,'valid_fraction':fraction,
+                        'scale_id':grid.scale_id,'rgb_band_order':'1,2,3','model_id':config['model_id'],
+                        'model_fingerprint':model_contract['model_fingerprint'],
+                        'preprocess_fingerprint':model_contract['preprocess_fingerprint'],
+                        'run_fingerprint':run_fingerprint,**footprints.metadata(window)})
+                    if len(images) == config['batch_size']:
+                        inputs = torch.stack(images)
+                        if torch.cuda.is_available() and not torch.version.hip:
+                            inputs = inputs.pin_memory()
+                        put(queue,('batch',inputs,rows,scanned),stop)
+                        images,rows = [],[]
+                if images:
+                    inputs = torch.stack(images)
+                    if torch.cuda.is_available() and not torch.version.hip:
+                        inputs = inputs.pin_memory()
+                    put(queue,('batch',inputs,rows,scanned),stop)
+        if before != (source.path.stat().st_size,source.path.stat().st_mtime_ns):
+            raise ValueError(f'Source changed during embedding: {source.uri}')
+        put(queue,('done',scanned,skipped),stop)
+    except BaseException as exc:
+        put(queue,Failure(exc),stop)
 
 
-def load_model(args: argparse.Namespace, device: torch.device):
-    """Download the repository's OpenCLIP checkpoint once and load it on ROCm."""
-    cache_dir = str(args.model_cache_dir) if args.model_cache_dir else None
-    checkpoint_path = Path(
-        hf_hub_download(
-            repo_id=args.model_id,
-            filename=args.model_filename,
-            cache_dir=cache_dir,
-        )
-    )
-    model, _, preprocess = open_clip.create_model_and_transforms(
-        args.arch, pretrained=args.base_pretrained
-    )
-    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
-    state_dict = checkpoint.get("state_dict", checkpoint) if isinstance(checkpoint, dict) else checkpoint
-    state_dict = {key.removeprefix("module."): value for key, value in state_dict.items()}
-    missing, unexpected = model.load_state_dict(state_dict, strict=False)
-    if unexpected:
-        LOG.warning("Checkpoint has %d unused keys", len(unexpected))
-    if missing:
-        LOG.warning("Model has %d keys not supplied by checkpoint", len(missing))
-    return model.to(device).eval(), preprocess, checkpoint_path, sha256_file(checkpoint_path)
-
-
-def encode_batch(
-    model: torch.nn.Module, preprocess, images: list[Image.Image], device: torch.device, amp: bool
-) -> np.ndarray:
-    inputs = torch.stack([preprocess(image) for image in images]).to(device, non_blocking=True)
-    with torch.inference_mode(), torch.autocast(
-        device_type="cuda", dtype=torch.float16, enabled=amp
-    ):
-        features = model.encode_image(inputs)
-    return F.normalize(features.float(), dim=-1).cpu().numpy()
-
-
-def manifest_rows(
-    chips: list[Chip], dataset_id: str, model_id: str, model_fingerprint: str,
-    preprocess_fingerprint: str, scale_id: str
-) -> list[dict]:
-    rows: list[dict] = []
-    for embedding_id, chip in enumerate(chips):
-        minx, miny, maxx, maxy = chip.native_bounds
-        west, south, east, north = chip.wgs84_bounds
-        rows.append(
-            {
-                "embedding_id": np.uint64(embedding_id),
-                "dataset_id": dataset_id,
-                "chip_id": chip.chip_id,
-                "source_uri": chip.source_uri,
-                "source_tile_id": chip.source_tile_id,
-                "pixel_x": chip.x,
-                "pixel_y": chip.y,
-                "pixel_width": chip.width,
-                "pixel_height": chip.height,
-                "native_minx": minx,
-                "native_miny": miny,
-                "native_maxx": maxx,
-                "native_maxy": maxy,
-                "west": west,
-                "south": south,
-                "east": east,
-                "north": north,
-                "centroid_lon": (west + east) / 2,
-                "centroid_lat": (south + north) / 2,
-                "crs_wkt": chip.crs_wkt,
-                "scale_id": scale_id,
-                "rgb_band_order": "1,2,3",
-                "model_id": model_id,
-                "model_fingerprint": model_fingerprint,
-                "preprocess_fingerprint": preprocess_fingerprint,
-                "geometry": to_wkb(box(minx, miny, maxx, maxy), output_dimension=2),
-            }
-        )
-    return rows
-
-
-def write_geoparquet(rows: list[dict], path: Path, crs_wkt: str) -> None:
-    """Write a standards-compliant WKB GeoParquet file without Pandas/GeoPandas."""
-    minx = min(row["native_minx"] for row in rows)
-    miny = min(row["native_miny"] for row in rows)
-    maxx = max(row["native_maxx"] for row in rows)
-    maxy = max(row["native_maxy"] for row in rows)
-    geo_metadata = {
-        "version": "1.0.0",
-        "primary_column": "geometry",
-        "columns": {
-            "geometry": {
-                "encoding": "WKB",
-                "geometry_types": ["Polygon"],
-                "crs": CRS.from_wkt(crs_wkt).to_json_dict(),
-                "bbox": [minx, miny, maxx, maxy],
-            }
-        },
-    }
-    table = pa.Table.from_pylist(rows)
-    metadata = dict(table.schema.metadata or {})
-    metadata[b"geo"] = json.dumps(geo_metadata, separators=(",", ":")).encode("utf-8")
-    pq.write_table(
-        table.replace_schema_metadata(metadata), path, compression="zstd"
-    )
-
-
-def parse_args() -> argparse.Namespace:
+def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--imagery-dir", type=Path, required=True)
-    parser.add_argument("--output-dir", type=Path, required=True)
-    parser.add_argument("--model-id", default="BiliSakura/GeoRSCLIP-ViT-H-14")
-    parser.add_argument("--model-filename", default="GeoRSCLIP-ViT-H-14.pt")
-    parser.add_argument(
-        "--model-cache-dir", type=Path,
-        help="Optional persistent Hugging Face cache directory; omit to use the normal user cache",
-    )
-    parser.add_argument("--dataset-id", default="albany_sp24")
-    parser.add_argument("--chip-size", type=int, default=512)
-    parser.add_argument("--stride", type=int, default=256)
-    parser.add_argument("--batch-size", type=int, default=32)
-    parser.add_argument("--arch", default="ViT-H-14")
-    parser.add_argument("--base-pretrained", default="laion2b_s32b_b79k")
-    parser.add_argument("--disable-amp", action="store_true")
-    return parser.parse_args()
+    parser.add_argument('--config',type=Path,default=CONFIG)
+    parser.add_argument('--job-root',type=Path,default=JOB)
+    parser.add_argument('--output-dir',type=Path)
+    parser.add_argument('--batch-size',type=int)
+    parser.add_argument('--workers',type=int)
+    parser.add_argument('--plan',action='store_true',help='Save inventory/count estimates; no GPU inference')
+    parser.add_argument('--smoke-test',action='store_true',help='128 candidate chips from one TIFF per UTM zone')
+    parser.add_argument('--resume',action='store_true',help='Verify completed compatible bundles and resume')
+    parser.add_argument('--model-cache-dir',type=Path)
+    parser.add_argument('--offline',action='store_true',help='Require the pinned checkpoint in the existing cache')
+    parser.add_argument('--disable-amp',action='store_true')
+    return parser.parse_args(argv)
 
 
-def main() -> None:
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    args = parse_args()
-    if not torch.cuda.is_available():
-        raise RuntimeError(
-            "No ROCm CUDA device is visible. Install AMD ROCm Windows PyTorch wheels, "
-            "then verify torch.cuda.is_available() is True."
-        )
-    device = torch.device("cuda:0")
-    LOG.info("Using %s", torch.cuda.get_device_name(device))
-    chips, collection_crs = plan_chips(args.imagery_dir, args.chip_size, args.stride)
-    args.output_dir.mkdir(parents=True, exist_ok=True)
-    vector_path = args.output_dir / "embeddings.f16.npy"
-    metadata_path = args.output_dir / "chips.geoparquet"
-    run_path = args.output_dir / "run.json"
-    if any(path.exists() for path in (vector_path, metadata_path, run_path)):
-        raise FileExistsError(f"Output exists in {args.output_dir}; choose a new output directory")
-
-    model, preprocess, checkpoint_path, model_fingerprint = load_model(args, device)
-    preprocess_fingerprint = hashlib.sha256(repr(preprocess).encode("utf-8")).hexdigest()
-    vector_store: np.memmap | None = None
-    written = 0
-    by_source: dict[Path, list[Chip]] = {}
-    for chip in chips:
-        by_source.setdefault(chip.source_path, []).append(chip)
-    progress = tqdm(total=len(chips), desc="Embedding chips", unit="chip")
-    for source_path, source_chips in by_source.items():
-        with rasterio.open(source_path) as dataset:
-            for batch in chip_batches(source_chips, args.batch_size):
-                features = encode_batch(
-                    model, preprocess, [read_chip(dataset, chip) for chip in batch],
-                    device, amp=not args.disable_amp,
-                )
-                if vector_store is None:
-                    vector_store = np.lib.format.open_memmap(
-                        vector_path, mode="w+", dtype=np.float16,
-                        shape=(len(chips), features.shape[1]),
-                    )
-                vector_store[written : written + len(batch)] = features.astype(np.float16)
-                written += len(batch)
-                progress.update(len(batch))
-    progress.close()
-    if vector_store is None or written != len(chips):
-        raise RuntimeError(f"Wrote {written} embeddings for {len(chips)} planned chips")
-    vector_store.flush()
-
-    model_id = args.model_id
-    scale_id = f"s{args.chip_size}_st{args.stride}"
-    write_geoparquet(
-        manifest_rows(
-            chips, args.dataset_id, model_id, model_fingerprint,
-            preprocess_fingerprint, scale_id,
-        ),
-        metadata_path,
-        collection_crs,
-    )
-    run_path.write_text(
-        json.dumps(
-            {
-                "dataset_id": args.dataset_id,
-                "created_at": datetime.now(UTC).isoformat(),
-                "chip_count": len(chips),
-                "chip_size": args.chip_size,
-                "stride": args.stride,
-                "model_id": model_id,
-                "model_filename": args.model_filename,
-                "model_cache_path": str(checkpoint_path),
-                "model_fingerprint": model_fingerprint,
-                "preprocess_fingerprint": preprocess_fingerprint,
-                "model_cache_dir": str(args.model_cache_dir) if args.model_cache_dir else None,
-                "embedding_dim": int(vector_store.shape[1]),
-                "embedding_dtype": "float16",
-                "metric": "cosine (L2-normalized inner product)",
-                "rgb_band_order": [1, 2, 3],
-                "source_crs_wkt": collection_crs,
-            }, indent=2,
-        ) + "\n", encoding="utf-8",
-    )
-    LOG.info("Wrote %d vectors of dimension %d to %s", len(chips), vector_store.shape[1], vector_path)
-    LOG.info("Wrote GeoParquet chip manifest to %s", metadata_path)
+def status_write(budget, output, payload):
+    try:
+        budget.atomic_json(output/'status.json',{'updated_utc':utc_now(),**payload})
+    except PermissionError:
+        pass  # Display locks cannot discard durable embedding bundles.
 
 
-if __name__ == "__main__":
+def build_recipe(config, sources, manifest_hash, grid, model_contract, smoke):
+    compatible_model = {key:model_contract[key] for key in (
+        'model_id','model_filename','model_revision','arch','base_pretrained','model_fingerprint',
+        'preprocess_fingerprint','embedding_dim','embedding_dtype','metric','amp')}
+    dependencies = {name:version(name) for name in ('numpy','rasterio','pyproj','pillow','pyarrow','open-clip-torch','torch')}
+    code_hashes = {name:sha256(Path(__file__).with_name(name)) for name in
+                   ('embed_georsclip.py','tiling.py','model.py','bundles.py')}
+    return {'format_version':1,'dataset_id':config['dataset_id'],'source_manifest_sha256':manifest_hash,
+            'chip_size':grid.size,'stride':grid.stride,'min_valid_fraction':grid.min_valid_fraction,
+            'edge_policy':'full-size final anchored window; no padding','geometry_crs':'EPSG:4326',
+            'mask_policy':'source validity mask; keep native RGB in accepted windows',
+            'rgb_band_order':[1,2,3],'scale_id':grid.scale_id,'model':compatible_model,
+            'dependencies':dependencies,'code_sha256':code_hashes,'scope':'smoke' if smoke else 'statewide',
+            'max_candidate_chips_per_tile':128 if smoke else None,
+            'sources':[{'uri':source.uri,'sha256':source.sha256} for source in sources]}
+
+
+def main(argv=None):
+    session_started = time.monotonic()
+    args = parse_args(argv)
+    config = load_config(args.config)
+    for name in ('batch_size','workers'):
+        if getattr(args,name) is not None:
+            if getattr(args,name) <= 0:
+                raise ValueError(f'{name} must be positive')
+            config[name] = getattr(args,name)
+    if args.disable_amp:
+        config['amp'] = False
+    if config['workers'] > 8:
+        raise ValueError('At most eight prefetched source workers are supported')
+    grid = Grid(config['chip_size'],config['stride'],config['min_valid_fraction'])
+    job_root = args.job_root.resolve()
+    sources,manifest_hash = load_inventory(job_root)
+    print(json.dumps(summarize(sources,grid),indent=2),flush=True)
+    if args.plan:
+        budget = Budget(job_root)
+        plan = {'created_utc':utc_now(),'source_manifest_sha256':manifest_hash,
+                'config':config,**summarize(sources,grid)}
+        destination = job_root/'tiling'/grid.scale_id/'plan.json'
+        budget.atomic_json(destination,plan)
+        print(f'Plan saved: {destination}',flush=True)
+        return 0
+    if args.smoke_test:
+        by_crs = {}
+        for source in sources:
+            by_crs.setdefault(source.crs,source)
+        sources = list(by_crs.values())
+        if args.output_dir is None:
+            args.output_dir = job_root/'embeddings'/f'smoke-{datetime.now(timezone.utc):%Y%m%dT%H%M%S%fZ}'
+    if args.output_dir is None:
+        args.output_dir = job_root/'embeddings'/f"georsclip-vith14-s{grid.size}-st{grid.stride}"
+    output = contained(job_root,args.output_dir)
+    for forbidden in ('imagery','metadata','records','temporary'):
+        protected = job_root/forbidden
+        if output == protected or output.is_relative_to(protected):
+            raise ValueError('Embedding output must not overlap downloader source folders')
+    if output.exists() and any(p.name not in ('worker.lock','runtime') for p in output.iterdir()) and not args.resume:
+        raise FileExistsError('Output already exists; use --resume or a distinct output directory')
+    output.mkdir(parents=True,exist_ok=True)
+    with job_lock(output), gpu_access(job_root):
+        budget = Budget(job_root)
+        previous_status = json.loads((output/'status.json').read_text(encoding='utf-8')) if args.resume and (output/'status.json').exists() else {}
+        elapsed_before = float(previous_status.get('elapsed_seconds',0))
+        stage_seconds = {name:float(previous_status.get(name,0)) for name in
+                         ('reader_wait_seconds','inference_seconds','publication_seconds')}
+        status_write(budget,output,{**previous_status,'state':'loading',
+            'pid':__import__('os').getpid(),'error':None,'eta_seconds':None,
+            'eta_hms':'estimating','folder_bytes':budget.total,'folder_cap_bytes':budget.cap})
+        if args.resume:
+            for signal in ('STOP','PAUSE'):
+                if (output/signal).exists():
+                    budget.remove(output/signal)
+        import torch
+        torch.set_num_threads(1)
+        print('Loading the pinned GeoRSCLIP checkpoint...',flush=True)
+        model,preprocess,device,model_contract = load_model(config,cache_dir=args.model_cache_dir,offline=args.offline)
+        recipe = build_recipe(config,sources,manifest_hash,grid,model_contract,args.smoke_test)
+        run_fingerprint = fingerprint(recipe)
+        recipe_path = output/'run.json'
+        if recipe_path.exists():
+            existing = json.loads(recipe_path.read_text(encoding='utf-8'))
+            if existing.get('run_fingerprint') != run_fingerprint:
+                raise ValueError('Different source/grid/model/preprocessing/code contract; choose a new output directory')
+        else:
+            budget.atomic_json(recipe_path,{'run_fingerprint':run_fingerprint,'recipe':recipe,
+                                          'model_contract':model_contract,'created_utc':utc_now()})
+        shards = output/'shards'
+        shards.mkdir(exist_ok=True)
+        discard_staging(budget,shards)
+        completed = {}
+        for source in sources:
+            directory = shards/source.shard_id
+            if directory.exists():
+                run = validate_bundle(directory,run_fingerprint,verify_hashes=True)
+                if run['source_uri'] != source.uri or run['source_sha256'] != source.sha256:
+                    raise ValueError('Completed shard source identity differs')
+                completed[source.uri] = run
+        limit = 128 if args.smoke_test else None
+        candidates = {source.uri:min(grid.count(source.width,source.height),limit) if limit else grid.count(source.width,source.height) for source in sources}
+        total_candidates = sum(candidates.values())
+        scanned = sum(run['scanned_chips'] for run in completed.values())
+        embedded = sum(run['chip_count'] for run in completed.values())
+        skipped = sum(run['skipped_chips'] for run in completed.values())
+        stop = threading.Event()
+        current = None
+        rate_samples = []
+        last_status = 0
+        loop_started = time.monotonic()
+        initial_scanned = scanned
+        progress = None
+
+        def checkpoint(state, force=False, error=None):
+            nonlocal last_status
+            tick = time.monotonic()
+            pause_requested = (output/'PAUSE').exists()
+            if state == 'running' and pause_requested:
+                state = 'pausing'
+            if force or tick-last_status >= 2:
+                last_status = tick
+                measured = rate_samples[-20:]
+                loop_elapsed = tick-loop_started
+                rate = (sum(count for count,seconds in measured)/sum(seconds for count,seconds in measured) if measured
+                        else (scanned-initial_scanned)/loop_elapsed if scanned>initial_scanned and loop_elapsed>0 else None)
+                metrics = progress_metrics(total_candidates,scanned,elapsed_before+tick-session_started,
+                                           tick-session_started,rate,state)
+                if progress is not None:
+                    progress.set_postfix_str(f"runtime {metrics['elapsed_hms']} | ETA {metrics['eta_hms']} | "
+                        f"vectors {embedded:,} | tiles {len(completed)}/{len(sources)}",refresh=True)
+                status_write(budget,output,{'state':state,'pid':__import__('os').getpid(),
+                    'current_tile':current,'completed_sources':len(completed),'total_sources':len(sources),
+                    'processed_candidate_chips':scanned,'total_candidate_chips':total_candidates,
+                    'embedded_chips':embedded,'skipped_chips':skipped,
+                    'durable_embedded_chips':sum(run['chip_count'] for run in completed.values()),
+                    'pause_requested':pause_requested,
+                    **metrics,**stage_seconds,
+                    'batch_size':config['batch_size'],'workers':config['workers'],
+                    'gpu':model_contract['gpu'],'error':error,'folder_bytes':budget.total,
+                    'folder_cap_bytes':budget.cap})
+
+        def save_collection(state):
+            entries = [{'shard_id':source.shard_id,'source_uri':source.uri,'chip_count':completed[source.uri]['chip_count']}
+                       for source in sources if source.uri in completed]
+            budget.atomic_json(output/'collection.json',{'format_version':1,'run_fingerprint':run_fingerprint,
+                'state':state,'scope':recipe['scope'],'total_sources':len(sources),'completed_sources':len(completed),
+                'chip_count':sum(e['chip_count'] for e in entries),'embedding_dim':model_contract['embedding_dim'],
+                'geometry_crs':'EPSG:4326','shards':entries})
+
+        pending = [source for source in sources if source.uri not in completed]
+        progress = tqdm(total=total_candidates,initial=scanned,desc='NYS embeddings',unit='window',dynamic_ncols=True,
+                        mininterval=2,bar_format='{desc}: {percentage:6.2f}% |{bar}| {n_fmt}/{total_fmt}{postfix}')
+        checkpoint('running',True)
+        save_collection('running')
+        executor = ThreadPoolExecutor(max_workers=config['workers'],thread_name_prefix='nys-reader')
+        active = []
+        pending_iterator = iter(pending)
+
+        def submit_next():
+            source = next(pending_iterator,None)
+            if source:
+                queue = Queue(maxsize=config['prefetch_batches'])
+                future = executor.submit(prepare_source,source,grid,config,preprocess,queue,stop,
+                                         run_fingerprint,model_contract,limit)
+                active.append((source,queue,future))
+
+        try:
+            for _ in range(config['workers']):
+                submit_next()
+            while active:
+                if (output/'PAUSE').exists():
+                    raise PauseRequested('Graceful pause: all computed chips of completed source tiles are saved')
+                source,queue,future = active.pop(0)
+                current = source.uri
+                started = time.monotonic()
+                capacity = candidates[source.uri]
+                if capacity > 50_000:
+                    raise ValueError('Source requires over 50,000 chips; split it before using this pipeline')
+                features = np.empty((capacity,model_contract['embedding_dim']),dtype=np.float16)
+                rows = []
+                seen = 0
+                while True:
+                    if (output/'STOP').exists():
+                        raise PauseRequested('STOP requested; completed source bundles are preserved')
+                    wait_started = time.monotonic()
+                    try:
+                        item = queue.get(timeout=.2)
+                    except Empty:
+                        if future.done():
+                            future.result()
+                            raise RuntimeError('Reader ended without completion marker')
+                        checkpoint('running')
+                        continue
+                    finally:
+                        stage_seconds['reader_wait_seconds'] += time.monotonic()-wait_started
+                    if isinstance(item,Failure):
+                        raise item.error
+                    if item[0] == 'done':
+                        _,source_scanned,source_skipped = item
+                        future.result()
+                        scanned += source_scanned-seen
+                        progress.update(source_scanned-seen)
+                        skipped += source_skipped
+                        break
+                    _,inputs,batch_rows,batch_scanned = item
+                    inference_started = time.monotonic()
+                    try:
+                        vectors = encode_images(model,inputs,device,config['amp'])
+                    finally:
+                        stage_seconds['inference_seconds'] += time.monotonic()-inference_started
+                    offset = len(rows)
+                    features[offset:offset+len(batch_rows)] = vectors.astype(np.float16)
+                    for index,row in enumerate(batch_rows,offset):
+                        row['embedding_id'] = index
+                    rows.extend(batch_rows)
+                    scanned += batch_scanned-seen
+                    progress.update(batch_scanned-seen)
+                    seen = batch_scanned
+                    embedded += len(batch_rows)
+                    checkpoint('running')
+                run = {**model_contract,'run_fingerprint':run_fingerprint,'dataset_id':config['dataset_id'],
+                    'source_uri':source.uri,'source_sha256':source.sha256,'source_crs_wkt':rows[0]['crs_wkt'] if rows else source.crs,
+                    'geometry_crs':'EPSG:4326','chip_size':grid.size,'stride':grid.stride,
+                    'scale_id':grid.scale_id,'min_valid_fraction':grid.min_valid_fraction,
+                    'scanned_chips':source_scanned,'skipped_chips':source_skipped,'created_at':utc_now()}
+                publication_started = time.monotonic()
+                completed[source.uri] = publish_bundle(budget,shards/source.shard_id,features[:len(rows)],rows,run)
+                save_collection('running')
+                stage_seconds['publication_seconds'] += time.monotonic()-publication_started
+                rate_samples.append((source_scanned,time.monotonic()-started))
+                checkpoint('running',True)
+                if not (output/'PAUSE').exists():
+                    submit_next()
+                if (output/'PAUSE').exists() and len(completed)<len(sources):
+                    raise PauseRequested('Graceful pause: current source tile saved; resume will skip completed tiles')
+            save_collection('complete')
+            budget.atomic_json(output/'completion.json',{'completed_utc':utc_now(),'run_fingerprint':run_fingerprint,
+                'source_tiles':len(completed),'chip_count':embedded,'skipped_chips':skipped,
+                'elapsed_seconds':elapsed_before+time.monotonic()-session_started,**stage_seconds})
+            current = None
+            checkpoint('complete',True)
+            print(f'Complete: {embedded:,} vectors. Collection: {output}',flush=True)
+            return 0
+        except BaseException as exc:
+            state = 'paused' if isinstance(exc,(PauseRequested,KeyboardInterrupt)) else 'failed'
+            stop.set()
+            # Report the durable checkpoint, excluding an interrupted source.
+            scanned = sum(run['scanned_chips'] for run in completed.values())
+            embedded = sum(run['chip_count'] for run in completed.values())
+            skipped = sum(run['skipped_chips'] for run in completed.values())
+            progress.n = scanned
+            save_collection(state)
+            checkpoint(state,True,str(exc))
+            if state == 'paused':
+                print(f'Paused safely: {embedded:,} saved vectors in {len(completed)} source tiles. Resume with -Resume.',flush=True)
+                return 0
+            raise
+        finally:
+            stop.set()
+            executor.shutdown(wait=True,cancel_futures=True)
+            progress.close()
+            # Release inference weights and cached buffers before unlocking the
+            # collection so a subsequent text query can safely use this GPU.
+            del model
+            import gc
+            gc.collect()  # OpenCLIP modules can retain cyclic parameter references.
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+
+
+if __name__ == '__main__':
     main()

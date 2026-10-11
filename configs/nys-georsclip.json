@@ -1,0 +1,15 @@
+{
+  "dataset_id": "nys_naip_2022_rgb060",
+  "chip_size": 256,
+  "stride": 192,
+  "min_valid_fraction": 0.95,
+  "model_id": "BiliSakura/GeoRSCLIP-ViT-H-14",
+  "model_filename": "GeoRSCLIP-ViT-H-14.pt",
+  "model_revision": "09af41b95fbb7b4bf884904e0d3c2777e83740bc",
+  "arch": "ViT-H-14",
+  "base_pretrained": "laion2b_s32b_b79k",
+  "batch_size": 128,
+  "workers": 4,
+  "prefetch_batches": 2,
+  "amp": true
+}

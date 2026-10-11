@@ -127,13 +127,13 @@ checks, file locking, status publication, ETA, and real compression of small
 synthetic four-band rasters including partial blocks and invalid edge pixels.
 No real imagery, checkpoints, embedding arrays, or generated reports are fixtures.
 
-The existing Albany embedder discovers JP2 imagery and requires one CRS per run.
-Statewide embedding still needs GeoTIFF discovery, multiple-CRS handling, and
-streamed or sharded metadata planning. This downloader produces no embeddings.
-At the current 512-pixel chip / 256-pixel stride baseline, the tile inventory
-implies about 6.55 million chips, including overlapping tile buffers. A 1,024-wide
-float16 embedding matrix would occupy about 13.4 GB, plus metadata. Keep this
-2022 collection separate from the Albany 2024 embedding bundle.
+The NYS embedding pipeline reads these RGB GeoTIFFs directly, keeps native pixel
+windows, and transforms metadata footprints into common WGS84 coordinates.
+The selected 256-pixel chip / 192-pixel stride gives 25% overlap and about
+11.99 million candidate chips before mask filtering. Their 1,024-dimensional
+float16 vectors occupy at most 24.55 GB, plus compressed metadata. Embeddings,
+plans, and search results stay inside this same job folder and use its budget
+guard. See the [NYS pipeline guide](nys-pipeline.md) for launch and resume commands.
 
 Provider: [NOAA Digital Coast tile index](https://coastalimagery.blob.core.windows.net/digitalcoast/NY_NAIP_2022_9986/index.html).
 Dataset metadata and use conditions: [NOAA InPort](https://www.fisheries.noaa.gov/inport/item/71609).

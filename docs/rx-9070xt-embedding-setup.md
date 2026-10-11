@@ -1,4 +1,4 @@
-# Running GeoRSCLIP embeddings on an AMD Radeon RX 9070 XT
+﻿# Running GeoRSCLIP embeddings on an AMD Radeon RX 9070 XT
 
 This repository is on Windows with an RX 9070 XT. Use AMD's ROCm PyTorch
 distribution, not the ordinary PyPI `torch` package: ROCm exposes the Radeon as
@@ -72,8 +72,9 @@ C:\Users\Tyler\.cache\huggingface\hub
 
 Restarting Windows or running the program again reuses that cache; it does not
 download the model again unless the cached files are removed or the model ID or
-filename is changed. The current CLI does not pin a Hugging Face revision, so
-the recorded checkpoint SHA-256 is the reproducibility identifier. To keep the
+filename is changed. The NYS configuration pins revision
+`09af41b95fbb7b4bf884904e0d3c2777e83740bc` and records the checkpoint SHA-256.
+To keep the
 cache on another drive, pass an explicit persistent directory such as
 `--model-cache-dir D:\hf-cache`. Do not put a multi-gigabyte cache under Git;
 if it lives in the repository, add it to `.gitignore`.
@@ -94,61 +95,37 @@ Vision-Language Dataset and a Large Vision-Language Model for Remote Sensing*,
 IEEE Transactions on Geoscience and Remote Sensing, 62, 1-23,
 <https://doi.org/10.1109/TGRS.2024.3449154>.
 
-## 3. Generate Albany chips and vectors
+## 3. NYS embedding and search
 
-The default grid is 512 x 512 native pixels at a 256-pixel stride. At Albany's
-0.5-foot GSD, every chip covers 256 x 256 feet. It reads the original JP2
-windows, uses natural-color bands 1/2/3 as RGB, and lets the model preprocess
-them to its 224-pixel input. The fourth NIR band is preserved in the source
-imagery but is not passed into this three-channel pretrained model.
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-$env:PYTHONPATH = "src"
-python -m geospatial_search.embed_georsclip `
-  --imagery-dir imagery/city_Albany_sp24 `
-  --output-dir data/embeddings/albany_sp24/georsclip-vith14-s512-st256 `
-  --dataset-id albany_sp24 `
-  --batch-size 32
-```
-
-The RX 9070 XT has 16 GB VRAM. Start at batch size 32. For an out-of-memory
-error, retry with a new output directory and batch size 16, then 8. If there is
-plenty of headroom, benchmark 48 or 64 and retain the best end-to-end
-chips/second. Float16 autocast is enabled by default; `--disable-amp` is only a
-diagnostic fallback for a numerical or ROCm-kernel problem.
-
-Before running Albany, perform a smoke test on a directory containing one JP2
-tile and a distinct output directory. This validates JP2 decoding, chip
-footprints, GPU visibility, and model loading without committing to the full
-run.
-
-## 4. Outputs and next search step
-
-| File | Meaning |
-| --- | --- |
-| `embeddings.f16.npy` | Row-major L2-normalized float16 vectors; memory-mappable |
-| `chips.geoparquet` | Chip footprints, source-pixel windows, IDs, and WGS84 display bounds |
-| `run.json` | Dataset/grid/model/revision/vector contract |
-
-`embedding_id` is the row number in `embeddings.f16.npy`; use it as the ID when
-building a FAISS or other ANN index. The GeoParquet file resolves result IDs to
-map footprints and source windows, so the vector index stays compact and fast.
-
-The heavy work already runs in ROCm/PyTorch and GDAL native code. On this data,
-JPEG 2000 decoding may limit throughput, so profile end-to-end speed before
-considering C++. CUDA-only FAISS GPU packages and NVIDIA cuVS cannot run on this
-AMD GPU; begin with CPU FAISS HNSW or exact search for this Albany-scale corpus.
-
-## 5. Text-query smoke test
-
-Render the ten nearest image chips for a natural-language query:
+The source imagery is now NYS 2022 NAIP RGB GeoTIFFs at 0.6 m/pixel.
+The selected 256-pixel chip and 192-pixel stride provide 25% overlap.
+Use the shared configuration and launchers in the
+[NYS pipeline guide](nys-pipeline.md).
 
 ```powershell
-$env:PYTHONPATH = "src"
-python -m geospatial_search.search_text --query "baseball field"
+.\scripts\setup-nys.ps1 -Embeddings
+.\scripts\embed-nys.ps1 -Plan
+.\scripts\embed-nys.ps1 -SmokeTest -Offline
+# Start the statewide collection after smoke verification:
+.\scripts\embed-nys.ps1 -Offline
+.\scripts\embed-nys.ps1 -Pause
+.\scripts\search-nys.ps1 -Query 'baseball field' -Offline
+.\scripts\embed-nys.ps1 -Unpause -Offline
 ```
 
-It writes ten labelled PNGs, a `contact-sheet.png`, and `results.json` under a
-new timestamped folder in `data/search-results/`. The query encoder uses the
-same cached GeoRSCLIP checkpoint as the embedding job.
+The RX 9070 XT has 16 GB VRAM. Batch size 128 is the measured default; its
+GPU benchmark reserved about 7 GB. On out-of-memory, resume the same compatible
+collection with `-BatchSize 64`, then 32, 16, or 8. For a smaller GPU, start at
+32. See the [benchmark results](nys-embedding-performance.md). AMP is
+enabled by default; changing it requires a distinct embedding output because
+it is part of the numerical compatibility contract. Completed source bundles
+are checksummed and skipped during resume.
+
+Keep Windows awake. The embedding worker runs in the background; closing its
+monitor leaves it running. Reattach with `scripts\embed-nys.ps1 -Monitor`.
+Pause waits for the current tile to be saved and the GPU to be released;
+search accepts the resulting partial collection automatically. Sources, plans,
+embeddings, status, and search results all remain inside the existing NYS
+folder. Preview/result coordinates use WGS84; source pixel grids remain in
+NAD83 UTM. GPU-specific PyTorch installations may need different wheels on
+another computer; the pipeline also supports a compatible NVIDIA CUDA build.

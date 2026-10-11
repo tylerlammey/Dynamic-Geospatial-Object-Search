@@ -2,6 +2,7 @@
 imagery/
 data/
 output/
+temp/
 models/*.pt
 hf-cache/
 model-cache/
