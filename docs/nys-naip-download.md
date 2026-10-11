@@ -6,8 +6,7 @@ JPEG-compressed GeoTIFFs with an internal lossless validity mask. Bands 1/2/3
 are RGB; NIR is omitted. JPEG quality starts at 83 and may fall to 80, 77, then
 75 to meet the per-tile size ceiling. Compression does not change pixel spacing.
 
-The [feasibility plan](nys-naip-download-plan.md) describes coverage, correctness,
-and storage accounting. Approximately **1.6 TB travels over the network** even
+Approximately **1.6 TB travels over the network** even
 though compressed RGB output is bounded at about **169 GB**. The default job
 folder has a **300 decimal GB** cap, including temporary files, and a 5 GB reserve.
 This acquisition needs CPU, RAM, disk, and network access; it does not use a GPU.
