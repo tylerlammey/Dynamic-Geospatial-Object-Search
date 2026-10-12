@@ -1,0 +1,27 @@
+# All generated frontend assets stay here and out of Git.
+node_modules/
+.venv/
+__pycache__/
+*.py[cod]
+cache/
+previews/
+exports/
+logs/
+build/
+dist/
+installers/
+state/
+temp/
+.tmp/
+tests/artifacts/
+.tools/
+.browser-profile/
+*.npy
+*.npz
+*.parquet
+*.geoparquet
+*.tif
+*.tiff
+*.pt
+*.pth
+*.safetensors

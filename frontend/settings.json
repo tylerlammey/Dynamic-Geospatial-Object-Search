@@ -1,0 +1,5 @@
+{
+  "cache_limit_bytes": 5000000000,
+  "imagery_workers": 2,
+  "offline_model": true
+}
