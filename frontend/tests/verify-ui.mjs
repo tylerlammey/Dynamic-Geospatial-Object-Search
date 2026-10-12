@@ -15,7 +15,7 @@ const reuseService=process.argv.includes('--existing-service');
 const service=reuseService?null:spawn(path.join(root,'.venv/Scripts/python.exe'),['-B',path.join(front,'service/server.py'),'--frontend',front,'--ready-file',ready],{windowsHide:true,env,stdio:['ignore','ignore','pipe']});
 let serviceLog='';service?.stderr.on('data',chunk=>{serviceLog+=chunk.toString();});
 let session;let edge;let pageSocket;let browserSocket;let origin;
-let id=0;const pending=new Map();const runtimeErrors=[];const requestUrls=[];const tileRequests=[];const mockSearchRequests=[];const mockHistoryClearRequests=[];let mockResults=null;let mockHistoryCleared=false;
+let id=0;const pending=new Map();const runtimeErrors=[];const requestUrls=[];const tileRequests=[];const mockSearchRequests=[];const mockHistoryClearRequests=[];const mockModelRequests=[];let mockResults=null;let mockHistoryCleared=false;let mockStatus=null;let mockModelState='unloaded';let modelLoadingPolls=0;
 function connection(url){return new Promise((resolve,reject)=>{const ws=new WebSocket(url);ws.onopen=()=>resolve(ws);ws.onerror=reject;});}
 function request(ws,method,params={}){return new Promise((resolve,reject)=>{const requestId=++id;const timeout=setTimeout(()=>{pending.delete(requestId);reject(new Error(`Timeout ${method}`));},20000);pending.set(requestId,{resolve,reject,timeout});ws.send(JSON.stringify({id:requestId,method,params}));});}
 function receive(event){const message=JSON.parse(event.data);if(message.id&&pending.has(message.id)){const p=pending.get(message.id);pending.delete(message.id);clearTimeout(p.timeout);message.error?p.reject(new Error(message.error.message)):p.resolve(message.result);}
@@ -23,6 +23,9 @@ function receive(event){const message=JSON.parse(event.data);if(message.id&&pend
   if(message.method==='Network.requestWillBeSent'){requestUrls.push(message.params.request.url);if(message.params.request.url.includes('/api/tiles/'))tileRequests.push(message.params.request.url);}
   if(message.method==='Fetch.requestPaused'){
     const data=message.params;
+    if(mockResults&&data.request.url.endsWith('/api/model/load')){mockModelRequests.push(JSON.parse(data.request.postData));mockModelState='loading';modelLoadingPolls=0;void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:202,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({state:'starting'})).toString('base64')});return;}
+    if(mockResults&&data.request.url.endsWith('/api/model/unload')){mockModelState='unloaded';void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({state:'unloaded'})).toString('base64')});return;}
+    if(mockResults&&data.request.url.endsWith('/api/status')){if(mockModelState==='loading'&&++modelLoadingPolls>=3)mockModelState='ready';void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({...mockStatus,busy:false,model:{state:mockModelState}})).toString('base64')});return;}
     if(data.request.url.includes('/api/search-progress?')&&mockResults){void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({state:'complete',result_id:'0123456789abcdef0123456789abcdef'})).toString('base64')});}
     else if(data.request.url.endsWith('/api/search')&&data.request.method==='POST'&&mockResults){mockSearchRequests.push(JSON.parse(data.request.postData));void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:202,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({task_id:'0123456789abcdef0123456789abcdef'})).toString('base64')});}
     else if(data.request.url.includes('/api/results?')&&mockResults){void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify(mockResults)).toString('base64')});}
@@ -104,7 +107,8 @@ try{
   const countBefore=tileRequests.length;await click('.leaflet-control-zoom-out');await delay(1000);await click('.leaflet-control-zoom-in');await delay(1000);assert.ok(tileRequests.length>countBefore,'Zoom must request another imagery level');
   await click('#coverage-toggle');assert.equal(await evaluate("document.getElementById('coverage-toggle').getAttribute('aria-pressed')"),'true');await click('#coverage-toggle');
   mockResults={query:'EXAMPLE TEST · baseball field',run_fingerprint:status.run_fingerprint,results:[{...chip,rank:1,score:.3184,embedding_id:1},{...chip,chip_id:chip.chip_id+'-2',rank:2,score:.3147,embedding_id:2},{...chip,chip_id:chip.chip_id+'-3',rank:3,score:.311,embedding_id:3}],searched_source_tiles:250,total_source_tiles:3805,searched_chip_count:1000,searched_source_uris:[chip.source_uri],partial_collection:true,created_utc:Date.now()/1000};
-  await request(pageSocket,'Fetch.enable',{patterns:[{urlPattern:'*/api/history*'},{urlPattern:'*/api/results*'},{urlPattern:'*/api/search*'}]});
+  mockStatus=status;
+  await request(pageSocket,'Fetch.enable',{patterns:[{urlPattern:'*/api/history*'},{urlPattern:'*/api/results*'},{urlPattern:'*/api/search*'},{urlPattern:'*/api/model/*'},{urlPattern:'*/api/status'}]});
   await click('#history');await waitFor("!!document.querySelector('[data-history]')");await click('[data-history]');
   await waitFor("document.querySelectorAll('.result-card').length===3");
   await click('[data-rank="2"]');await waitFor("document.querySelector('.selection-nav').textContent.includes('Rank 2')");
@@ -123,13 +127,21 @@ try{
     await waitFor("!document.getElementById('search-button').disabled && document.querySelectorAll('.result-card').length===3");
   }
   // Intercept the destructive request: real user history must never be cleared.
+  await click('#load-model');await waitFor("document.getElementById('load-model').textContent==='Loading model…'");
+  assert.ok(await evaluate("document.getElementById('search-button').disabled"),'Search must wait for preload');
+  await waitFor("document.getElementById('load-model').textContent==='Model on GPU' && !document.getElementById('search-button').disabled");
+  assert.deepEqual(mockModelRequests,[{allow_partial:false}]);
+  assert.ok(await evaluate("!document.getElementById('unload-model').classList.contains('hidden')"));
   await click('#history');await waitFor("!!document.querySelector('#clear-history')");
   await click('#clear-history');await waitFor("!!document.querySelector('#confirm-history')");
   assert.equal(mockHistoryClearRequests.length,0,'Cleanup requires confirmation');
   await click('#confirm-history');await waitFor("document.getElementById('dialog-title').textContent==='Saved searches' && !document.querySelector('[data-history]')");
   assert.deepEqual(mockHistoryClearRequests,[{confirm:'frontend-history-only'}]);
   assert.equal(await evaluate("document.querySelectorAll('.result-card').length"),3,'Displayed results remain usable');
+  assert.equal(await evaluate("document.getElementById('load-model').textContent"),'Model on GPU','Clearing history must leave the resident model loaded');
   await click('#close-dialog');
+  await click('#unload-model');await waitFor("document.getElementById('load-model').textContent==='Load model to GPU' && !document.getElementById('load-model').disabled");
+  assert.ok(await evaluate("document.getElementById('unload-model').classList.contains('hidden')"));
   // Wide and scaled viewport checks on actual imagery; intercepted ranks are
   // test fixtures only and do not persist or mutate any embedding bundle.
   for(const [width,height,label] of [[1093,720,'scaled'],[1920,1080,'large'],[900,700,'compact']]){

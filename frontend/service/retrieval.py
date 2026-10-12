@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import sys
 import time
+from contextlib import ExitStack, nullcontext
 
 from storage import atomic_json, contained
 
@@ -93,6 +94,42 @@ class ExactRetrieval:
         self.repository=Path(repository).resolve();self.frontend=Path(frontend).resolve()
         self.job=self.repository/'data/nys-naip-2022-rgb-060m'
         self.collection=self.job/'embeddings/georsclip-vith14-s256-st192'
+        self.resident_model=None;self.resident_device=None;self.resident_contract=None
+        self.resident_fingerprint=None;self.resident_locks=None
+
+    def preload(self,allow_partial=False,offline=True,progress=lambda value:None):
+        """Keep the pinned model and both OS locks until explicitly closed."""
+        if self.resident_locks is not None:return
+        from geospatial_search.embedding_control import idle_collection,gpu_access
+        from geospatial_search import search_text
+        from geospatial_search.model import load_model,encode_text
+        if status_snapshot(self.collection,self.job)['busy']:raise RuntimeError(BUSY_MESSAGE)
+        self.resident_locks=ExitStack()
+        try:
+            self.resident_locks.enter_context(idle_collection(self.collection))
+            self.resident_locks.enter_context(gpu_access(self.job))
+            root,collection=search_text.read_collection(self.collection,allow_partial)
+            if not collection['chip_count']:raise ValueError('No saved embeddings yet')
+            progress({'state':'loading'})
+            stored=root['model_contract'];config={**root['recipe']['model'],'amp':stored['amp']}
+            self.resident_model,_,self.resident_device,self.resident_contract=load_model(config,offline=offline)
+            verify_model_contract(stored,self.resident_contract)
+            self.resident_fingerprint=root['run_fingerprint']
+            # Initialize text inference now, rather than charging the first query.
+            encode_text(self.resident_model,'aerial imagery',config['arch'],self.resident_device,config['amp'])
+            progress({'state':'ready','run_fingerprint':self.resident_fingerprint,'gpu':self.resident_contract.get('gpu')})
+        except Exception:
+            self.close();raise
+
+    def close(self):
+        self.resident_model=None;self.resident_device=None;self.resident_contract=None;self.resident_fingerprint=None
+        try:
+            gc.collect()
+            torch=sys.modules.get('torch')
+            if torch is not None and torch.cuda.is_available():torch.cuda.empty_cache()
+        finally:
+            if self.resident_locks is not None:
+                self.resident_locks.close();self.resident_locks=None
 
     def text(self,request,progress):
         query,top_k,allow_partial=validate_query(request)
@@ -102,12 +139,15 @@ class ExactRetrieval:
         from geospatial_search.model import load_model,encode_text
         from geospatial_search.bundles import selected_rows
         from geospatial_search.download_nys_naip import sha256
-        status=status_snapshot(self.collection,self.job)
-        if status['busy']:raise RuntimeError(BUSY_MESSAGE)
-        with idle_collection(self.collection),gpu_access(self.job):
+        resident=self.resident_locks is not None
+        if not resident and status_snapshot(self.collection,self.job)['busy']:raise RuntimeError(BUSY_MESSAGE)
+        with (nullcontext() if resident else idle_collection(self.collection)), (nullcontext() if resident else gpu_access(self.job)):
             model=None;query_vector=None
             try:
                 root,collection=search_text.read_collection(self.collection,allow_partial)
+                if resident:
+                    if root['run_fingerprint']!=self.resident_fingerprint:raise ValueError('Loaded GPU model belongs to another collection fingerprint; unload it first')
+                    verify_model_contract(root['model_contract'],self.resident_contract)
                 if not collection['chip_count']:raise ValueError('No saved embeddings yet')
                 from geospatial_search.search_index import validate_exclusions
                 validate_exclusions(collection,seen)
@@ -123,8 +163,10 @@ class ExactRetrieval:
                     query_vector=np.asarray(saved['vector'],dtype=np.float32)
                     if query_vector.shape!=(stored['embedding_dim'],) or not np.isfinite(query_vector).all() or not np.isclose(np.linalg.norm(query_vector),1,atol=.002):raise ValueError('Invalid cached query vector')
                 else:
-                    model,_,device,loaded=load_model(config,offline=request.get('offline_model',True))
-                    verify_model_contract(stored,loaded)
+                    if resident:model=self.resident_model;device=self.resident_device
+                    else:
+                        model,_,device,loaded=load_model(config,offline=request.get('offline_model',True))
+                        verify_model_contract(stored,loaded)
                     query_vector=encode_text(model,query,config['arch'],device,config['amp'])
                     atomic_json(vector_path,{'run_fingerprint':root['run_fingerprint'],'vector':query_vector.tolist()},self.frontend)
                 def progress_iterator(entries,**kwargs):
@@ -155,6 +197,8 @@ class ExactRetrieval:
                         'searched_chip_count':collection['chip_count'],'searched_source_uris':[s['source_uri'] for s in collection['shards']],
                         'created_utc':time.time(),'search':search_details,'results':results}
             finally:
-                model=None;query_vector=None;gc.collect()
-                torch=sys.modules.get('torch')
-                if torch is not None and torch.cuda.is_available():torch.cuda.empty_cache()
+                model=None;query_vector=None
+                if not resident:
+                    gc.collect()
+                    torch=sys.modules.get('torch')
+                    if torch is not None and torch.cuda.is_available():torch.cuda.empty_cache()

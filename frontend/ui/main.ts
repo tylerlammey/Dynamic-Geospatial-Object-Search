@@ -4,7 +4,7 @@ import './style.css';
 
 type Chip={rank:number|null;score:number|null;shard_id:string;embedding_id:number|null;chip_id:string;source_uri:string;source_sha256:string;pixel_x:number;pixel_y:number;pixel_width:number;pixel_height:number;centroid_lon:number;centroid_lat:number;west:number;south:number;east:number;north:number;geometry:Polygon;crs_wkt:string};
 type ResultSet={query:string;result_id?:string;run_fingerprint:string;results:Chip[];searched_source_tiles:number;total_source_tiles:number;searched_chip_count:number;searched_source_uris?:string[];partial_collection:boolean;created_utc:number;search?:{backend:string;approximate:boolean;search_seconds:number}};
-type Status={state:string;collection_state:string;busy:boolean;published_sources:number;published_chips:number;total_sources:number;coverage:string[];run_fingerprint?:string;partial:boolean;error?:string;imagery_error?:string;cache:{bytes:number;limit_bytes:number;files:number};elapsed_hms?:string;eta_hms?:string;search_index?:{ready:boolean;algorithm:string};overview?:{state:string;ready:boolean;epoch:number;completed_sources?:number;total_sources?:number;eta_seconds?:number;error?:string}};
+type Status={state:string;collection_state:string;busy:boolean;published_sources:number;published_chips:number;total_sources:number;coverage:string[];run_fingerprint?:string;partial:boolean;error?:string;imagery_error?:string;model?:{state:string;error?:string;gpu?:string};cache:{bytes:number;limit_bytes:number;files:number};elapsed_hms?:string;eta_hms?:string;search_index?:{ready:boolean;algorithm:string};overview?:{state:string;ready:boolean;epoch:number;completed_sources?:number;total_sources?:number;eta_seconds?:number;error?:string}};
 type Configuration={imagery:{bounds:[number,number,number,number];count:number}|null;imagery_error?:string;sources:{uri:string;bounds:[number,number,number,number]}[];attribution:string};
 const $=<T extends HTMLElement=HTMLElement>(selector:string)=>{const value=document.querySelector<T>(selector);if(!value)throw new Error(`Missing UI control: ${selector}`);return value;};
 const escape=(value:unknown)=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
@@ -19,6 +19,7 @@ async function api<T>(route:string,value?:unknown):Promise<T>{
 }
 const state:{results:Chip[];session:ResultSet|null;selected:Chip|null;page:number;coverage:boolean;status:Status|null;config:Configuration|null;bookmarks:Chip[];task:string|null;allowPartial:boolean}={results:[],session:null,selected:null,page:0,coverage:false,status:null,config:null,bookmarks:[],task:null,allowPartial:false};
 const PAGE=20;
+let modelAction=false;
 let toastTimer:number|undefined;
 function toast(message:string){$('#toast').textContent=message;$('#toast').classList.remove('hidden');window.clearTimeout(toastTimer);toastTimer=window.setTimeout(()=>$('#toast').classList.add('hidden'),5500);}
 function notice(message:string){$('#notice').textContent=message;$('#notice').classList.toggle('hidden',!message);}
@@ -150,9 +151,16 @@ async function loadResults(identifier:string){
 }
 function renderStatus(){
   const status=state.status;if(!status)return;
+  const model=status.model?.state||'unloaded';const loading=['starting','loading'].includes(model);const resident=['ready','searching'].includes(model);
+  $<HTMLButtonElement>('#load-model').textContent=loading?'Loading model…':resident?'Model on GPU':'Load model to GPU';
+  $<HTMLButtonElement>('#load-model').disabled=modelAction||loading||resident||model==='unloading'||!!state.task||status.busy||!status.published_chips;
+  $('#unload-model').classList.toggle('hidden',!resident&&model!=='unloading');
+  $<HTMLButtonElement>('#unload-model').disabled=modelAction||!!state.task||model==='searching'||model==='unloading';
   $('#coverage-text').textContent=`${status.published_sources.toLocaleString()} of ${status.total_sources.toLocaleString()} source tiles searchable · ${status.published_chips.toLocaleString()} saved chips`;
   $('#coverage-pill').textContent=status.partial?'Partial coverage':'Complete coverage';$('#status-dot').style.background=status.busy?'#b48736':'#4d9668';
   $('#footer-worker').textContent=status.busy?`Embedding / GPU busy · imagery available${status.elapsed_hms?` · elapsed ${status.elapsed_hms}`:''}`:`${status.collection_state||status.state} collection · ${status.search_index?.ready?'fast indexed':'exact'} search available`;
+  if(loading)$('#footer-worker').textContent='Loading GeoRSCLIP onto the GPU · imagery browsing remains available';
+  else if(resident)$('#footer-worker').textContent='GeoRSCLIP stays on GPU · unload the model before embedding or CLI search';
   $('.search-meta').textContent=status.search_index?.ready?'GeoRSCLIP · fast search / exact candidate scores':'GeoRSCLIP · exact similarity search';
   $('#cache-status').textContent=`Cache ${(status.cache.bytes/1e9).toFixed(2)} / ${(status.cache.limit_bytes/1e9).toFixed(2)} GB`;
   const overview=status.overview;
@@ -161,16 +169,33 @@ function renderStatus(){
     $('#overview-status').classList.toggle('hidden',overview.ready&&!building);
     $('#overview-status').textContent=building?`Preparing photographic overview · ${overview.completed_sources||0} / ${overview.total_sources||3805} source tiles${overview.eta_seconds?` · about ${Math.ceil(overview.eta_seconds/60)} min remaining`:''}`:overview.error?`Overview: ${overview.error}`:'Prepare the photographic overview in Settings for statewide viewing. Close-up imagery is available now.';
   }
-  $<HTMLButtonElement>('#search-button').disabled=!!state.task||!status.published_chips;
+  $<HTMLButtonElement>('#search-button').disabled=!!state.task||!status.published_chips||modelAction||loading||model==='unloading';
   if(!state.task){
     if(status.imagery_error)notice(`Local imagery unavailable: ${status.imagery_error}`);
     else if(status.error)notice(status.error);
+    else if(status.model?.error)notice(`GPU model: ${status.model.error}`);
+    else if(loading)notice('Loading and warming up the pinned GeoRSCLIP model once. Later searches will reuse it until you unload it or close the app.');
     else if(status.busy){$('#notice').innerHTML='Embedding is running; pause it using the existing command before searching. Run <code>.\\scripts\\embed-nys.ps1 -Pause</code> yourself and wait for acknowledgement. Imagery browsing and saved results remain available.';$('#notice').classList.remove('hidden');}
     else if(!status.published_chips)notice('No saved embeddings yet. Browse the imagery while the pipeline publishes its first complete source bundle.');
     else notice('');
   }
 }
 async function refreshStatus(){const before=state.status?.overview;state.status=await api<Status>('/api/status');renderStatus();if(state.coverage&&!state.session?.searched_source_uris)showCoverage();const after=state.status.overview;if(before&&after&&(before.ready!==after.ready||before.epoch!==after.epoch)){tiles.redraw();if(after.ready)toast('Photographic overview is ready. Statewide and county views now use cached aerial imagery.');}}
+async function pollModel(){
+  await refreshStatus();
+  if(['starting','loading'].includes(state.status?.model?.state||''))window.setTimeout(()=>run(pollModel),1000);
+  else if(state.status?.model?.state==='ready')toast('GeoRSCLIP is ready on the GPU. Searches will reuse this model.');
+}
+$('#load-model').addEventListener('click',()=>run(async()=>{
+  if(modelAction)return;modelAction=true;renderStatus();
+  try{await api('/api/model/load',{allow_partial:state.allowPartial});await pollModel();}
+  finally{modelAction=false;renderStatus();}
+}));
+$('#unload-model').addEventListener('click',()=>run(async()=>{
+  if(modelAction)return;modelAction=true;renderStatus();
+  try{await api('/api/model/unload',{});await refreshStatus();toast('Model unloaded; the GPU is available again.');}
+  finally{modelAction=false;renderStatus();}
+}));
 async function pollSearch(identifier:string){
   const progress=await api<{state:string;error?:string;result_id?:string;scanned_sources?:number;searched_source_tiles?:number;total_source_tiles?:number}>(`/api/search-progress?id=${identifier}`);
   if(progress.state==='complete'){state.task=null;$('#progress').classList.add('hidden');$<HTMLButtonElement>('#search-button').textContent='Search imagery';await loadResults(progress.result_id!);await refreshStatus();toast(`Search finished: ${state.results.length} results from a fixed published snapshot.`);return;}

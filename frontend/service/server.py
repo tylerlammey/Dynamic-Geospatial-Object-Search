@@ -45,6 +45,7 @@ class Application:
         self.pool=ThreadPoolExecutor(max_workers=workers,thread_name_prefix='imagery')
         self.map_slots=threading.BoundedSemaphore(workers+12)
         self.search_lock=threading.Lock();self.search=None;self.search_id=None;self.search_log=None
+        self.model_worker=None;self.model_worker_id=None;self.model_log=None
         self.state_lock=threading.RLock();self.poll_lock=threading.Lock();self.last_status=None;self.status_at=0
         self.overview_lock=threading.Lock();self.overview_thread=None;self.overview_cancel=threading.Event()
         self.overview_status={'state':'complete' if self.renderer and self.renderer.overview_ready() else 'idle','ready':bool(self.renderer and self.renderer.overview_ready())}
@@ -56,8 +57,87 @@ class Application:
                 try:self.last_status=status_snapshot(self.collection,self.job)
                 except Exception as exc:self.last_status={'state':'error','error':str(exc),'busy':True,'published_sources':0,'published_chips':0,'total_sources':3805,'coverage':[],'partial':True}
                 self.status_at=time.monotonic()
-            return {**self.last_status,'cache':self.cache.stats(),'imagery_error':self.imagery_error,'metrics':self.renderer.metrics if self.renderer else {},
+            model=self.model_status()
+            owns_gpu=model['state'] in ('loading','ready','searching','unloading')
+            return {**self.last_status,'busy':self.last_status['busy'] and not owns_gpu,'model':model,
+                    'cache':self.cache.stats(),'imagery_error':self.imagery_error,'metrics':self.renderer.metrics if self.renderer else {},
                     'overview':{**self.overview_status,'ready':bool(self.renderer and self.renderer.overview_ready()),'epoch':self.renderer.display_epoch if self.renderer else 0}}
+
+    def model_status(self):
+        worker=getattr(self,'model_worker',None)
+        if worker is None:return {'state':'unloaded'}
+        try:
+            data=json.loads((self.frontend/'logs/model-status.json').read_text(encoding='utf-8'))
+            # Windows venv python.exe may be a redirector whose child has a
+            # different PID. Match this launch's ID, while poll() checks liveness.
+            identifier=getattr(self,'model_worker_id',None)
+            if not identifier or data.get('worker_id')!=identifier:data={'state':'starting'}
+        except (FileNotFoundError,ValueError):data={'state':'starting'}
+        if worker.poll() is not None and data['state'] not in ('unloaded','error'):
+            return {'state':'error','error':'GPU model process stopped; load the model again to retry'}
+        return data
+
+    def query_running(self):
+        if not self.search or self.search.poll() is not None:return False
+        if self.search is not getattr(self,'model_worker',None):return True
+        try:
+            path=contained(self.frontend,self.frontend/'logs/search'/self.search_id/'status.json')
+            return json.loads(path.read_text(encoding='utf-8'))['state'] not in ('complete','error')
+        except (FileNotFoundError,ValueError,KeyError):return True
+
+    def start_model(self,value):
+        allow_partial=value.get('allow_partial',False)
+        if type(allow_partial) is not bool:raise ValueError('allow_partial must be boolean')
+        with self.search_lock:
+            if self.query_running():raise RuntimeError('Wait for the running search before loading the model')
+            if getattr(self,'model_worker',None) and self.model_worker.poll() is None:return self.model_status()
+            self.status_at=0;status=self.status()
+            if status.get('error'):raise ValueError(status['error'])
+            if status['busy']:raise RuntimeError(BUSY_MESSAGE)
+            if not status['published_chips']:raise ValueError('No saved embeddings yet')
+            if status['collection_state'] not in ('complete','paused') and not allow_partial:
+                raise ValueError('Explicitly enable searching an idle incomplete collection in Settings')
+            previous=getattr(self,'model_worker',None)
+            if previous and previous.stdin and not previous.stdin.closed:previous.stdin.close()
+            if getattr(self,'model_log',None):self.model_log.close()
+            self.model_worker_id=uuid.uuid4().hex
+            atomic_json(self.frontend/'logs/model-status.json',{'state':'starting','worker_id':self.model_worker_id},self.frontend)
+            self.model_log=(self.frontend/'logs/model-worker.log').open('ab')
+            command=[sys.executable,'-B',str(Path(__file__).with_name('search_worker.py')),'--frontend',str(self.frontend),'--resident','--worker-id',self.model_worker_id]
+            if allow_partial:command.append('--allow-partial')
+            if not self.settings.get('offline_model',True):command.append('--online')
+            env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1','GDAL_PAM_ENABLED':'NO','TEMP':str(self.frontend/'temp'),'TMP':str(self.frontend/'temp')}
+            try:
+                self.model_worker=subprocess.Popen(command,stdin=subprocess.PIPE,stdout=self.model_log,stderr=self.model_log,
+                    text=True,encoding='utf-8',env=env,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+            except Exception:
+                self.model_log.close();self.model_log=None;raise
+            return {'state':'starting'}
+
+    def stop_model(self,force=False):
+        """Stop only our own model child, never the backend embedding worker."""
+        with self.search_lock:
+            worker=getattr(self,'model_worker',None)
+            if worker is None:return {'state':'unloaded'}
+            if not force:
+                if self.query_running():raise RuntimeError('Wait for the running search before unloading the model')
+                if self.model_status()['state'] in ('starting','loading'):
+                    raise RuntimeError('Wait for model loading to finish before unloading')
+            if worker.poll() is None:
+                try:
+                    worker.stdin.write(json.dumps({'action':'unload'})+'\n');worker.stdin.flush();worker.stdin.close()
+                except (OSError,ValueError):pass
+                try:worker.wait(timeout=3 if force else 15)
+                except subprocess.TimeoutExpired:
+                    worker.terminate()
+                    try:worker.wait(timeout=5)
+                    except subprocess.TimeoutExpired:worker.kill();worker.wait(timeout=5)
+            if worker.stdin and not worker.stdin.closed:worker.stdin.close()
+            if self.search is worker:self.search=None;self.search_id=None
+            self.model_worker=None;self.model_worker_id=None
+            if self.model_log:self.model_log.close();self.model_log=None
+            self.status_at=0
+            return {'state':'unloaded'}
 
     def config(self):
         sources=[] if not self.inventory else [{'uri':s.uri,'bounds':s.bounds} for s in self.inventory.sources]
@@ -125,7 +205,7 @@ class Application:
     def clear_history(self):
         """Remove disposable frontend searches only, while no query can publish."""
         with self.search_lock, self.state_lock:
-            if self.search and self.search.poll() is None:
+            if self.query_running():
                 raise RuntimeError('Wait for the running search to finish before clearing history')
             files=[];folders=[]
             for relative,pattern in (
@@ -220,18 +300,30 @@ class Application:
         query,top_k,allow_partial=validate_query(value)
         backend,effort,seen=validate_search_options(value)
         with self.search_lock:
-            if self.search and self.search.poll() is None:raise RuntimeError('A frontend search is already running')
+            if self.query_running():raise RuntimeError('A frontend search is already running')
             # Refresh the read-only status before creating any query process.
             self.status_at=0;status=self.status()
             if status.get('error'):raise ValueError(status['error'])
             if status['busy']:raise RuntimeError(BUSY_MESSAGE)
             if not status['published_chips']:raise ValueError('No saved embeddings yet; imagery browsing remains available')
             if status['collection_state'] not in ('complete','paused') and not allow_partial:raise ValueError('Interrupted collection: explicitly enable searching an idle incomplete collection in Settings')
+            model=self.model_status()
+            if model['state'] in ('starting','loading','searching','unloading'):
+                raise RuntimeError('Wait for the GPU model to be ready before searching')
             identifier=uuid.uuid4().hex;folder=self.frontend/'logs/search'/identifier
             request={'task_id':identifier,'query':query,'top_k':top_k,'allow_partial':allow_partial,
                      'offline_model':self.settings.get('offline_model',True),'search_backend':backend,'search_effort':effort,'exclude_ids':seen}
             atomic_json(folder/'request.json',request,self.frontend)
             atomic_json(folder/'status.json',{'state':'starting','task_id':identifier},self.frontend)
+            if model['state']=='ready':
+                self.search=self.model_worker;self.search_id=identifier
+                try:
+                    self.model_worker.stdin.write(json.dumps({'action':'search','request':(folder/'request.json').relative_to(self.frontend).as_posix()})+'\n')
+                    self.model_worker.stdin.flush()
+                except (OSError,ValueError):
+                    atomic_json(folder/'status.json',{'state':'error','error':'GPU model process stopped; reload it and retry'},self.frontend)
+                    raise RuntimeError('GPU model process stopped; reload it and retry')
+                return {'task_id':identifier}
             if self.search_log:self.search_log.close()
             self.search_log=(folder/'worker.log').open('wb')
             env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1','GDAL_PAM_ENABLED':'NO','TEMP':str(self.frontend/'temp'),'TMP':str(self.frontend/'temp')}
@@ -243,7 +335,7 @@ class Application:
     def search_progress(self,identifier):
         if not re.fullmatch('[a-f0-9]{32}',identifier):raise ValueError('Invalid task ID')
         data=json.loads(contained(self.frontend,self.frontend/'logs/search'/identifier/'status.json').read_text(encoding='utf-8'))
-        if identifier==self.search_id and self.search and self.search.poll() is None and data['state']=='complete':
+        if identifier==self.search_id and self.search and self.search is not getattr(self,'model_worker',None) and self.search.poll() is None and data['state']=='complete':
             # Results may be published just before native process teardown.
             # Publish completion only when a following serialized query can start.
             return {**data,'state':'finishing'}
@@ -275,6 +367,7 @@ class Application:
         self.overview_cancel.set()
         if self.renderer:self.renderer.close()
         # Only the child stored by this frontend is eligible for termination.
+        self.stop_model(force=True)
         if self.search and self.search.poll() is None:
             self.search.terminate()
             try:self.search.wait(timeout=5)
@@ -360,6 +453,8 @@ class Handler(BaseHTTPRequestHandler):
             value=json.loads(self.rfile.read(length))
             if not isinstance(value,dict):raise ValueError('Expected an object')
             if url.path=='/api/search':return self.json(app.start_search(value),202)
+            if url.path=='/api/model/load':return self.json(app.start_model(value),202)
+            if url.path=='/api/model/unload':return self.json(app.stop_model())
             if url.path=='/api/overview/prepare':
                 if value.get('confirm')!='prepare-local-overview':raise ValueError('Confirm prepare-local-overview')
                 return self.json(app.start_overview(),202)

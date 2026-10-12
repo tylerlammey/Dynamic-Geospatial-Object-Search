@@ -86,6 +86,20 @@ to apply. No imagery or location artifacts were published.
 
 ## Search and saved results
 
+Use **Load model to GPU** in the header to load and warm up the existing pinned
+GeoRSCLIP checkpoint once. The button changes to **Model on GPU** when ready;
+later text queries reuse the same process/model and its in-memory search index.
+Loading is optional: ordinary search still works without it. The frontend
+shows loading errors and never falls back to a CPU embedding model.
+
+The loaded model reserves both the collection and job-wide GPU locks, including
+between searches. Choose **Unload model** before resuming embedding or running
+CLI searches. It finishes an active query before allowing manual unload;
+closing the frontend releases its own worker and locks. Loading does not create
+image embeddings or change the checkpoint or collection. Model status and logs
+stay under `frontend/logs/model-status.json` and `model-worker.log`. Clearing
+search history leaves the resident model loaded.
+
 If search reports **WinError 4551** loading AMD PyTorch's `aotriton_v2.dll`, see
 [the Windows Application Control diagnosis](SEARCH_TROUBLESHOOTING.md). This
 machine previously blocked that unsigned DLL through Smart App Control. Resolving
@@ -137,7 +151,8 @@ explicit **Settings** checkbox; paused partial collections are already allowed.
 Each query process holds both original collection/GPU locks, reuses the pinned
 model loader and float32 text encoding, and releases GPU allocations before
 releasing locks. Repeated text queries can reuse a CPU query vector tied to the
-collection fingerprint. No GPU model stays resident between queries. Cached
+collection fingerprint. Explicitly loading the model keeps it resident between
+queries. Cached
 result chips resolve by `(shard_id, embedding_id)` back to original pixel windows.
 
 Bookmarks live under `frontend/state/`. The latest 30 frontend searches and 200

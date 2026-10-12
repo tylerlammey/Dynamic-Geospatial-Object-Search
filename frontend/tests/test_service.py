@@ -300,6 +300,28 @@ class SearchContract(Fixtures):
                 with self.assertRaises(ValueError):
                     with patch('geospatial_search.model.load_model',return_value=(object(),None,'synthetic',{**contract,'model_fingerprint':'different'})):
                         adapter.text({'query':'different','top_k':1},updates.append)
+                adapter.preload(progress=updates.append)
+                self.assertEqual(loader.call_count,2)
+                self.assertTrue(status_snapshot(collection,inventory.job)['busy'],'The resident model must hold both backend locks')
+                try:
+                    first=adapter.text({'query':'new resident phrase one','top_k':3},updates.append)
+                    second=adapter.text({'query':'new resident phrase two','top_k':3},updates.append)
+                    self.assertEqual(loader.call_count,2,'Distinct queries must reuse the already loaded GPU model')
+                    self.assertEqual(first['results'],second['results'])
+                    changed={**catalog,'run_fingerprint':'other-run'}
+                    (collection/'collection.json').write_text(json.dumps(changed))
+                    (collection/'run.json').write_text(json.dumps({'run_fingerprint':'other-run','model_contract':contract,'recipe':{'model':{'arch':'synthetic'}}}))
+                    with self.assertRaisesRegex(ValueError,'another collection fingerprint'):
+                        adapter.text({'query':'changed collection'},updates.append)
+                    (collection/'collection.json').write_text(json.dumps(catalog))
+                    (collection/'run.json').write_text(json.dumps({'run_fingerprint':'synthetic-run','model_contract':contract,'recipe':{'model':{'arch':'synthetic'}}}))
+                finally:adapter.close()
+                self.assertFalse(status_snapshot(collection,inventory.job)['busy'],'Unloading must release collection and GPU locks')
+                with patch('geospatial_search.model.load_model',return_value=(object(),None,'synthetic',{**contract,'model_fingerprint':'wrong'})):
+                    with self.assertRaisesRegex(ValueError,'model_fingerprint'):adapter.preload()
+                self.assertIsNone(adapter.resident_model)
+                self.assertIsNone(adapter.resident_locks)
+                self.assertFalse(status_snapshot(collection,inventory.job)['busy'],'Failed preload must release both locks')
             self.assertTrue(any(p['state']=='searching' for p in updates))
             self.assertEqual(json.loads((collection/'collection.json').read_text()),catalog)
         finally:search_text.tqdm=original_tqdm
