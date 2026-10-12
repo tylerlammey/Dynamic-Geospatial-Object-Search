@@ -141,8 +141,14 @@ embeddings/source tiles searched and indicate partial coverage. Use
 whose collection is idle. Active workers are rejected before loading the query
 model. A collection with no saved vectors asks you to finish at least one tile.
 Custom collections require matching `-OutputDir` for embedding/control and
-`-CollectionDir` for search. Exact search scans up to 24.55 GB of vectors; it is a correct
-baseline, not an interactive statewide ANN index. The matched original source
+`-CollectionDir` for search. Build the CPU IVF-PQ index with
+`scripts/build-search-index.ps1` for interactive retrieval. The default search
+uses that index when its snapshot matches, then rescores candidates using the
+original vectors. `-Backend Exact` retains the full 24.55 GB scan as a baseline.
+Missing or stale indexes automatically use exact search. See the
+[search index guide](nys-search-index.md) for benchmarks, quality controls,
+rebuilding after collection changes, and the future decision-model interface.
+The matched original source
 TIFFs are checksummed before rendering. Result folders contain labelled PNGs,
 `contact-sheet.png`, and `results.json` with scores, source windows, shard IDs,
 and coordinates. Rendering accepts 1 to 100 results.
@@ -167,6 +173,10 @@ data/nys-naip-2022-rgb-060m/
     worker.lock
     PAUSE                  # Zero-byte signal while a pause is requested
     runtime/*.log          # Background worker console/error logs
+    search-index/          # Derived CPU index; never replaces original bundles
+      index-HASH.faiss
+      manifest.json        # Collection mapping, snapshot, checksum, parameters
+      status.json          # CPU build percent, elapsed time, ETA
     shards/SOURCE_TILE/
       embeddings.f16.npy
       chips.geoparquet

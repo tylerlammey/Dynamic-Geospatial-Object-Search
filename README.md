@@ -22,6 +22,11 @@ uses an AMD RX 9070 XT with ROCm. See the
 .\scripts\embed-nys.ps1 -Pause
 .\scripts\search-nys.ps1 -Query 'baseball field' -Offline
 .\scripts\embed-nys.ps1 -Unpause -Offline
+# Once the collection is complete or safely paused, build the CPU search index:
+.\scripts\build-search-index.ps1
+.\scripts\search-nys.ps1 -Query 'fighter jet' -Offline -SearchEffort Thorough
+# Interactive map, chip previews, and indexed search:
+.\frontend\scripts\launch.ps1
 ```
 
 The download on this machine is complete. On a new computer, install downloader
@@ -49,8 +54,11 @@ temp/                           # Ignored temporary AI scripts/plans
 Chips are read directly from TIFF windows rather than saved as millions of
 individual image files. Each source TIFF gets one compatible bundle containing
 `embeddings.f16.npy`, `chips.geoparquet`, and `run.json`. Vectors are normalized
-in float32 and stored as float16; search uses exact cosine ranking across
-memory-mapped bundles. All geographic footprints use WGS84, while pixel windows
+in float32 and stored as float16. Search uses a compatible CPU IVF-PQ index to
+find candidates, then scores those candidates from the original vectors. Exact
+full-scan search remains available. See the [search index guide](docs/nys-search-index.md)
+for measured speed, recall, and controls for requesting more matches.
+All geographic footprints use WGS84, while pixel windows
 retain their original raster CRS and transform.
 
 Imagery, checkpoints, embeddings, local environments, and generated previews

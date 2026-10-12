@@ -92,8 +92,12 @@ machine previously blocked that unsigned DLL through Smart App Control. Resolvin
 it requires a Windows security decision or a compatible trusted signed runtime;
 frontend setup and imagery preparation do not change those settings.
 
-Enter a phrase and a result count (1–5,000). Retrieval remains the backend's
-bounded exact cosine scan, including bundle and model compatibility checks.
+Enter a phrase and a result count (1–5,000). **Balanced** uses the compatible
+CPU IVF-PQ index and rescores candidates from original vectors. **Thorough**
+expands both the indexed search and candidate pool; **Exact** scans all vectors.
+A missing or stale index falls back to exact search. The collection/model
+compatibility checks and original source coordinates remain in effect. See the
+[search index guide](../docs/nys-search-index.md) for measured speed and recall.
 Only 20 thumbnail results are rendered per page; candidate count and thumbnail
 rendering are separate. Clusters retain all overlapping matches. Select a
 cluster rank or card to synchronize the footprint and inspector. Use previous/
@@ -129,8 +133,8 @@ result chips resolve by `(shard_id, embedding_id)` back to original pixel window
 Bookmarks live under `frontend/state/`. The latest 30 frontend searches and 200
 CPU text vectors are retained. Existing backend searches are never removed.
 The retrieval boundary is `service/retrieval.py`; future consumers can request
-more results without changing the renderer. No ANN index or decision model was
-added.
+more results without changing the renderer. Requests accept search quality
+and qualified already-seen IDs; the future decision model has not been added.
 
 ## Cache and process limits
 
@@ -250,7 +254,7 @@ $env:PYTHONPATH = 'src;frontend/service'
 They check photographic averaging and partial mask edges, prepared-state tile reads without opening originals, cancelled requests, all three UTM zones, RGB, internal mask transparency, native chip
 windows, tile coordinate conversion, RGB previews, bounded atomic/LRU
 cache writes including staging, cache-clear/path containment, service ownership,
-query inputs, partial published coverage, exact helper integration, model
+query inputs, quality controls, seen-ID exclusion, partial published coverage, exact helper integration, model
 contract rejection, and fingerprinted CPU text-vector reuse. GPU encoding is
 stubbed in those tests.
 
@@ -277,18 +281,23 @@ The prepared full-state, regional, county, and neighborhood views were also
 verified against the real local collection. All 3,805 photographic source
 overviews and the 6,966 x 5,488 statewide raster are prepared on this machine.
 
-The 19 frontend service regressions passed, including an actual Windows reader
-holding a status file open during replacement, transient replacement failures,
-and preservation of cache accounting on permanent failure. All 42 required
-backend regressions passed in the latest run. An earlier run was blocked by
-Smart App Control at PyTorch import; see the search troubleshooting guide.
-The worker environment was left unchanged.
-Temporary files were redirected to `frontend/temp/`. Both Electron startup and the packaged launcher
-are smoke-tested. Protection verification compares all 31 tracked backend files,
-size/mtime for all 3,805 source TIFFs, and SHA-256 for one source per UTM zone.
-This is not a second full 115 GB imagery checksum sweep. No real GPU query was
-forced for this imagery change. A new GPU text-encoding smoke test remains
-pending; cached searches and synthetic encoding tests were used for validation.
+The search-index update passed **25 frontend service regressions** and **56
+backend regressions**. The live browser check also verified Settings, all three
+search-mode request payloads, photographic views, result selection, history,
+context, and four viewport sizes. The Windows package was rebuilt successfully.
+
+Real authenticated HTTP searches verified indexed retrieval and an immediate
+Thorough request for additional unseen chip IDs. All 13 returned PNG previews
+were compared pixel for pixel with their original TIFF windows. Completion
+acknowledgement now waits for the owned query process to exit, allowing a later
+decision model to request more matches without racing cleanup.
+
+A real GPU text-encoding/CLI query used the existing pinned GeoRSCLIP checkpoint.
+Original embedding-code hashes and all fingerprinted dependency versions match
+the saved collection recipe. Imagery and embedding bundles remain at their
+original paths. Generated indexes, benchmarks, previews, and browser artifacts
+remain ignored. See the [search index guide](../docs/nys-search-index.md) for
+measured full-state retrieval speed and recall.
 
 Primary implementation references: [Leaflet 1.9.4 API](https://leafletjs.com/reference-1.9.4.html),
 [Rasterio WarpedVRT](https://rasterio.readthedocs.io/en/stable/api/rasterio.vrt.html),

@@ -17,6 +17,9 @@ manifest, records, and provider metadata; do not relocate these paths.
 - embed_georsclip.py: bounded threaded readers, GPU inference, durable resume.
 - embedding_control.py: graceful pause, collection ownership, shared GPU lock.
 - search_text.py: compatible text encoding, collection search, result rendering.
+- search_index.py: CPU IVF-PQ candidates, original-vector rescoring, seen-ID exclusion.
+- build_search_index.py: budgeted, checksummed, snapshot-bound atomic index publication.
+- benchmark_search_index.py: real-query comparisons with the unchanged exact baseline.
 - preview_tiles.py: CPU previews of the selected chip size.
 - scripts/: repository-anchored PowerShell setup/download/embed/search launchers.
 - tests/: synthetic offline regressions.
@@ -38,6 +41,11 @@ cosine ranking. Each source TIFF has its own shard: embedding_id equals the
 vector row number within that shard, and (shard_id, embedding_id) identifies a
 collection row. Never mix embeddings.f16.npy, chips.geoparquet, and run.json
 across shards or compatibility fingerprints. Publish the three files together.
+The optional search index is derived from one published snapshot and lives in
+that collection's search-index/. Preserve original vectors. ANN candidate
+selection is approximate; returned scores use the original float16 vectors
+converted to float32. Keep exact search available and measure recall before
+changing indexed defaults. Additional-match requests use qualified seen IDs.
 
 Pin BiliSakura/GeoRSCLIP-ViT-H-14 to the config's full commit SHA. Build OpenCLIP
 ViT-H-14 with laion2b_s32b_b79k preprocessing, then load the exact checkpoint
