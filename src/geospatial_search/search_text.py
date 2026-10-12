@@ -1,4 +1,4 @@
-"""Exact text search over NYS embedding bundles; render only the top chip windows."""
+"""Compatible indexed or exact text search; render only the top chip windows."""
 from __future__ import annotations
 
 import argparse
@@ -20,6 +20,7 @@ from .embedding_control import gpu_access, idle_collection
 from .model import encode_text, load_model
 from .paths import EMBEDDINGS, IMAGERY, RESULTS, contained
 from .tiling import read_rgb
+from .search_index import IndexDependencyUnavailable,indexed_search,read_manifest,validate_exclusions,validate_options
 
 
 def parse_args(argv=None):
@@ -32,6 +33,8 @@ def parse_args(argv=None):
     parser.add_argument('--model-cache-dir',type=Path)
     parser.add_argument('--offline',action='store_true')
     parser.add_argument('--allow-partial',action='store_true',help='Search compatible published bundles from an unfinished run')
+    parser.add_argument('--backend',choices=('auto','exact','ann'),default='auto')
+    parser.add_argument('--search-effort',choices=('fast','balanced','thorough'),default='balanced')
     return parser.parse_args(argv)
 
 
@@ -49,7 +52,7 @@ def read_collection(directory: Path, allow_partial=False):
     return root,collection
 
 
-def search_collection(directory: Path, collection: dict, query: np.ndarray, top_k: int):
+def exact_search_collection(directory: Path, collection: dict, query: np.ndarray, top_k: int):
     if top_k <= 0 or collection['chip_count'] == 0:
         raise ValueError('Require a positive top-k and at least one published vector')
     matches = []
@@ -63,6 +66,33 @@ def search_collection(directory: Path, collection: dict, query: np.ndarray, top_
         matches.extend((entry['shard_id'],row_id,score) for row_id,score in candidates)
         matches = sorted(matches,key=lambda item:(-item[2],item[0],item[1]))[:top_k]
         del vectors
+    return matches
+
+
+def search_collection(directory: Path, collection: dict, query: np.ndarray, top_k: int,
+                      *,backend='auto',effort='balanced',exclude_ids=None,diagnostics=None,progress=None):
+    """Use a compatible ANN index when ready; retain the exact baseline/fallback."""
+    import time
+    validate_options(backend,effort)
+    excluded=validate_exclusions(collection,exclude_ids)
+    diagnostics={} if diagnostics is None else diagnostics
+    started=time.perf_counter()
+    if backend!='exact':
+        try:
+            read_manifest(Path(directory),collection)
+        except (FileNotFoundError,ValueError) as exc:
+            if backend=='ann':raise
+            diagnostics['fallback_reason']=str(exc)
+        else:
+            try:
+                return indexed_search(directory,collection,query,top_k,effort,excluded,diagnostics,progress)
+            except IndexDependencyUnavailable as exc:
+                if backend=='ann':raise
+                diagnostics['fallback_reason']=str(exc)
+    matches=exact_search_collection(directory,collection,query,min(collection['chip_count'],top_k+len(excluded)))
+    matches=[m for m in matches if (m[0],m[1]) not in excluded][:top_k]
+    diagnostics.update(backend='exact',approximate=False,search_seconds=time.perf_counter()-started,
+                       effort=effort,excluded_count=len(excluded))
     return matches
 
 
@@ -120,7 +150,10 @@ def run_search(args):
         if loaded[name] != stored[name]:
             raise ValueError(f'Query model differs from image embeddings: {name}')
     query = encode_text(model,args.query,config['arch'],device,config['amp'])
-    matches = search_collection(directory,collection,query,args.top_k)
+    search_details={}
+    matches = search_collection(directory,collection,query,args.top_k,backend=args.backend,
+                                effort=args.search_effort,diagnostics=search_details)
+    print(f"Retrieval: {search_details['backend']} in {search_details['search_seconds']:.2f}s",flush=True)
     by_shard = {}
     for shard_id,row_id,_ in matches:
         by_shard.setdefault(shard_id,[]).append(row_id)
@@ -149,7 +182,7 @@ def run_search(args):
         'scope':collection['scope'],'collection_state':collection['state'],
         'partial_collection':collection['state']!='complete','searched_chip_count':collection['chip_count'],
         'searched_source_tiles':len(collection['shards']),'total_source_tiles':collection.get('total_sources'),
-        'collection_dir':str(directory),'results':results})
+        'collection_dir':str(directory),'search':search_details,'results':results})
     print(f'Results: {destination}')
     return 0
 

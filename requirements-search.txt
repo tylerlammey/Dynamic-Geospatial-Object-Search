@@ -1,0 +1,3 @@
+# Optional native CPU index. Image/query model and preprocessing are unchanged.
+faiss-cpu==1.15.1
+threadpoolctl==3.7.0
