@@ -15,7 +15,7 @@ const reuseService=process.argv.includes('--existing-service');
 const service=reuseService?null:spawn(path.join(root,'.venv/Scripts/python.exe'),['-B',path.join(front,'service/server.py'),'--frontend',front,'--ready-file',ready],{windowsHide:true,env,stdio:['ignore','ignore','pipe']});
 let serviceLog='';service?.stderr.on('data',chunk=>{serviceLog+=chunk.toString();});
 let session;let edge;let pageSocket;let browserSocket;let origin;
-let id=0;const pending=new Map();const runtimeErrors=[];const requestUrls=[];const tileRequests=[];let mockResults=null;
+let id=0;const pending=new Map();const runtimeErrors=[];const requestUrls=[];const tileRequests=[];const mockSearchRequests=[];let mockResults=null;
 function connection(url){return new Promise((resolve,reject)=>{const ws=new WebSocket(url);ws.onopen=()=>resolve(ws);ws.onerror=reject;});}
 function request(ws,method,params={}){return new Promise((resolve,reject)=>{const requestId=++id;const timeout=setTimeout(()=>{pending.delete(requestId);reject(new Error(`Timeout ${method}`));},20000);pending.set(requestId,{resolve,reject,timeout});ws.send(JSON.stringify({id:requestId,method,params}));});}
 function receive(event){const message=JSON.parse(event.data);if(message.id&&pending.has(message.id)){const p=pending.get(message.id);pending.delete(message.id);clearTimeout(p.timeout);message.error?p.reject(new Error(message.error.message)):p.resolve(message.result);}
@@ -23,7 +23,9 @@ function receive(event){const message=JSON.parse(event.data);if(message.id&&pend
   if(message.method==='Network.requestWillBeSent'){requestUrls.push(message.params.request.url);if(message.params.request.url.includes('/api/tiles/'))tileRequests.push(message.params.request.url);}
   if(message.method==='Fetch.requestPaused'){
     const data=message.params;
-    if(data.request.url.includes('/api/results?')&&mockResults){void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify(mockResults)).toString('base64')});}
+    if(data.request.url.includes('/api/search-progress?')&&mockResults){void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({state:'complete',result_id:'0123456789abcdef0123456789abcdef'})).toString('base64')});}
+    else if(data.request.url.endsWith('/api/search')&&data.request.method==='POST'&&mockResults){mockSearchRequests.push(JSON.parse(data.request.postData));void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:202,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({task_id:'0123456789abcdef0123456789abcdef'})).toString('base64')});}
+    else if(data.request.url.includes('/api/results?')&&mockResults){void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify(mockResults)).toString('base64')});}
     else if(data.request.url.includes('/api/history')&&mockResults){void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify([{id:'0123456789abcdef0123456789abcdef',query:'EXAMPLE TEST · baseball field',count:3,searched_source_tiles:250,total_source_tiles:3805,created_utc:Date.now()/1000}])).toString('base64')});}
     else void request(pageSocket,'Fetch.continueRequest',{requestId:data.requestId});
   }
@@ -86,6 +88,12 @@ try{
   await request(pageSocket,'Input.dispatchMouseEvent',{type:'mouseReleased',x:Math.round(await evaluate("document.getElementById('map').getBoundingClientRect().left+document.getElementById('map').clientWidth/2")),y:Math.round(await evaluate("document.getElementById('map').getBoundingClientRect().top+document.getElementById('map').clientHeight/2")),button:'left',clickCount:1});
   await waitFor("document.querySelector('.selected-preview')?.complete && document.querySelector('.selected-preview')?.naturalWidth===256");
   await screenshot('actual-imagery-desktop');
+  assert.deepEqual(await evaluate("[...document.querySelector('#search-mode').options].map(o=>o.value)"),['balanced','thorough','exact']);
+  assert.equal(await evaluate("document.getElementById('search-mode').value"),'balanced');
+  await click('#settings');
+  assert.equal(await evaluate("document.getElementById('dialog').open"),true);
+  assert.ok(await evaluate("!!document.getElementById('prepare-overview') && !!document.getElementById('clear-cache') && !!document.getElementById('allow-partial')"));
+  await click('#close-dialog');
   if(cached){
     await click('#history');await waitFor(`!!document.querySelector('[data-history="${cached.id}"]')`);await click(`[data-history="${cached.id}"]`);
     await waitFor("document.querySelectorAll('.result-card').length>0");await click('.result-card');
@@ -95,7 +103,7 @@ try{
   const countBefore=tileRequests.length;await click('.leaflet-control-zoom-out');await delay(1000);await click('.leaflet-control-zoom-in');await delay(1000);assert.ok(tileRequests.length>countBefore,'Zoom must request another imagery level');
   await click('#coverage-toggle');assert.equal(await evaluate("document.getElementById('coverage-toggle').getAttribute('aria-pressed')"),'true');await click('#coverage-toggle');
   mockResults={query:'EXAMPLE TEST · baseball field',run_fingerprint:status.run_fingerprint,results:[{...chip,rank:1,score:.3184,embedding_id:1},{...chip,chip_id:chip.chip_id+'-2',rank:2,score:.3147,embedding_id:2},{...chip,chip_id:chip.chip_id+'-3',rank:3,score:.311,embedding_id:3}],searched_source_tiles:250,total_source_tiles:3805,searched_chip_count:1000,searched_source_uris:[chip.source_uri],partial_collection:true,created_utc:Date.now()/1000};
-  await request(pageSocket,'Fetch.enable',{patterns:[{urlPattern:'*/api/history*'},{urlPattern:'*/api/results*'}]});
+  await request(pageSocket,'Fetch.enable',{patterns:[{urlPattern:'*/api/history*'},{urlPattern:'*/api/results*'},{urlPattern:'*/api/search*'}]});
   await click('#history');await waitFor("!!document.querySelector('[data-history]')");await click('[data-history]');
   await waitFor("document.querySelectorAll('.result-card').length===3");
   await click('[data-rank="2"]');await waitFor("document.querySelector('.selection-nav').textContent.includes('Rank 2')");
@@ -106,6 +114,13 @@ try{
   await click('#next');await waitFor("document.querySelector('.selection-nav').textContent.includes('Rank 3')");
   await click('#previous');await click('#context-preview');assert.ok(await evaluate("document.getElementById('dialog').open"));await click('#close-dialog');
   await click('#fit-matches');await delay(500);
+  for(const mode of ['balanced','thorough','exact']){
+    await evaluate(`document.getElementById('query').value='EXAMPLE TEST'; document.getElementById('search-mode').value=${JSON.stringify(mode)}; document.getElementById('search-form').requestSubmit()`);
+    for(let attempts=0;mockSearchRequests.length<['balanced','thorough','exact'].indexOf(mode)+1&&attempts<100;attempts++)await delay(100);
+    assert.equal(mockSearchRequests.at(-1)?.search_backend,mode==='exact'?'exact':'auto');
+    assert.equal(mockSearchRequests.at(-1)?.search_effort,mode==='thorough'?'thorough':'balanced');
+    await waitFor("!document.getElementById('search-button').disabled && document.querySelectorAll('.result-card').length===3");
+  }
   // Wide and scaled viewport checks on actual imagery; intercepted ranks are
   // test fixtures only and do not persist or mutate any embedding bundle.
   for(const [width,height,label] of [[1093,720,'scaled'],[1920,1080,'large'],[900,700,'compact']]){

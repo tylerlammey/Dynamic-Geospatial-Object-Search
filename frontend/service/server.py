@@ -20,7 +20,7 @@ from urllib.parse import parse_qs, unquote, urlsplit
 import uuid
 
 from imagery import Inventory, TileRenderer
-from retrieval import BUSY_MESSAGE, status_snapshot, validate_query
+from retrieval import BUSY_MESSAGE, status_snapshot, validate_query, validate_search_options
 from storage import DiskCache, atomic_json, contained, frontend_ownership
 from overview import prepare_overview
 
@@ -177,6 +177,7 @@ class Application:
 
     def start_search(self,value):
         query,top_k,allow_partial=validate_query(value)
+        backend,effort,seen=validate_search_options(value)
         with self.search_lock:
             if self.search and self.search.poll() is None:raise RuntimeError('A frontend search is already running')
             # Refresh the read-only status before creating any query process.
@@ -186,7 +187,8 @@ class Application:
             if not status['published_chips']:raise ValueError('No saved embeddings yet; imagery browsing remains available')
             if status['collection_state'] not in ('complete','paused') and not allow_partial:raise ValueError('Interrupted collection: explicitly enable searching an idle incomplete collection in Settings')
             identifier=uuid.uuid4().hex;folder=self.frontend/'logs/search'/identifier
-            request={'task_id':identifier,'query':query,'top_k':top_k,'allow_partial':allow_partial,'offline_model':self.settings.get('offline_model',True)}
+            request={'task_id':identifier,'query':query,'top_k':top_k,'allow_partial':allow_partial,
+                     'offline_model':self.settings.get('offline_model',True),'search_backend':backend,'search_effort':effort,'exclude_ids':seen}
             atomic_json(folder/'request.json',request,self.frontend)
             atomic_json(folder/'status.json',{'state':'starting','task_id':identifier},self.frontend)
             if self.search_log:self.search_log.close()
@@ -200,6 +202,10 @@ class Application:
     def search_progress(self,identifier):
         if not re.fullmatch('[a-f0-9]{32}',identifier):raise ValueError('Invalid task ID')
         data=json.loads(contained(self.frontend,self.frontend/'logs/search'/identifier/'status.json').read_text(encoding='utf-8'))
+        if identifier==self.search_id and self.search and self.search.poll() is None and data['state']=='complete':
+            # Results may be published just before native process teardown.
+            # Publish completion only when a following serialized query can start.
+            return {**data,'state':'finishing'}
         if identifier==self.search_id and self.search and self.search.poll() is not None and data['state'] not in ('complete','error'):
             data={'state':'error','error':'Query process stopped. See the frontend query log.'}
         return data

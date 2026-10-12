@@ -1,4 +1,4 @@
-"""Retrieval boundary: read snapshots; request exact searches; keep UI separate."""
+"""Retrieval boundary: read snapshots and use compatible indexed or exact search."""
 import gc
 import hashlib
 import json
@@ -45,6 +45,19 @@ def verify_model_contract(stored,loaded):
         if loaded.get(name)!=stored.get(name):raise ValueError(f'Query model differs from image embeddings: {name}')
 
 
+def validate_search_options(value):
+    from geospatial_search.search_index import validate_options
+    backend=value.get('search_backend','auto');effort=value.get('search_effort','balanced')
+    validate_options(backend,effort)
+    seen=value.get('exclude_ids',[])
+    if not isinstance(seen,list) or len(seen)>20000:raise ValueError('Invalid already-seen chip IDs')
+    for pair in seen:
+        if (not isinstance(pair,list) or len(pair)!=2 or not isinstance(pair[0],str)
+            or not 1<=len(pair[0])<=160 or type(pair[1]) is not int or pair[1]<0):
+            raise ValueError('Excluded chip IDs must be [shard_id, embedding_id] pairs')
+    return backend,effort,seen
+
+
 def status_snapshot(collection,job):
     collection=Path(collection);job=Path(job)
     try:
@@ -59,20 +72,22 @@ def status_snapshot(collection,job):
     except FileNotFoundError:worker={}
     collection_busy=lock_held(collection/'worker.lock')
     gpu_busy=lock_held(job/'embeddings/gpu-runtime/worker.lock')
+    from geospatial_search.search_index import describe_index
+    index=describe_index(collection,catalog)
     return {'state':worker.get('state',catalog.get('state','missing')),'collection_state':catalog.get('state'),
             'busy':collection_busy or gpu_busy,'collection_busy':collection_busy,'gpu_busy':gpu_busy,
             'published_sources':len(shards),'total_sources':catalog.get('total_sources',3805),
             'published_chips':catalog['chip_count'],'partial':catalog.get('state')!='complete',
             'run_fingerprint':catalog.get('run_fingerprint'),'elapsed_hms':worker.get('elapsed_hms'),
             'eta_hms':worker.get('eta_hms'),'percent_complete':worker.get('percent_complete'),
-            'coverage':[s['source_uri'] for s in shards]}
+            'coverage':[s['source_uri'] for s in shards],'search_index':index}
 
 
 class ExactRetrieval:
-    """Future consumers can call text(query,k); rendering is a separate service.
+    """Compatible retrieval boundary; indexed search with the exact fallback.
 
     Similar-chip and geographic-neighbor operations can be added here without
-    changing the UI or the current exact retrieval algorithm.
+    changing the UI. The legacy class name remains for worker compatibility.
     """
     def __init__(self,repository,frontend):
         self.repository=Path(repository).resolve();self.frontend=Path(frontend).resolve()
@@ -81,6 +96,7 @@ class ExactRetrieval:
 
     def text(self,request,progress):
         query,top_k,allow_partial=validate_query(request)
+        backend,effort,seen=validate_search_options(request)
         from geospatial_search import search_text
         from geospatial_search.embedding_control import idle_collection,gpu_access
         from geospatial_search.model import load_model,encode_text
@@ -93,6 +109,8 @@ class ExactRetrieval:
             try:
                 root,collection=search_text.read_collection(self.collection,allow_partial)
                 if not collection['chip_count']:raise ValueError('No saved embeddings yet')
+                from geospatial_search.search_index import validate_exclusions
+                validate_exclusions(collection,seen)
                 total=len(collection['shards'])
                 progress({'state':'encoding','scanned_sources':0,'searched_source_tiles':total,'total_source_tiles':collection.get('total_sources',3805)})
                 stored=root['model_contract'];config={**root['recipe']['model'],'amp':stored['amp']}
@@ -115,7 +133,10 @@ class ExactRetrieval:
                         yield entry
                     progress({'state':'metadata','scanned_sources':total,'searched_source_tiles':total,'total_source_tiles':collection.get('total_sources',3805)})
                 search_text.tqdm=progress_iterator
-                matches=search_text.search_collection(self.collection,collection,query_vector,top_k)
+                search_details={}
+                matches=search_text.search_collection(self.collection,collection,query_vector,top_k,
+                    backend=backend,effort=effort,exclude_ids=seen,diagnostics=search_details,
+                    progress=lambda value:progress({'searched_source_tiles':total,'total_source_tiles':collection.get('total_sources',3805),**value}))
                 by_shard={}
                 for shard,row_id,_ in matches:by_shard.setdefault(shard,[]).append(row_id)
                 metadata={shard:selected_rows(contained(self.collection/'shards',self.collection/'shards'/shard)/'chips.geoparquet',ids) for shard,ids in by_shard.items()}
@@ -132,7 +153,7 @@ class ExactRetrieval:
                 return {'query':query,'run_fingerprint':collection['run_fingerprint'],'collection_state':collection['state'],
                         'partial_collection':collection['state']!='complete','searched_source_tiles':total,'total_source_tiles':collection.get('total_sources',3805),
                         'searched_chip_count':collection['chip_count'],'searched_source_uris':[s['source_uri'] for s in collection['shards']],
-                        'created_utc':time.time(),'results':results}
+                        'created_utc':time.time(),'search':search_details,'results':results}
             finally:
                 model=None;query_vector=None;gc.collect()
                 torch=sys.modules.get('torch')

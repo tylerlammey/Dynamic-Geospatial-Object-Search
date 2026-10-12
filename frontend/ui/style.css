@@ -5,3 +5,5 @@
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
 .overview-status{position:absolute;top:64px;left:16px;right:58px;z-index:800;background:#fff5dd;color:#63501e;border:1px solid #e8d5a6;border-radius:6px;padding:8px 11px;font-size:12px;line-height:1.5;pointer-events:none}.overview-status:not(.hidden)~.tile-status{top:123px}
+/* Search quality is independent of how many matches are requested. */
+.search-zone select{font:inherit;color:inherit;background:#fff;border:1px solid #ccd4cb;border-radius:6px;padding:8px;max-width:120px}

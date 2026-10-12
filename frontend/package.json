@@ -2,7 +2,7 @@
   "name": "nys-imagery-search-desktop",
   "version": "0.1.0",
   "private": true,
-  "description": "Local NYS aerial imagery explorer and exact GeoRSCLIP search",
+  "description": "Local NYS aerial imagery explorer and indexed GeoRSCLIP search",
   "main": "desktop/main.cjs",
   "scripts": {
     "build": "tsc --noEmit && vite build",
