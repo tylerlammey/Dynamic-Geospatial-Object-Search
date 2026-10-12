@@ -21,7 +21,7 @@ import uuid
 
 from imagery import Inventory, TileRenderer
 from retrieval import BUSY_MESSAGE, status_snapshot, validate_query, validate_search_options
-from storage import DiskCache, atomic_json, contained, frontend_ownership
+from storage import DiskCache, atomic_json, contained, frontend_ownership, retry_windows_file_operation
 from overview import prepare_overview
 
 
@@ -121,6 +121,47 @@ class Application:
                 except (ValueError,KeyError):continue
             records.extend({k:v for k,v in r.items() if k!='backend_path'} for r in self.backend_history())
             return sorted(records,key=lambda r:r['created_utc'],reverse=True)[:50]
+
+    def clear_history(self):
+        """Remove disposable frontend searches only, while no query can publish."""
+        with self.search_lock, self.state_lock:
+            if self.search and self.search.poll() is None:
+                raise RuntimeError('Wait for the running search to finish before clearing history')
+            files=[];folders=[]
+            for relative,pattern in (
+                ('state/searches',r'[a-f0-9]{32}\.json(?:\.[a-f0-9]{32}\.tmp)?'),
+                ('state/text-vectors',r'[a-f0-9]{64}\.json(?:\.[a-f0-9]{32}\.tmp)?'),
+                ('logs/search',None),
+            ):
+                directory=self.frontend/relative
+                if directory.is_symlink() or contained(self.frontend,directory)!=directory.absolute():
+                    raise ValueError('History directories cannot be redirected')
+                if not directory.exists():continue
+                for path in directory.iterdir():
+                    if pattern:
+                        if re.fullmatch(pattern,path.name):files.append(path)
+                    elif re.fullmatch('[a-f0-9]{32}',path.name):
+                        if path.is_symlink() or contained(directory,path)!=path.absolute() or not path.is_dir():
+                            raise ValueError('Search log folders cannot be redirected')
+                        folders.append(path)
+                        for child in path.iterdir():
+                            if not re.fullmatch(r'(?:worker\.log|(?:request|status)\.json(?:\.[a-f0-9]{32}\.tmp)?)',child.name):
+                                raise ValueError('Unexpected file in search logs; cleanup cancelled')
+                            files.append(child)
+            # Validate every target before deleting anything. Never follow links
+            # or recurse into an unexpected directory, including Windows junctions.
+            for path in files:
+                if path.is_symlink() or contained(self.frontend,path)!=path.absolute() or not path.is_file():
+                    raise ValueError('History files must be regular frontend files')
+            if self.search_log:
+                self.search_log.close();self.search_log=None
+            freed=0
+            for path in files:
+                size=path.stat().st_size
+                retry_windows_file_operation(path.unlink);freed+=size
+            for folder in folders:retry_windows_file_operation(folder.rmdir)
+            self.search=None;self.search_id=None
+            return {'removed_files':len(files),'freed_bytes':freed}
 
     def backend_history(self):
         """Expose compatible existing CLI searches without changing their files."""
@@ -323,6 +364,9 @@ class Handler(BaseHTTPRequestHandler):
                 if value.get('confirm')!='prepare-local-overview':raise ValueError('Confirm prepare-local-overview')
                 return self.json(app.start_overview(),202)
             if url.path=='/api/bookmarks':return self.json(app.save_bookmark(value))
+            if url.path=='/api/history/clear':
+                if value.get('confirm')!='frontend-history-only':raise ValueError('Confirm frontend-history-only')
+                return self.json(app.clear_history())
             if url.path=='/api/cache/clear':
                 if value.get('confirm')!='frontend-cache-only':raise ValueError('Confirm frontend-cache-only')
                 if app.overview_thread and app.overview_thread.is_alive():raise ValueError('Wait for overview preparation before clearing the cache')

@@ -15,7 +15,7 @@ const reuseService=process.argv.includes('--existing-service');
 const service=reuseService?null:spawn(path.join(root,'.venv/Scripts/python.exe'),['-B',path.join(front,'service/server.py'),'--frontend',front,'--ready-file',ready],{windowsHide:true,env,stdio:['ignore','ignore','pipe']});
 let serviceLog='';service?.stderr.on('data',chunk=>{serviceLog+=chunk.toString();});
 let session;let edge;let pageSocket;let browserSocket;let origin;
-let id=0;const pending=new Map();const runtimeErrors=[];const requestUrls=[];const tileRequests=[];const mockSearchRequests=[];let mockResults=null;
+let id=0;const pending=new Map();const runtimeErrors=[];const requestUrls=[];const tileRequests=[];const mockSearchRequests=[];const mockHistoryClearRequests=[];let mockResults=null;let mockHistoryCleared=false;
 function connection(url){return new Promise((resolve,reject)=>{const ws=new WebSocket(url);ws.onopen=()=>resolve(ws);ws.onerror=reject;});}
 function request(ws,method,params={}){return new Promise((resolve,reject)=>{const requestId=++id;const timeout=setTimeout(()=>{pending.delete(requestId);reject(new Error(`Timeout ${method}`));},20000);pending.set(requestId,{resolve,reject,timeout});ws.send(JSON.stringify({id:requestId,method,params}));});}
 function receive(event){const message=JSON.parse(event.data);if(message.id&&pending.has(message.id)){const p=pending.get(message.id);pending.delete(message.id);clearTimeout(p.timeout);message.error?p.reject(new Error(message.error.message)):p.resolve(message.result);}
@@ -26,7 +26,8 @@ function receive(event){const message=JSON.parse(event.data);if(message.id&&pend
     if(data.request.url.includes('/api/search-progress?')&&mockResults){void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({state:'complete',result_id:'0123456789abcdef0123456789abcdef'})).toString('base64')});}
     else if(data.request.url.endsWith('/api/search')&&data.request.method==='POST'&&mockResults){mockSearchRequests.push(JSON.parse(data.request.postData));void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:202,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({task_id:'0123456789abcdef0123456789abcdef'})).toString('base64')});}
     else if(data.request.url.includes('/api/results?')&&mockResults){void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify(mockResults)).toString('base64')});}
-    else if(data.request.url.includes('/api/history')&&mockResults){void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify([{id:'0123456789abcdef0123456789abcdef',query:'EXAMPLE TEST · baseball field',count:3,searched_source_tiles:250,total_source_tiles:3805,created_utc:Date.now()/1000}])).toString('base64')});}
+    else if(data.request.url.endsWith('/api/history/clear')&&data.request.method==='POST'&&mockResults){mockHistoryClearRequests.push(JSON.parse(data.request.postData));mockHistoryCleared=true;void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({removed_files:6,freed_bytes:2000000})).toString('base64')});}
+    else if(data.request.url.includes('/api/history')&&mockResults){void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify(mockHistoryCleared?[]:[{id:'0123456789abcdef0123456789abcdef',query:'EXAMPLE TEST · baseball field',count:3,searched_source_tiles:250,total_source_tiles:3805,created_utc:Date.now()/1000}])).toString('base64')});}
     else void request(pageSocket,'Fetch.continueRequest',{requestId:data.requestId});
   }
 }
@@ -121,6 +122,14 @@ try{
     assert.equal(mockSearchRequests.at(-1)?.search_effort,mode==='thorough'?'thorough':'balanced');
     await waitFor("!document.getElementById('search-button').disabled && document.querySelectorAll('.result-card').length===3");
   }
+  // Intercept the destructive request: real user history must never be cleared.
+  await click('#history');await waitFor("!!document.querySelector('#clear-history')");
+  await click('#clear-history');await waitFor("!!document.querySelector('#confirm-history')");
+  assert.equal(mockHistoryClearRequests.length,0,'Cleanup requires confirmation');
+  await click('#confirm-history');await waitFor("document.getElementById('dialog-title').textContent==='Saved searches' && !document.querySelector('[data-history]')");
+  assert.deepEqual(mockHistoryClearRequests,[{confirm:'frontend-history-only'}]);
+  assert.equal(await evaluate("document.querySelectorAll('.result-card').length"),3,'Displayed results remain usable');
+  await click('#close-dialog');
   // Wide and scaled viewport checks on actual imagery; intercepted ranks are
   // test fixtures only and do not persist or mutate any embedding bundle.
   for(const [width,height,label] of [[1093,720,'scaled'],[1920,1080,'large'],[900,700,'compact']]){

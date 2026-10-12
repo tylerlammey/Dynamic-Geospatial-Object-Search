@@ -112,6 +112,16 @@ current published coverage. New frontend searches store their immutable source
 snapshot, and the overlay shows that exact searched coverage. All saved-result
 metadata is checked against compatible published bundles before use.
 
+Frontend result JSON files live in `frontend/state/searches/`. In **History >
+Clear frontend history**, confirm removal to delete these results plus cached
+query vectors (`frontend/state/text-vectors/`) and per-query logs
+(`frontend/logs/search/`). The dialog reports storage reclaimed and refreshes
+the saved-search list. A running frontend search blocks cleanup. Bookmarks,
+imagery, embeddings, and CLI results in
+`data/nys-naip-2022-rgb-060m/search-results/` are preserved. Results already
+displayed remain on screen until you open or run another search. **Settings >
+Clear frontend imagery cache** separately clears cached imagery and overviews.
+
 If the collection or job-wide GPU lock is held, a new query is rejected before
 loading a model. The app shows the existing manual command:
 
