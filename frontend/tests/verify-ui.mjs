@@ -136,8 +136,11 @@ try{
   await click('#clear-history');await waitFor("!!document.querySelector('#confirm-history')");
   assert.equal(mockHistoryClearRequests.length,0,'Cleanup requires confirmation');
   await click('#confirm-history');await waitFor("document.getElementById('dialog-title').textContent==='Saved searches' && !document.querySelector('[data-history]')");
-  assert.deepEqual(mockHistoryClearRequests,[{confirm:'frontend-history-only'}]);
-  assert.equal(await evaluate("document.querySelectorAll('.result-card').length"),3,'Displayed results remain usable');
+  assert.deepEqual(mockHistoryClearRequests,[{confirm:'all-search-history'}]);
+  assert.equal(await evaluate("document.querySelectorAll('.result-card, .rank-marker, .selected-preview, .selection-nav').length"),0,'Current results, markers, and inspector must clear');
+  assert.equal(await evaluate("document.getElementById('result-count').textContent"),'0');
+  assert.equal(await evaluate("document.getElementById('query').value"),'');
+  assert.equal(await evaluate("document.getElementById('search-scope').textContent"),'');
   assert.equal(await evaluate("document.getElementById('load-model').textContent"),'Model on GPU','Clearing history must leave the resident model loaded');
   await click('#close-dialog');
   await click('#unload-model');await waitFor("document.getElementById('load-model').textContent==='Load model to GPU' && !document.getElementById('load-model').disabled");

@@ -1,4 +1,4 @@
-"""Search cleanup must never touch source data, bookmarks, or CLI outputs."""
+"""Search cleanup must never touch source imagery, embeddings, or bookmarks."""
 from http.client import HTTPConnection
 import json
 from pathlib import Path
@@ -8,6 +8,7 @@ import unittest
 from unittest.mock import Mock,patch
 
 from server import Application,Server
+from geospatial_search.embedding_control import gpu_access
 
 
 class HistoryCleanup(unittest.TestCase):
@@ -17,6 +18,8 @@ class HistoryCleanup(unittest.TestCase):
         self.root=Path(self.directory.name).resolve()
         self.app=Application.__new__(Application)
         self.app.frontend=self.root/'frontend';self.app.frontend.mkdir()
+        self.app.job=self.root/'data/nys-naip-2022-rgb-060m'
+        self.app.collection=self.app.job/'embeddings/georsclip-vith14-s256-st192'
         self.app.search_lock=threading.Lock();self.app.state_lock=threading.RLock()
         self.app.search=None;self.app.search_id=None;self.app.search_log=None
 
@@ -76,6 +79,59 @@ class HistoryCleanup(unittest.TestCase):
                 self.app.clear_history()
         self.assertTrue(result.exists())
 
+    def test_all_history_removes_backend_json_pngs_and_incomplete_outputs(self):
+        frontend=self.write('frontend/state/searches/'+('a'*32)+'.json')
+        backend='data/nys-naip-2022-rgb-060m/search-results/'
+        completed=backend+'20261011T214926687552Z-airplane/'
+        incomplete=backend+'20261011T215106035347Z-baseball-field/'
+        artifacts=[self.write(completed+name) for name in (
+            'results.json','contact-sheet.png','rank-01_score-0.2784.png','rank-02_score--0.0123.png')]
+        artifacts += [self.write(incomplete+name) for name in ('results.json.new','rank-01_score-0.2456.png')]
+        protected=[self.write(relative) for relative in (
+            'frontend/state/bookmarks.json','frontend/cache/preview.png',
+            'data/nys-naip-2022-rgb-060m/imagery/utm18/source.tif',
+            'data/nys-naip-2022-rgb-060m/embeddings/shards/source/embeddings.f16.npy',
+            'data/nys-naip-2022-rgb-060m/manifest.json',backend+'notes.txt')]
+        self.assertEqual(self.app.clear_history(include_backend=True),{'removed_files':7,'freed_bytes':28})
+        self.assertTrue(all(not path.exists() for path in [frontend,*artifacts]))
+        self.assertFalse(artifacts[0].parent.exists());self.assertFalse(artifacts[-1].parent.exists())
+        self.assertTrue(all(path.read_bytes()==b'test' for path in protected))
+        self.assertEqual(self.app.clear_history(include_backend=True),{'removed_files':0,'freed_bytes':0})
+
+    def test_backend_busy_blocks_all_cleanup_and_preserves_frontend_history(self):
+        frontend=self.write('frontend/state/searches/'+('a'*32)+'.json')
+        backend=self.write('data/nys-naip-2022-rgb-060m/search-results/example/results.json')
+        with gpu_access(self.app.job):
+            with self.assertRaisesRegex(RuntimeError,'using the GPU'):
+                self.app.clear_history(include_backend=True)
+        self.assertTrue(frontend.exists());self.assertTrue(backend.exists())
+
+    def test_unexpected_backend_data_cancels_before_any_deletion(self):
+        frontend=self.write('frontend/state/searches/'+('a'*32)+'.json')
+        backend=self.write('data/nys-naip-2022-rgb-060m/search-results/example/results.json')
+        original=self.write('data/nys-naip-2022-rgb-060m/search-results/example/source.tif')
+        with self.assertRaisesRegex(ValueError,'Unexpected file in backend'):
+            self.app.clear_history(include_backend=True)
+        self.assertTrue(all(path.exists() for path in (frontend,backend,original)))
+
+    def test_redirected_backend_directory_is_rejected_before_any_deletion(self):
+        frontend=self.write('frontend/state/searches/'+('a'*32)+'.json')
+        backend=self.write('data/nys-naip-2022-rgb-060m/search-results/example/results.json')
+        original_is_symlink=Path.is_symlink
+        with patch.object(Path,'is_symlink',lambda path: path.name=='search-results' or original_is_symlink(path)):
+            with self.assertRaisesRegex(ValueError,'Backend search directory cannot be redirected'):
+                self.app.clear_history(include_backend=True)
+        self.assertTrue(frontend.exists());self.assertTrue(backend.exists())
+
+    def test_resident_model_survives_all_history_cleanup_without_reacquiring_its_locks(self):
+        frontend=self.write('frontend/state/searches/'+('a'*32)+'.json')
+        backend=self.write('data/nys-naip-2022-rgb-060m/search-results/example/results.json')
+        self.app.model_status=Mock(return_value={'state':'ready'})
+        with gpu_access(self.app.job):
+            self.assertEqual(self.app.clear_history(include_backend=True)['removed_files'],2)
+        self.assertFalse(frontend.exists());self.assertFalse(backend.exists())
+        self.assertEqual(self.app.model_status()['state'],'ready')
+
     def test_http_cleanup_requires_auth_confirmation_and_idle_worker(self):
         result=self.write('frontend/state/searches/'+('a'*32)+'.json')
         self.app.token='synthetic-session-token'
@@ -100,6 +156,9 @@ class HistoryCleanup(unittest.TestCase):
             self.app.search.poll.return_value=0
             self.assertEqual(post(confirm),(200,{'removed_files':1,'freed_bytes':4}))
             self.assertFalse(result.exists())
+            backend=self.write('data/nys-naip-2022-rgb-060m/search-results/example/results.json')
+            self.assertEqual(post({'confirm':'all-search-history'}),(200,{'removed_files':1,'freed_bytes':4}))
+            self.assertFalse(backend.exists())
         finally:
             server.shutdown();server.server_close();thread.join(timeout=3)
 

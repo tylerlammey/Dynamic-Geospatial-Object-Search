@@ -1,5 +1,6 @@
 """Authenticated loopback service, bounded map work, serialized owned search."""
 import argparse
+from contextlib import ExitStack
 import hashlib
 from concurrent.futures import ThreadPoolExecutor,TimeoutError as FutureTimeout,CancelledError
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -202,9 +203,9 @@ class Application:
             records.extend({k:v for k,v in r.items() if k!='backend_path'} for r in self.backend_history())
             return sorted(records,key=lambda r:r['created_utc'],reverse=True)[:50]
 
-    def clear_history(self):
-        """Remove disposable frontend searches only, while no query can publish."""
-        with self.search_lock, self.state_lock:
+    def clear_history(self,include_backend=False):
+        """Remove saved search artifacts under explicitly bounded roots."""
+        with self.search_lock, self.state_lock, ExitStack() as locks:
             if self.query_running():
                 raise RuntimeError('Wait for the running search to finish before clearing history')
             files=[];folders=[]
@@ -228,6 +229,32 @@ class Application:
                             if not re.fullmatch(r'(?:worker\.log|(?:request|status)\.json(?:\.[a-f0-9]{32}\.tmp)?)',child.name):
                                 raise ValueError('Unexpected file in search logs; cleanup cancelled')
                             files.append(child)
+            backend_files=[]
+            if include_backend:
+                root=self.job/'search-results'
+                if root.is_symlink() or contained(self.job,root)!=root.absolute():
+                    raise ValueError('Backend search directory cannot be redirected')
+                model=self.model_status()['state']
+                if model in ('starting','loading','searching','unloading'):
+                    raise RuntimeError('Wait for model loading or search to finish before clearing all history')
+                if root.exists():
+                    if model!='ready':
+                        from geospatial_search.embedding_control import idle_collection,gpu_access
+                        if self.collection.is_dir():locks.enter_context(idle_collection(self.collection))
+                        locks.enter_context(gpu_access(self.job))
+                    # A ready resident worker already holds both locks, and the
+                    # search_lock above prevents sending it a competing query.
+                    for folder in root.iterdir():
+                        if folder.is_symlink() or contained(root,folder)!=folder.absolute():
+                            raise ValueError('Backend search folders cannot be redirected')
+                        if not folder.is_dir():continue
+                        folders.append(folder)
+                        for path in folder.iterdir():
+                            if not re.fullmatch(r'(?:results\.json(?:\.new)?|contact-sheet\.png|rank-\d{2,}_score--?\d+\.\d{4}\.png)',path.name):
+                                raise ValueError('Unexpected file in backend search results; cleanup cancelled')
+                            if path.is_symlink() or contained(root,path)!=path.absolute() or not path.is_file():
+                                raise ValueError('Backend results must be regular search output files')
+                            backend_files.append(path)
             # Validate every target before deleting anything. Never follow links
             # or recurse into an unexpected directory, including Windows junctions.
             for path in files:
@@ -235,6 +262,7 @@ class Application:
                     raise ValueError('History files must be regular frontend files')
             if self.search_log:
                 self.search_log.close();self.search_log=None
+            files.extend(backend_files)
             freed=0
             for path in files:
                 size=path.stat().st_size
@@ -460,8 +488,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self.json(app.start_overview(),202)
             if url.path=='/api/bookmarks':return self.json(app.save_bookmark(value))
             if url.path=='/api/history/clear':
-                if value.get('confirm')!='frontend-history-only':raise ValueError('Confirm frontend-history-only')
-                return self.json(app.clear_history())
+                confirmation=value.get('confirm')
+                if confirmation not in ('frontend-history-only','all-search-history'):
+                    raise ValueError('Confirm all-search-history or frontend-history-only')
+                return self.json(app.clear_history(include_backend=confirmation=='all-search-history'))
             if url.path=='/api/cache/clear':
                 if value.get('confirm')!='frontend-cache-only':raise ValueError('Confirm frontend-cache-only')
                 if app.overview_thread and app.overview_thread.is_alive():raise ValueError('Wait for overview preparation before clearing the cache')

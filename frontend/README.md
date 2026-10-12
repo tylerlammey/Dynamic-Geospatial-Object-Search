@@ -118,7 +118,7 @@ cluster rank or card to synchronize the footprint and inspector. Use previous/
 next and **Fit all matches** to navigate. Similarity is a ranking score, not
 object-detection confidence.
 
-Search history includes **compatible existing CLI searches** from the read-only
+Search history includes **compatible existing CLI searches** from the
 NYS `search-results/` folder and new frontend searches. You can open their real
 chips while embedding runs. Historical CLI results include their searched source
 count but not the full shard list: their coverage overlay is labeled as the
@@ -127,14 +127,20 @@ snapshot, and the overlay shows that exact searched coverage. All saved-result
 metadata is checked against compatible published bundles before use.
 
 Frontend result JSON files live in `frontend/state/searches/`. In **History >
-Clear frontend history**, confirm removal to delete these results plus cached
+Clear all search history**, confirm removal to delete these results plus cached
 query vectors (`frontend/state/text-vectors/`) and per-query logs
 (`frontend/logs/search/`). The dialog reports storage reclaimed and refreshes
-the saved-search list. A running frontend search blocks cleanup. Bookmarks,
-imagery, embeddings, and CLI results in
-`data/nys-naip-2022-rgb-060m/search-results/` are preserved. Results already
-displayed remain on screen until you open or run another search. **Settings >
-Clear frontend imagery cache** separately clears cached imagery and overviews.
+the saved-search list, and resets the displayed results, markers, query, and
+chip inspector. It also deletes saved CLI result JSON, rank PNGs, and contact
+sheets under `data/nys-naip-2022-rgb-060m/search-results/`, including incomplete
+search output folders. Source imagery, embeddings, downloader provenance,
+bookmarks, and the loaded GPU model are preserved. Cleanup refuses redirected
+paths or unexpected files and waits for an idle search/model. With no resident
+model, it acquires the existing collection/GPU locks to prevent racing a backend
+search. The legacy API confirmation `frontend-history-only` still scopes cleanup
+to frontend files; the UI now explicitly confirms `all-search-history`.
+**Settings > Clear frontend imagery cache** separately clears cached imagery
+and overviews.
 
 If the collection or job-wide GPU lock is held, a new query is rejected before
 loading a model. The app shows the existing manual command:
@@ -156,7 +162,8 @@ queries. Cached
 result chips resolve by `(shard_id, embedding_id)` back to original pixel windows.
 
 Bookmarks live under `frontend/state/`. The latest 30 frontend searches and 200
-CPU text vectors are retained. Existing backend searches are never removed.
+CPU text vectors are retained. Clear all search history also removes backend
+saved searches.
 The retrieval boundary is `service/retrieval.py`; future consumers can request
 more results without changing the renderer. Requests accept search quality
 and qualified already-seen IDs; the future decision model has not been added.

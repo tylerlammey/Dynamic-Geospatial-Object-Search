@@ -119,7 +119,10 @@ function renderOverlays(){
 }
 function renderResults(){
   $('#results-title').textContent=state.session?`“${state.session.query}”`:'Search matches';$('#result-count').textContent=String(state.results.length);
-  if(!state.session)return;
+  if(!state.session){
+    $('#result-list').innerHTML='<div class="empty-state"><strong>Your imagery is ready to explore.</strong><p>Run a text search or click downloaded imagery to inspect a native chip.</p></div>';
+    $('.pagination').classList.add('hidden');$('#page-label').textContent='';return;
+  }
   const start=state.page*PAGE;const page=state.results.slice(start,start+PAGE);
   $('#result-list').innerHTML=page.length?page.map(row=>`<button class="result-card${state.selected&&chipKey(row)===chipKey(state.selected)?' selected':''}" data-rank="${row.rank}" aria-pressed="${!!state.selected&&chipKey(row)===chipKey(state.selected)}"><img loading="lazy" src="${escape(previewUrl(row))}" alt="Native aerial chip, rank ${row.rank}"><span class="info"><span class="rank">${String(row.rank).padStart(2,'0')} · ${row.centroid_lat.toFixed(3)}° N</span><span class="score">${row.score!.toFixed(4)} similarity</span><span class="coords">${row.centroid_lon.toFixed(4)}, ${row.centroid_lat.toFixed(4)}</span></span></button>`).join(''):'<div class="empty-state"><strong>No matches.</strong><p>Try another phrase, and check the searched coverage.</p></div>';
   $('#result-list').querySelectorAll<HTMLButtonElement>('[data-rank]').forEach(button=>button.addEventListener('click',()=>select(state.results.find(row=>row.rank===Number(button.dataset.rank))!)));
@@ -127,7 +130,10 @@ function renderResults(){
   $<HTMLButtonElement>('#page-prev').disabled=state.page===0;$<HTMLButtonElement>('#page-next').disabled=start+PAGE>=state.results.length;
 }
 function renderSelection(){
-  const row=state.selected;if(!row)return;
+  const row=state.selected;if(!row){
+    $('#selection-kind').textContent='NATIVE WINDOW';
+    $('#selection').innerHTML='<div class="empty-state">Click the map or select a search result to see the actual native-resolution chip here.</div>';return;
+  }
   const isSearch=row.rank!==null;const bookmarked=state.bookmarks.some(b=>chipKey(b)===chipKey(row));
   $('#selection-kind').textContent=isSearch?'SEARCH MATCH':'MAP LOCATION';
   $('#selection').innerHTML=`<div class="selection-nav"><span>${isSearch?`Rank ${row.rank} of ${state.results.length}`:'Selected map location'}</span><button id="previous" aria-label="Previous result" ${isSearch?'':'disabled'}>←</button><button id="next" aria-label="Next result" ${isSearch?'':'disabled'}>→</button></div><div class="inspector-main"><div><div class="preview-label"><span>256 × 256 source pixels</span><span>Actual imagery</span></div><img class="selected-preview" src="${escape(previewUrl(row))}" alt="Selected actual NAIP chip"><div class="context-wrap"><img id="context-preview" src="${escape(previewUrl(row,true))}" alt="Surrounding imagery, gold chip outline" tabindex="0" role="button"><span>Surrounding imagery<br><span class="muted">Gold outline = selected chip</span></span></div></div><div><h3>${isSearch?`Match ${row.rank}`:'Map location'}</h3>${isSearch?`<div class="selection-score">${row.score!.toFixed(4)} <span class="small">SIMILARITY</span></div><p class="score-note">A ranking score, not detection confidence.</p>`:'<p class="score-note">Native chip from your downloaded imagery.</p>'}<dl class="details"><div><dt>Source</dt><dd>2022 NAIP · RGB</dd></div><div><dt>Native resolution</dt><dd>0.6 m / pixel</dd></div><div><dt>Chip width</dt><dd>153.6 m</dd></div><div><dt>Longitude</dt><dd>${row.centroid_lon.toFixed(6)}</dd></div><div><dt>Latitude</dt><dd>${row.centroid_lat.toFixed(6)}</dd></div><div><dt>Pixel window</dt><dd>${row.pixel_x}, ${row.pixel_y}<br>256 × 256</dd></div></dl><button class="bookmark" id="bookmark">${bookmarked?'★ Remove bookmark':'☆ Bookmark this chip'}</button></div></div><p class="inspector-foot">${escape(row.source_uri)}<br>${isSearch?`Shard ${escape(row.shard_id)} / row ${row.embedding_id}`:'Source grid preserved. Display map uses Web Mercator.'}</p>`;
@@ -228,17 +234,22 @@ $('#close-dialog').addEventListener('click',()=>$<HTMLDialogElement>('#dialog').
 async function showHistory(){
   const records=await api<{id:string;query:string;count:number;searched_source_tiles:number;total_source_tiles:number;created_utc:number}[]>('/api/history');
   const list=records.length?`<div class="dialog-list">${records.map(r=>`<button data-history="${r.id}">${escape(r.query)}<small>${r.count} matches · searched ${r.searched_source_tiles} / ${r.total_source_tiles} source tiles · ${new Date(r.created_utc*1000).toLocaleString()}</small></button>`).join('')}</div>`:'<p>No saved searches yet. Once a query finishes, you can reopen it here while embedding runs.</p>';
-  openDialog('Saved searches',`${list}<p><button id="clear-history" ${state.task?'disabled':''}>Clear frontend history…</button></p><p class="muted">Command-line search results remain available. Wait for any running search to finish before clearing.</p>`);
+  openDialog('Saved searches',`${list}<p><button id="clear-history" ${state.task?'disabled':''}>Clear all search history…</button></p><p class="muted">Removes frontend and command-line saved searches, generated search previews, and the currently displayed matches.</p>`);
   $('#dialog-content').querySelectorAll<HTMLButtonElement>('[data-history]').forEach(button=>button.addEventListener('click',()=>run(async()=>{
     $<HTMLDialogElement>('#dialog').close();await loadResults(button.dataset.history!);
   })));
   $('#clear-history').addEventListener('click',()=>{
-    openDialog('Clear frontend search history?', '<p>This removes saved frontend searches, cached query vectors, and search logs to free storage. Bookmarks, imagery, embeddings, and command-line results are preserved.</p><p><button id="confirm-history" class="primary">Clear frontend history</button></p>');
+    openDialog('Clear all search history?', '<p>This removes frontend and backend saved searches, generated backend search previews/contact sheets, cached query vectors, and search logs to free storage. It also clears the current results and map markers. Bookmarks, source imagery, embeddings, and the loaded GPU model are preserved.</p><p><button id="confirm-history" class="primary">Clear all search history</button></p>');
     $('#confirm-history').addEventListener('click',()=>run(async()=>{
       $<HTMLButtonElement>('#confirm-history').disabled=true;
       try{
-        const cleared=await api<{removed_files:number;freed_bytes:number}>('/api/history/clear',{confirm:'frontend-history-only'});
-        await showHistory();toast(`Frontend history cleared: ${(cleared.freed_bytes/1e6).toFixed(1)} MB freed.`);
+        const cleared=await api<{removed_files:number;freed_bytes:number}>('/api/history/clear',{confirm:'all-search-history'});
+        state.results=[];state.session=null;state.selected=null;state.page=0;state.coverage=false;
+        $<HTMLInputElement>('#query').value='';$('#search-scope').textContent='';map.closePopup();
+        $('#coverage-toggle').setAttribute('aria-pressed','false');$('#coverage-toggle').textContent='Show search coverage';
+        $('#progress').classList.add('hidden');
+        renderResults();renderSelection();renderOverlays();showCoverage();renderStatus();
+        await showHistory();toast(`Search history cleared: ${(cleared.freed_bytes/1e6).toFixed(1)} MB freed.`);
       }catch(error){if(document.querySelector('#confirm-history'))$<HTMLButtonElement>('#confirm-history').disabled=false;throw error;}
     }));
   });
