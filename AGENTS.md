@@ -1,5 +1,19 @@
 # Dynamic Geospatial Object Search: Agent Guide
 
+## Starting a new task
+
+For a new substantial task, read docs/PROJECT_STATE.md for the current project
+snapshot, operating commands, limitations, and discussed next steps. This file
+does not authorize starting the listed future work. Live manifests, collection
+catalogs, configuration, and OS locks take precedence over dated snapshots.
+Frontend work also follows frontend/AGENTS.md.
+
+Update docs/PROJECT_STATE.md after material changes to architecture, data,
+models, operating commands, known limitations, or agreed next steps. Date local
+observations; keep credentials, session tokens, PIDs, and temporary plans out
+of that document. Keep durable engineering rules here or in scoped AGENTS.md
+files, and temporary working notes under the ignored temp/ folder.
+
 ## Scope
 
 The frozen New York State 2022 NAIP base and its separately labeled 2021-release

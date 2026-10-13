@@ -4,6 +4,10 @@ Semantic text search over New York State's 2022 NAIP aerial imagery. Sources
 are native 0.6 m/pixel RGB GeoTIFFs. GeoRSCLIP encodes 256 x 256 pixel chips
 (153.6 x 153.6 meters), using a 192-pixel stride for **25% overlap**.
 
+For a new development task, start with the [current project state](docs/PROJECT_STATE.md)
+and the repository's [agent guide](AGENTS.md). Frontend-specific instructions
+are in [frontend/AGENTS.md](frontend/AGENTS.md).
+
 ## Run
 
 Use Python 3.12. Install the appropriate GPU PyTorch build first; this machine
