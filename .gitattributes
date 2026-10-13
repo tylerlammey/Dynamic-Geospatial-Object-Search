@@ -1,0 +1,2 @@
+# Embedding recipes fingerprint source bytes; Windows checkout must preserve LF.
+src/geospatial_search/*.py text eol=lf
