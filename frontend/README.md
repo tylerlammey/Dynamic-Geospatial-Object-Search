@@ -68,6 +68,9 @@ imagery; actual progress reports the measured ETA. Prepared data stays under
 A statewide display request opens one derived raster, not thousands of TIFFs.
 Visible tiles are cached, browser fetches are bounded, and obsolete requests
 are cancelled both in the browser and in queued/source-loop service work.
+Zooming keeps already-loaded imagery visible and scales it with the map while
+replacement tiles load and fade in. Only unfinished requests at obsolete zoom
+levels are cancelled; Leaflet prunes the retained imagery after replacement.
 
 If the photographic overview has not been prepared, the app shows preparation
 instructions at statewide zoom instead of displaying a misleading pixelated
@@ -297,6 +300,9 @@ node .\frontend\tests\verify-ui.mjs
 
 # Verify prepared statewide/county imagery against an already-open desktop.
 node .\frontend\tests\verify-ui.mjs --existing-service --overview
+
+# Hold replacement tiles back to check progressive zoom in/out and rapid zoom.
+node .\frontend\tests\verify-zoom.mjs
 ```
 
 These use installed Edge and the actual local TIFFs for a small area. They check
@@ -308,6 +314,11 @@ checks, local-only resources, runtime errors, and 1440 × 960 / 1093 × 720 /
 the browser; they are never published into the real collection. Ignored
 screenshots/report are in `frontend/tests/artifacts/`. This verifies CSS viewport
 adaptation, not all physical Windows monitor/DPI combinations.
+
+The zoom check serves the current build through a read-only proxy to local
+imagery. It can reuse an open desktop without restarting it or running GPU
+inference. It verifies that loaded tiles stay visible and scale during delayed
+single-step and rapid zooms, then disappear after replacements are ready.
 
 The prepared full-state, regional, county, and neighborhood views were also
 verified against the real local collection. All 3,805 photographic source

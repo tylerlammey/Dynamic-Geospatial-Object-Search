@@ -67,10 +67,10 @@ const tilePool=new TilePool();
 const jobs=new WeakMap<HTMLElement,TileJob>();
 const LocalTiles=L.GridLayer.extend({
   createTile(coords:L.Coords,done:L.DoneCallback){const img=document.createElement('img');img.alt='';img.setAttribute('role','presentation');const job={img,coords,done,controller:new AbortController(),cancelled:false};jobs.set(img,job);tilePool.enqueue(job);return img;},
-  _abortLoading(this:L.GridLayer & {_tiles:Record<string,{coords:L.Coords}>;_tileZoom:number;_removeTile:(key:string)=>void}){
-    // GridLayer retains unloaded old levels for its fade. Abort them as soon
-    // as zoom changes, rather than letting them starve the current viewport.
-    for(const [key,tile] of Object.entries(this._tiles||{}))if(tile.coords.z!==this._tileZoom)this._removeTile(key);
+  _abortLoading(this:L.GridLayer & {_tiles:Record<string,{coords:L.Coords;loaded?:number}>;_tileZoom:number;_removeTile:(key:string)=>void}){
+    // Cancel unfinished requests from old zoom levels. Loaded tiles must stay
+    // available for Leaflet to scale beneath replacements until they fade in.
+    for(const [key,tile] of Object.entries(this._tiles||{}))if(tile.coords.z!==this._tileZoom&&!tile.loaded)this._removeTile(key);
   }
 });
 const TileClass=LocalTiles as typeof L.GridLayer;
