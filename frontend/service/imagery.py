@@ -55,10 +55,14 @@ class Source:
     sha256:str
     bytes:int
     mtime:int
+    dataset_id:str='nys_naip_2022_rgb060'
+    release_year:int=2022
+    acquisition_date:str|None=None
+    inventory_fingerprint:str=''
 
 
 class Inventory:
-    def __init__(self,job,strict=True):
+    def __init__(self,job,strict=True,include_supplements=True):
         self.job=Path(job).resolve()
         manifest_path=self.job/'manifest.json'
         blob=manifest_path.read_bytes();manifest=json.loads(blob)
@@ -68,6 +72,9 @@ class Inventory:
             completion=json.loads((self.job/'completion.json').read_text(encoding='utf-8'))
             if completion.get('manifest_sha256')!=hashlib.sha256(blob).hexdigest():raise ValueError('Source manifest differs from completed acquisition')
         self.fingerprint=hashlib.sha256(blob).hexdigest()[:20]
+        self.base_fingerprint=self.fingerprint
+        from geospatial_search.gapfill import BASE_DATASET,DATASET,RELATIVE,directory,load_inventory
+        import re
         sources=[]
         for entry in manifest['tiles']:
             name=entry['name']
@@ -80,12 +87,28 @@ class Inventory:
                 expected=f"imagery/utm{entry['zone']}/{name}"
                 if record['output']!=expected or record['source_url']!=entry['url'] or record['crs']!=entry['crs'] or (record['width'],record['height'])!=(entry['width'],entry['height']) or not np.allclose(record['transform'],entry['transform'],rtol=0,atol=1e-6):
                     raise ValueError('Source record differs from manifest')
-            sources.append(Source(path.relative_to(self.job/'imagery').as_posix(),path,record['width'],record['height'],record['crs'],tuple(record['transform']),tuple(record['bounds_wgs84']),record['output_sha256'],stat.st_size,stat.st_mtime_ns))
-        self.sources=sorted(sources,key=lambda s:s.uri)
+            date=re.search(r'_(\d{4})(\d{2})(\d{2})\.tif$',name)
+            sources.append(Source(path.relative_to(self.job/'imagery').as_posix(),path,record['width'],record['height'],record['crs'],tuple(record['transform']),tuple(record['bounds_wgs84']),record['output_sha256'],stat.st_size,stat.st_mtime_ns,
+                BASE_DATASET,2022,'-'.join(date.groups()) if date else None,self.fingerprint))
+        self.base_sources=sorted(sources,key=lambda s:s.uri)
+        patches=[];supplement=directory(self.job)
+        if include_supplements and (supplement/'completion.json').exists():
+            extra,digest=load_inventory(self.job)
+            for source in extra:
+                record=json.loads((supplement/'records'/f'{source.path.name}.json').read_text())
+                stat=source.path.stat()
+                patches.append(Source(f'{RELATIVE.as_posix()}/{source.uri}',source.path,source.width,source.height,source.crs,
+                    source.transform,tuple(record['bounds_wgs84']),source.sha256,stat.st_size,stat.st_mtime_ns,
+                    DATASET,2021,record['acquisition_date'],digest[:20]))
+            self.fingerprint=hashlib.sha256((self.fingerprint+'\0'+digest).encode()).hexdigest()[:20]
+        # Draw older pixels first. Valid base pixels always cover supplements.
+        self.sources=sorted(patches,key=lambda s:s.uri)+self.base_sources
         self.by_uri={s.uri:s for s in self.sources}
         if len(self.by_uri)!=len(self.sources):raise ValueError('Duplicate sources')
         self.tree=STRtree([box(*s.bounds) for s in self.sources])
-        self.bounds=(min(s.bounds[0] for s in sources),min(s.bounds[1] for s in sources),max(s.bounds[2] for s in sources),max(s.bounds[3] for s in sources))
+        self.bounds=(min(s.bounds[0] for s in self.sources),min(s.bounds[1] for s in self.sources),max(s.bounds[2] for s in self.sources),max(s.bounds[3] for s in self.sources))
+        self.datasets=[{'dataset_id':BASE_DATASET,'release_year':2022,'sources':len(self.base_sources)}]
+        if patches:self.datasets.append({'dataset_id':DATASET,'release_year':2021,'sources':len(patches)})
 
     def intersect(self,bounds):
         return [self.sources[int(i)] for i in sorted(self.tree.query(box(*bounds)))]
@@ -95,7 +118,7 @@ class Inventory:
         if stat.st_size!=source.bytes or stat.st_mtime_ns!=source.mtime:raise ValueError('Original imagery changed; restart to verify inventory')
 
     def public(self):
-        return {'bounds':self.bounds,'count':len(self.sources),'fingerprint':self.fingerprint,'source_resolution':.6,'year':2022}
+        return {'bounds':self.bounds,'count':len(self.sources),'fingerprint':self.fingerprint,'source_resolution':.6,'year':2022,'datasets':self.datasets}
 
 
 def png(image):
@@ -112,12 +135,13 @@ class TileRenderer:
         self.photo_locks=[threading.Lock() for _ in range(64)]
         self.display_epoch=0
         self.overview_key=f'{inventory.fingerprint}/{DISPLAY_VERSION}/state.tif'
+        self.base_overview_key=f'{inventory.base_fingerprint}/{DISPLAY_VERSION}/state.tif'
 
     def overview_ready(self):return self.cache.exists(self.overview_key)
 
     def photograph(self,source):
         """One reusable, mask-aware averaged photographic source overview."""
-        key=f'{self.inventory.fingerprint}/{DISPLAY_VERSION}/sources/{Path(source.uri).stem}.png'
+        key=f'{source.inventory_fingerprint or self.inventory.fingerprint}/{DISPLAY_VERSION}/sources/{Path(source.uri).stem}.png'
         cached=self.cache.read(key)
         if cached:return Image.open(io.BytesIO(cached)).convert('RGBA')
         with self.photo_locks[hash(source.uri)%len(self.photo_locks)]:
@@ -152,11 +176,12 @@ class TileRenderer:
             target=from_bounds(*bounds,SIZE,SIZE)
             result=Image.new('RGBA',(SIZE,SIZE))
             if z<=10:
-                if not ready:
+                overview_key=self.overview_key if ready else self.base_overview_key
+                if not ready and not self.cache.exists(overview_key):
                     # Preparation is required; statewide requests must not
                     # scan thousands of original TIFFs.
                     return png(result)
-                with self.cache.file(self.overview_key) as overview:
+                with self.cache.file(overview_key) as overview:
                     if overview is None:return png(result)
                     with rasterio.Env(GDAL_PAM_ENABLED=False,GDAL_CACHEMAX=32_000_000,GDAL_NUM_THREADS='1'):
                         with rasterio.open(overview,sharing=False) as ds:
@@ -203,7 +228,8 @@ class TileRenderer:
                     from shapely import from_wkb
                     geometry=from_wkb(meta.pop('geometry')).__geo_interface__
                     return {'rank':None,'score':None,'shard_id':Path(source.uri).stem,'embedding_id':None,'chip_id':f'map:{source.uri}:{x}:{y}',
-                            'source_uri':source.uri,'source_sha256':source.sha256,'pixel_x':x,'pixel_y':y,'pixel_width':256,'pixel_height':256,'geometry':geometry,**meta}
+                            'source_uri':source.uri,'source_sha256':source.sha256,'pixel_x':x,'pixel_y':y,'pixel_width':256,'pixel_height':256,
+                            'dataset_id':source.dataset_id,'release_year':source.release_year,'acquisition_date':source.acquisition_date,'geometry':geometry,**meta}
         raise ValueError('No valid downloaded imagery at this location')
 
     def preview(self,row,context=False):

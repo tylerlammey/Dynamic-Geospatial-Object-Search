@@ -25,7 +25,7 @@ function receive(event){const message=JSON.parse(event.data);if(message.id&&pend
     const data=message.params;
     if(mockResults&&data.request.url.endsWith('/api/model/load')){mockModelRequests.push(JSON.parse(data.request.postData));mockModelState='loading';modelLoadingPolls=0;void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:202,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({state:'starting'})).toString('base64')});return;}
     if(mockResults&&data.request.url.endsWith('/api/model/unload')){mockModelState='unloaded';void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({state:'unloaded'})).toString('base64')});return;}
-    if(mockResults&&data.request.url.endsWith('/api/status')){if(mockModelState==='loading'&&++modelLoadingPolls>=3)mockModelState='ready';void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({...mockStatus,busy:false,model:{state:mockModelState}})).toString('base64')});return;}
+    if(mockResults&&new URL(data.request.url).pathname==='/api/status'){if(mockModelState==='loading'&&++modelLoadingPolls>=3)mockModelState='ready';void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({...mockStatus,busy:false,model:{state:mockModelState}})).toString('base64')});return;}
     if(data.request.url.includes('/api/search-progress?')&&mockResults){void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({state:'complete',result_id:'0123456789abcdef0123456789abcdef'})).toString('base64')});}
     else if(data.request.url.endsWith('/api/search')&&data.request.method==='POST'&&mockResults){mockSearchRequests.push(JSON.parse(data.request.postData));void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:202,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({task_id:'0123456789abcdef0123456789abcdef'})).toString('base64')});}
     else if(data.request.url.includes('/api/results?')&&mockResults){void request(pageSocket,'Fetch.fulfillRequest',{requestId:data.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify(mockResults)).toString('base64')});}
@@ -52,7 +52,8 @@ try{
   const history=await (await api('/api/history')).json();
   const cached=history.find(r=>r.id.startsWith('backend-')&&r.query==='baseball field')||history.find(r=>r.id.startsWith('backend-'));
   if(cached){const savedResponse=await api(`/api/results?id=${cached.id}`);assert.equal(savedResponse.status,200);const saved=await savedResponse.json();assert.ok(saved.results.length>0);assert.equal(saved.results[0].geometry.type,'Polygon');assert.equal(saved.run_fingerprint,status.run_fingerprint);}
-  assert.equal(config.imagery.count,3805);assert.equal((await fetch(origin+'/api/status')).status,403);
+  assert.equal(config.imagery.datasets?.find(dataset=>dataset.release_year===2022)?.sources||config.imagery.count,3805);
+  assert.equal(config.imagery.count,config.sources.length);assert.equal((await fetch(origin+'/api/status')).status,403);
   assert.equal((await fetch(origin+'/api/status',{headers:{Authorization:`Bearer ${session.token}`,Origin:'https://example.com'}})).status,403);
   assert.equal((await api('/api/tiles/21/0/0.png')).status,400);
   const overviewChecks=[];
@@ -107,8 +108,8 @@ try{
   const countBefore=tileRequests.length;await click('.leaflet-control-zoom-out');await delay(1000);await click('.leaflet-control-zoom-in');await delay(1000);assert.ok(tileRequests.length>countBefore,'Zoom must request another imagery level');
   await click('#coverage-toggle');assert.equal(await evaluate("document.getElementById('coverage-toggle').getAttribute('aria-pressed')"),'true');await click('#coverage-toggle');
   mockResults={query:'EXAMPLE TEST · baseball field',run_fingerprint:status.run_fingerprint,results:[{...chip,rank:1,score:.3184,embedding_id:1},{...chip,chip_id:chip.chip_id+'-2',rank:2,score:.3147,embedding_id:2},{...chip,chip_id:chip.chip_id+'-3',rank:3,score:.311,embedding_id:3}],searched_source_tiles:250,total_source_tiles:3805,searched_chip_count:1000,searched_source_uris:[chip.source_uri],partial_collection:true,created_utc:Date.now()/1000};
-  mockStatus=status;
-  await request(pageSocket,'Fetch.enable',{patterns:[{urlPattern:'*/api/history*'},{urlPattern:'*/api/results*'},{urlPattern:'*/api/search*'},{urlPattern:'*/api/model/*'},{urlPattern:'*/api/status'}]});
+  mockStatus={...status,overview:{...status.overview,ready:true}};
+  await request(pageSocket,'Fetch.enable',{patterns:[{urlPattern:'*/api/history*'},{urlPattern:'*/api/results*'},{urlPattern:'*/api/search*'},{urlPattern:'*/api/model/*'},{urlPattern:'*/api/status*'}]});
   await click('#history');await waitFor("!!document.querySelector('[data-history]')");await click('[data-history]');
   await waitFor("document.querySelectorAll('.result-card').length===3");
   await click('[data-rank="2"]');await waitFor("document.querySelector('.selection-nav').textContent.includes('Rank 2')");
@@ -124,8 +125,19 @@ try{
     for(let attempts=0;mockSearchRequests.length<['balanced','thorough','exact'].indexOf(mode)+1&&attempts<100;attempts++)await delay(100);
     assert.equal(mockSearchRequests.at(-1)?.search_backend,mode==='exact'?'exact':'auto');
     assert.equal(mockSearchRequests.at(-1)?.search_effort,mode==='thorough'?'thorough':'balanced');
+    assert.equal(mockSearchRequests.at(-1)?.include_supplements,true);
     await waitFor("!document.getElementById('search-button').disabled && document.querySelectorAll('.result-card').length===3");
   }
+  await click('#settings');await waitFor("!!document.querySelector('#base-only')");
+  await evaluate("document.getElementById('base-only').checked=true; document.getElementById('base-only').dispatchEvent(new Event('change',{bubbles:true}))");
+  await waitFor("!document.getElementById('dialog').open");
+  await evaluate("document.getElementById('query').value='EXAMPLE TEST'; document.getElementById('search-form').requestSubmit()");
+  for(let attempts=0;mockSearchRequests.length<4&&attempts<100;attempts++)await delay(100);
+  assert.equal(mockSearchRequests.at(-1)?.include_supplements,false);
+  await waitFor("!document.getElementById('search-button').disabled && document.querySelectorAll('.result-card').length===3");
+  await click('#settings');await waitFor("!!document.querySelector('#base-only')");
+  await evaluate("document.getElementById('base-only').checked=false; document.getElementById('base-only').dispatchEvent(new Event('change',{bubbles:true}))");
+  await waitFor("!document.getElementById('dialog').open");
   // Intercept the destructive request: real user history must never be cleared.
   await click('#load-model');await waitFor("document.getElementById('load-model').textContent==='Loading model…'");
   assert.ok(await evaluate("document.getElementById('search-button').disabled"),'Search must wait for preload');

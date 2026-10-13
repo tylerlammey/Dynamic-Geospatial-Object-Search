@@ -53,13 +53,14 @@ def validate_search_options(value):
     seen=value.get('exclude_ids',[])
     if not isinstance(seen,list) or len(seen)>20000:raise ValueError('Invalid already-seen chip IDs')
     for pair in seen:
-        if (not isinstance(pair,list) or len(pair)!=2 or not isinstance(pair[0],str)
-            or not 1<=len(pair[0])<=160 or type(pair[1]) is not int or pair[1]<0):
-            raise ValueError('Excluded chip IDs must be [shard_id, embedding_id] pairs')
+        if (not isinstance(pair,list) or len(pair) not in (2,3)
+            or any(not isinstance(value,str) or not 1<=len(value)<=160 for value in pair[:-1])
+            or type(pair[-1]) is not int or pair[-1]<0):
+            raise ValueError('Excluded IDs must be [shard_id, embedding_id] or [dataset_id, shard_id, embedding_id]')
     return backend,effort,seen
 
 
-def status_snapshot(collection,job):
+def status_snapshot(collection,job,include_supplements=True):
     collection=Path(collection);job=Path(job)
     try:
         root=json.loads((collection/'run.json').read_text(encoding='utf-8'))
@@ -75,13 +76,25 @@ def status_snapshot(collection,job):
     gpu_busy=lock_held(job/'embeddings/gpu-runtime/worker.lock')
     from geospatial_search.search_index import describe_index
     index=describe_index(collection,catalog)
-    return {'state':worker.get('state',catalog.get('state','missing')),'collection_state':catalog.get('state'),
+    coverage=[s['source_uri'] for s in shards];total_sources=catalog.get('total_sources',3805)
+    published=len(shards);chips=catalog['chip_count'];states=[catalog.get('state')]
+    from geospatial_search.gapfill import collections
+    for dataset in collections(job,include_supplements)[1:]:
+        extra=json.loads((dataset.directory/'collection.json').read_text(encoding='utf-8'))
+        extra_root=json.loads((dataset.directory/'run.json').read_text(encoding='utf-8'))
+        if extra['run_fingerprint']!=extra_root['run_fingerprint']:raise ValueError('Supplement collection fingerprint differs')
+        coverage.extend(dataset.qualify(s['source_uri']) for s in extra['shards'])
+        published+=len(extra['shards']);chips+=extra['chip_count'];total_sources+=extra['total_sources'];states.append(extra['state'])
+        if extra['state']!='complete' and lock_held(dataset.directory/'worker.lock'):
+            worker=json.loads((dataset.directory/'status.json').read_text(encoding='utf-8'))
+    collection_state='complete' if all(state=='complete' for state in states) else ('paused' if all(state in ('complete','paused') for state in states) else catalog.get('state'))
+    return {'state':worker.get('state',catalog.get('state','missing')),'collection_state':collection_state,
             'busy':collection_busy or gpu_busy,'collection_busy':collection_busy,'gpu_busy':gpu_busy,
-            'published_sources':len(shards),'total_sources':catalog.get('total_sources',3805),
-            'published_chips':catalog['chip_count'],'partial':catalog.get('state')!='complete',
+            'published_sources':published,'total_sources':total_sources,
+            'published_chips':chips,'partial':any(state!='complete' for state in states),
             'run_fingerprint':catalog.get('run_fingerprint'),'elapsed_hms':worker.get('elapsed_hms'),
             'eta_hms':worker.get('eta_hms'),'percent_complete':worker.get('percent_complete'),
-            'coverage':[s['source_uri'] for s in shards],'search_index':index}
+            'coverage':coverage,'search_index':index}
 
 
 class ExactRetrieval:
@@ -95,7 +108,7 @@ class ExactRetrieval:
         self.job=self.repository/'data/nys-naip-2022-rgb-060m'
         self.collection=self.job/'embeddings/georsclip-vith14-s256-st192'
         self.resident_model=None;self.resident_device=None;self.resident_contract=None
-        self.resident_fingerprint=None;self.resident_locks=None
+        self.resident_fingerprint=None;self.resident_locks=None;self.resident_collections=set()
 
     def preload(self,allow_partial=False,offline=True,progress=lambda value:None):
         """Keep the pinned model and both OS locks until explicitly closed."""
@@ -108,7 +121,15 @@ class ExactRetrieval:
         try:
             self.resident_locks.enter_context(idle_collection(self.collection))
             self.resident_locks.enter_context(gpu_access(self.job))
+            from geospatial_search.gapfill import collections
+            from geospatial_search.federated import compatible_models
             root,collection=search_text.read_collection(self.collection,allow_partial)
+            self.resident_collections={self.collection.resolve()}
+            for dataset in collections(self.job)[1:]:
+                self.resident_locks.enter_context(idle_collection(dataset.directory))
+                supplement,_=search_text.read_collection(dataset.directory,allow_partial)
+                compatible_models(root['model_contract'],supplement['model_contract'])
+                self.resident_collections.add(dataset.directory.resolve())
             if not collection['chip_count']:raise ValueError('No saved embeddings yet')
             progress({'state':'loading'})
             stored=root['model_contract'];config={**root['recipe']['model'],'amp':stored['amp']}
@@ -123,6 +144,7 @@ class ExactRetrieval:
 
     def close(self):
         self.resident_model=None;self.resident_device=None;self.resident_contract=None;self.resident_fingerprint=None
+        self.resident_collections=set()
         try:
             gc.collect()
             torch=sys.modules.get('torch')
@@ -141,7 +163,7 @@ class ExactRetrieval:
         from geospatial_search.download_nys_naip import sha256
         resident=self.resident_locks is not None
         if not resident and status_snapshot(self.collection,self.job)['busy']:raise RuntimeError(BUSY_MESSAGE)
-        with (nullcontext() if resident else idle_collection(self.collection)), (nullcontext() if resident else gpu_access(self.job)):
+        with (nullcontext() if resident else idle_collection(self.collection)), (nullcontext() if resident else gpu_access(self.job)), ExitStack() as extra_locks:
             model=None;query_vector=None
             try:
                 root,collection=search_text.read_collection(self.collection,allow_partial)
@@ -149,9 +171,22 @@ class ExactRetrieval:
                     if root['run_fingerprint']!=self.resident_fingerprint:raise ValueError('Loaded GPU model belongs to another collection fingerprint; unload it first')
                     verify_model_contract(root['model_contract'],self.resident_contract)
                 if not collection['chip_count']:raise ValueError('No saved embeddings yet')
-                from geospatial_search.search_index import validate_exclusions
-                validate_exclusions(collection,seen)
-                total=len(collection['shards'])
+                from geospatial_search.gapfill import Collection,BASE_DATASET,collections
+                from geospatial_search.federated import compatible_models,search as federated_search
+                if type(request.get('include_supplements',True)) is not bool:raise ValueError('include_supplements must be boolean')
+                datasets=[Collection(root['recipe'].get('dataset_id',BASE_DATASET),self.collection,self.job/'imagery',2022)]
+                datasets += collections(self.job,request.get('include_supplements',True))[1:]
+                entries=[(datasets[0],root,collection)]
+                for dataset in datasets[1:]:
+                    if resident:
+                        if dataset.directory.resolve() not in self.resident_collections:
+                            self.resident_locks.enter_context(idle_collection(dataset.directory));self.resident_collections.add(dataset.directory.resolve())
+                    else:extra_locks.enter_context(idle_collection(dataset.directory))
+                    other_root,catalog=search_text.read_collection(dataset.directory,allow_partial)
+                    compatible_models(root['model_contract'],other_root['model_contract'])
+                    entries.append((dataset,other_root,catalog))
+                total=sum(len(catalog['shards']) for _,_,catalog in entries)
+                total_sources=sum(catalog.get('total_sources',3805) for _,_,catalog in entries)
                 progress({'state':'encoding','scanned_sources':0,'searched_source_tiles':total,'total_source_tiles':collection.get('total_sources',3805)})
                 stored=root['model_contract'];config={**root['recipe']['model'],'amp':stored['amp']}
                 key=hashlib.sha256((root['run_fingerprint']+'\0'+query).encode()).hexdigest()
@@ -175,26 +210,32 @@ class ExactRetrieval:
                         yield entry
                     progress({'state':'metadata','scanned_sources':total,'searched_source_tiles':total,'total_source_tiles':collection.get('total_sources',3805)})
                 search_text.tqdm=progress_iterator
-                search_details={}
-                matches=search_text.search_collection(self.collection,collection,query_vector,top_k,
-                    backend=backend,effort=effort,exclude_ids=seen,diagnostics=search_details,
+                matches,search_details=federated_search(entries,query_vector,top_k,
+                    backend=backend,effort=effort,exclude_ids=seen,
                     progress=lambda value:progress({'searched_source_tiles':total,'total_source_tiles':collection.get('total_sources',3805),**value}))
                 by_shard={}
-                for shard,row_id,_ in matches:by_shard.setdefault(shard,[]).append(row_id)
-                metadata={shard:selected_rows(contained(self.collection/'shards',self.collection/'shards'/shard)/'chips.geoparquet',ids) for shard,ids in by_shard.items()}
+                for dataset,shard,row_id,_ in matches:by_shard.setdefault((dataset.dataset_id,shard),[]).append(row_id)
+                by_dataset={dataset.dataset_id:dataset for dataset in datasets}
+                metadata={(dataset_id,shard):selected_rows(contained(by_dataset[dataset_id].directory/'shards',by_dataset[dataset_id].directory/'shards'/shard)/'chips.geoparquet',ids)
+                    for (dataset_id,shard),ids in by_shard.items()}
                 from shapely import from_wkb
                 verified=set();results=[]
-                for rank,(shard,row_id,score) in enumerate(matches,1):
-                    row=metadata[shard][row_id]
-                    source=contained(self.job/'imagery',self.job/'imagery'/row['source_uri'])
+                for rank,(dataset,shard,row_id,score) in enumerate(matches,1):
+                    row=metadata[(dataset.dataset_id,shard)][row_id]
+                    source=contained(dataset.imagery,dataset.imagery/row['source_uri'])
                     if source not in verified:
                         if sha256(source)!=row['source_sha256']:raise ValueError('Result source checksum differs')
                         verified.add(source)
                     fields=('embedding_id','chip_id','source_uri','source_sha256','pixel_x','pixel_y','pixel_width','pixel_height','centroid_lon','centroid_lat','west','south','east','north','crs_wkt','scale_id','window_transform')
-                    results.append({'rank':rank,'score':score,'shard_id':shard,**{name:row[name] for name in fields},'geometry':from_wkb(row['geometry']).__geo_interface__})
+                    results.append({'rank':rank,'score':score,'shard_id':shard,**{name:row[name] for name in fields},
+                        'dataset_id':dataset.dataset_id,'dataset_source_uri':row['source_uri'],'source_uri':dataset.qualify(row['source_uri']),
+                        'release_year':dataset.release_year,'acquisition_date':dataset.acquisition_date(row['source_uri']),
+                        'geometry':from_wkb(row['geometry']).__geo_interface__})
                 return {'query':query,'run_fingerprint':collection['run_fingerprint'],'collection_state':collection['state'],
-                        'partial_collection':collection['state']!='complete','searched_source_tiles':total,'total_source_tiles':collection.get('total_sources',3805),
-                        'searched_chip_count':collection['chip_count'],'searched_source_uris':[s['source_uri'] for s in collection['shards']],
+                        'partial_collection':any(catalog['state']!='complete' for _,_,catalog in entries),'searched_source_tiles':total,'total_source_tiles':total_sources,
+                        'collection_fingerprints':{dataset.dataset_id:recipe['run_fingerprint'] for dataset,recipe,_ in entries},
+                        'searched_chip_count':sum(catalog['chip_count'] for _,_,catalog in entries),
+                        'searched_source_uris':[dataset.qualify(s['source_uri']) for dataset,_,catalog in entries for s in catalog['shards']],
                         'created_utc':time.time(),'search':search_details,'results':results}
             finally:
                 model=None;query_vector=None

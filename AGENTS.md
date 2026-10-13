@@ -2,10 +2,17 @@
 
 ## Scope
 
-Only New York State 2022 NAIP is active. Read README.md, docs/nys-pipeline.md,
+The frozen New York State 2022 NAIP base and its separately labeled 2021-release
+gap-fill supplement are active. Read README.md, docs/nys-pipeline.md,
 and docs/nys-naip-download.md. Keep the completed source imagery immutable at
 data/nys-naip-2022-rgb-060m/imagery/utm17, utm18, and utm19. Preserve downloader
 manifest, records, and provider metadata; do not relocate these paths.
+Read docs/nys-gapfill.md when working with supplements. Keep their imagery,
+records, recipes, and vectors separate under the primary job's supplements/;
+share the primary 300 GB budget and GPU lock. Preserve acquisition dates and
+release years. Valid base pixels take display precedence, and base-only display
+and search must remain available. Globally qualify rows by
+(dataset_id, shard_id, embedding_id).
 
 ## Code and configuration
 

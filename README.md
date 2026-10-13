@@ -39,6 +39,10 @@ The embedding launcher starts a background worker or attaches to the existing
 one. Closing the progress monitor leaves embedding running; use `-Pause` to
 save the current source tile and release the GPU before searching.
 
+The two audited interior gaps have an additive, separately labeled NAIP
+gap-fill pipeline. See the [gap-fill guide](docs/nys-gapfill.md) for download,
+verification, embedding, combined search, and strict base-only operation.
+
 ## Layout
 
 ```text

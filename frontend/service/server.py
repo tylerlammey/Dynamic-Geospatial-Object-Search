@@ -37,10 +37,12 @@ class Application:
         if type(limit) is not int or not 1_000_000<=limit<=20_000_000_000:raise ValueError('Cache limit must be 1 MB to 20 GB')
         if type(workers) is not int or not 1<=workers<=4:raise ValueError('Use 1 to 4 imagery workers')
         self.cache=DiskCache(self.frontend/'cache',limit)
-        self.inventory=None;self.renderer=None;self.imagery_error=None
+        self.inventory=None;self.renderer=None;self.base_inventory=None;self.base_renderer=None;self.imagery_error=None
         try:
             self.inventory=Inventory(self.job)
             self.renderer=TileRenderer(self.inventory,self.cache,workers)
+            self.base_inventory=Inventory(self.job,include_supplements=False) if len(self.inventory.datasets)>1 else self.inventory
+            self.base_renderer=TileRenderer(self.base_inventory,self.cache,workers) if self.base_inventory is not self.inventory else self.renderer
         except (FileNotFoundError,ValueError) as exc:self.imagery_error=str(exc)
         self.token=secrets.token_urlsafe(32)
         self.pool=ThreadPoolExecutor(max_workers=workers,thread_name_prefix='imagery')
@@ -52,17 +54,19 @@ class Application:
         self.overview_status={'state':'complete' if self.renderer and self.renderer.overview_ready() else 'idle','ready':bool(self.renderer and self.renderer.overview_ready())}
         for name in ('logs','state','state/searches','temp'):(self.frontend/name).mkdir(parents=True,exist_ok=True)
 
-    def status(self):
+    def status(self,base_only=False):
         with self.poll_lock:
             if self.last_status is None or time.monotonic()-self.status_at>3:
                 try:self.last_status=status_snapshot(self.collection,self.job)
                 except Exception as exc:self.last_status={'state':'error','error':str(exc),'busy':True,'published_sources':0,'published_chips':0,'total_sources':3805,'coverage':[],'partial':True}
                 self.status_at=time.monotonic()
             model=self.model_status()
+            renderer=self.base_renderer if base_only else self.renderer
+            snapshot=status_snapshot(self.collection,self.job,include_supplements=False) if base_only else self.last_status
             owns_gpu=model['state'] in ('loading','ready','searching','unloading')
-            return {**self.last_status,'busy':self.last_status['busy'] and not owns_gpu,'model':model,
+            return {**snapshot,'busy':snapshot['busy'] and not owns_gpu,'model':model,
                     'cache':self.cache.stats(),'imagery_error':self.imagery_error,'metrics':self.renderer.metrics if self.renderer else {},
-                    'overview':{**self.overview_status,'ready':bool(self.renderer and self.renderer.overview_ready()),'epoch':self.renderer.display_epoch if self.renderer else 0}}
+                    'overview':{**self.overview_status,'ready':bool(renderer and renderer.overview_ready()),'epoch':renderer.display_epoch if renderer else 0}}
 
     def model_status(self):
         worker=getattr(self,'model_worker',None)
@@ -140,9 +144,10 @@ class Application:
             self.status_at=0
             return {'state':'unloaded'}
 
-    def config(self):
-        sources=[] if not self.inventory else [{'uri':s.uri,'bounds':s.bounds} for s in self.inventory.sources]
-        return {'imagery':self.inventory.public() if self.inventory else None,'imagery_error':self.imagery_error,'sources':sources,
+    def config(self,base_only=False):
+        inventory=self.base_inventory if base_only else self.inventory
+        sources=[] if not inventory else [{'uri':s.uri,'bounds':s.bounds,'dataset_id':s.dataset_id,'release_year':s.release_year,'acquisition_date':s.acquisition_date} for s in inventory.sources]
+        return {'imagery':inventory.public() if inventory else None,'imagery_error':self.imagery_error,'sources':sources,
                 'tile_size':256,'native_resolution':.6,'attribution':'Courtesy USDA-FSA; distributed by NOAA Digital Coast'}
 
     def map_work(self,operation,*args,connection=None,tile=False):
@@ -163,7 +168,7 @@ class Application:
                             cancel.set();future.cancel();raise CancelledError('Browser disconnected')
         finally:self.map_slots.release()
 
-    def start_overview(self):
+    def start_overview(self,base_only=False):
         if not self.renderer:raise ValueError('Downloaded imagery is unavailable')
         self.status_at=0;status=self.status()
         if status['busy'] and status['state'] in ('running','pausing'):raise RuntimeError('Embedding is running. Prepare the display overview while embeddings are idle or manually paused.')
@@ -171,7 +176,8 @@ class Application:
             if self.overview_thread and self.overview_thread.is_alive():return self.overview_status
             self.overview_cancel.clear()
             workers=min(8,os.cpu_count() or 2)
-            self.overview_status={'state':'starting','ready':self.renderer.overview_ready(),'total_sources':len(self.inventory.sources),'completed_sources':0,'workers':workers}
+            renderer=self.base_renderer if base_only else self.renderer
+            self.overview_status={'state':'starting','ready':renderer.overview_ready(),'total_sources':len(renderer.inventory.sources),'completed_sources':0,'workers':workers}
             last_log=[0.]
             def progress(value):
                 self.overview_status={**value,'workers':workers}
@@ -185,7 +191,7 @@ class Application:
                 if os.name=='nt':
                     import ctypes
                     ctypes.windll.kernel32.SetThreadExecutionState(0x80000001)
-                try:prepare_overview(self.renderer,progress,workers,self.overview_cancel,embedding_active)
+                try:prepare_overview(renderer,progress,workers,self.overview_cancel,embedding_active)
                 except CancelledError as exc:progress({'state':'cancelled','error':str(exc)})
                 except Exception as exc:progress({'state':'error','error':str(exc)})
                 finally:
@@ -294,35 +300,47 @@ class Application:
         if status.get('run_fingerprint') and result.get('run_fingerprint')!=status['run_fingerprint']:raise ValueError('Saved results belong to another collection fingerprint')
         return result
 
-    def saved_backend(self,identifier):
-        record=next((r for r in self.backend_history() if r['id']==identifier),None)
+    def saved_backend(self,history_identifier):
+        record=next((r for r in self.backend_history() if r['id']==history_identifier),None)
         if record is None:raise ValueError('Compatible saved search was not found')
         data=json.loads(record['backend_path'].read_text(encoding='utf-8'))
         # Published bundles are immutable. Read only matching metadata groups;
         # no model, GPU lock, pause signal, or backend output write is involved.
         from geospatial_search.bundles import selected_rows,validate_bundle
+        from geospatial_search.gapfill import BASE_DATASET,collections
         from shapely import from_wkb
-        catalog=json.loads((self.collection/'collection.json').read_text(encoding='utf-8'))
-        if catalog['run_fingerprint']!=data['run_fingerprint']:raise ValueError('Saved search fingerprint differs')
-        published={s['shard_id']:s for s in catalog['shards']};groups={}
+        datasets={dataset.dataset_id:dataset for dataset in collections(self.job)}
+        catalogs={identifier:json.loads((dataset.directory/'collection.json').read_text(encoding='utf-8')) for identifier,dataset in datasets.items()}
+        fingerprints=data.get('collection_fingerprints',{BASE_DATASET:data['run_fingerprint']})
+        for identifier,fingerprint in fingerprints.items():
+            if identifier not in catalogs or catalogs[identifier]['run_fingerprint']!=fingerprint:raise ValueError('Saved search fingerprint differs')
+        groups={}
         for result in data['results']:
+            identifier=result.get('dataset_id',BASE_DATASET)
+            if identifier not in fingerprints:raise ValueError('Saved dataset is outside its recorded snapshot')
+            published={s['shard_id']:s for s in catalogs[identifier]['shards']}
             if result['shard_id'] not in published:raise ValueError('Saved result is not published')
-            groups.setdefault(result['shard_id'],[]).append(result['embedding_id'])
+            groups.setdefault((identifier,result['shard_id']),[]).append(result['embedding_id'])
         metadata={}
-        for shard,ids in groups.items():
-            folder=contained(self.collection/'shards',self.collection/'shards'/shard)
-            run=validate_bundle(folder,data['run_fingerprint'])
-            entry=published[shard]
+        for (identifier,shard),ids in groups.items():
+            dataset=datasets[identifier]
+            folder=contained(dataset.directory/'shards',dataset.directory/'shards'/shard)
+            run=validate_bundle(folder,fingerprints[identifier])
+            entry=next(entry for entry in catalogs[identifier]['shards'] if entry['shard_id']==shard)
             if run['source_uri']!=entry['source_uri'] or run['chip_count']!=entry['chip_count']:raise ValueError('Saved bundle identity differs from catalog')
-            metadata[shard]=selected_rows(folder/'chips.geoparquet',ids)
+            metadata[(identifier,shard)]=selected_rows(folder/'chips.geoparquet',ids)
         results=[]
         for saved in data['results']:
-            row=metadata[saved['shard_id']][saved['embedding_id']]
-            for field in ('source_uri','source_sha256','pixel_x','pixel_y','pixel_width','pixel_height','chip_id'):
+            identifier=saved.get('dataset_id',BASE_DATASET);dataset=datasets[identifier]
+            row=metadata[(identifier,saved['shard_id'])][saved['embedding_id']]
+            if row['source_uri']!=saved.get('dataset_source_uri',saved['source_uri']):raise ValueError('Saved source identity differs')
+            for field in ('source_sha256','pixel_x','pixel_y','pixel_width','pixel_height','chip_id'):
                 if row[field]!=saved[field]:raise ValueError('Saved result identity differs from original metadata')
-            results.append({**saved,'geometry':from_wkb(row['geometry']).__geo_interface__})
+            results.append({**saved,'dataset_id':identifier,'source_uri':dataset.qualify(row['source_uri']),
+                'dataset_source_uri':row['source_uri'],'release_year':dataset.release_year,'acquisition_date':dataset.acquisition_date(row['source_uri']),
+                'geometry':from_wkb(row['geometry']).__geo_interface__})
         return {**{key:value for key,value in data.items() if key not in ('results','collection_dir')},
-                'results':results,'created_utc':record['created_utc'],'result_id':identifier,'cached_backend':True}
+                'results':results,'created_utc':record['created_utc'],'result_id':history_identifier,'cached_backend':True}
 
     def start_search(self,value):
         query,top_k,allow_partial=validate_query(value)
@@ -341,6 +359,8 @@ class Application:
             identifier=uuid.uuid4().hex;folder=self.frontend/'logs/search'/identifier
             request={'task_id':identifier,'query':query,'top_k':top_k,'allow_partial':allow_partial,
                      'offline_model':self.settings.get('offline_model',True),'search_backend':backend,'search_effort':effort,'exclude_ids':seen}
+            if type(value.get('include_supplements',True)) is not bool:raise ValueError('include_supplements must be boolean')
+            request['include_supplements']=value.get('include_supplements',True)
             atomic_json(folder/'request.json',request,self.frontend)
             atomic_json(folder/'status.json',{'state':'starting','task_id':identifier},self.frontend)
             if model['state']=='ready':
@@ -394,6 +414,7 @@ class Application:
     def shutdown(self):
         self.overview_cancel.set()
         if self.renderer:self.renderer.close()
+        if self.base_renderer and self.base_renderer is not self.renderer:self.base_renderer.close()
         # Only the child stored by this frontend is eligible for termination.
         self.stop_model(force=True)
         if self.search and self.search.poll() is None:
@@ -446,20 +467,21 @@ class Handler(BaseHTTPRequestHandler):
         app=self.server.application;url=urlsplit(self.path);query=parse_qs(url.query);route=unquote(url.path)
         try:
             self.validate_access(route.startswith('/api/'),query)
-            if route=='/api/config':return self.json(app.config())
-            if route=='/api/status':return self.json(app.status())
+            base_only=query.get('base_only',['0'])[0]=='1'
+            if route=='/api/config':return self.json(app.config(base_only))
+            if route=='/api/status':return self.json(app.status(base_only))
             if route=='/api/history':return self.json(app.history())
             if route=='/api/bookmarks':return self.json(app.bookmarks())
             if route=='/api/results':return self.json(app.saved(query.get('id',[''])[0]))
             if route=='/api/search-progress':return self.json(app.search_progress(query.get('id',[''])[0]))
-            if route=='/api/inspect':return self.json(app.map_work(app.renderer.inspect,float(query['lon'][0]),float(query['lat'][0])))
+            if route=='/api/inspect':return self.json(app.map_work((app.base_renderer if base_only else app.renderer).inspect,float(query['lon'][0]),float(query['lat'][0])))
             if route=='/api/preview':
                 uri=query.get('source',[''])[0];source=app.inventory.by_uri.get(uri)
                 if not source:raise ValueError('Unknown source')
                 row={'source_uri':uri,'source_sha256':source.sha256,'pixel_x':int(query['x'][0]),'pixel_y':int(query['y'][0]),'pixel_width':256,'pixel_height':256}
                 return self.send(200,app.map_work(app.renderer.preview,row,query.get('context',['0'])[0]=='1'),'image/png')
             match=re.fullmatch(r'/api/tiles/(\d+)/(\d+)/(\d+)\.png',route)
-            if match:return self.send(200,app.map_work(app.renderer.tile,*map(int,match.groups()),connection=self.connection,tile=True),'image/png')
+            if match:return self.send(200,app.map_work((app.base_renderer if base_only else app.renderer).tile,*map(int,match.groups()),connection=self.connection,tile=True),'image/png')
             if route.startswith('/api/'):return self.json({'error':'Unknown API endpoint'},404)
             static=app.build/'index.html' if route=='/' else contained(app.build,app.build/route.lstrip('/'))
             if not static.is_file():return self.json({'error':'File not found'},404)
@@ -485,7 +507,7 @@ class Handler(BaseHTTPRequestHandler):
             if url.path=='/api/model/unload':return self.json(app.stop_model())
             if url.path=='/api/overview/prepare':
                 if value.get('confirm')!='prepare-local-overview':raise ValueError('Confirm prepare-local-overview')
-                return self.json(app.start_overview(),202)
+                return self.json(app.start_overview(value.get('base_only',False)),202)
             if url.path=='/api/bookmarks':return self.json(app.save_bookmark(value))
             if url.path=='/api/history/clear':
                 confirmation=value.get('confirm')
