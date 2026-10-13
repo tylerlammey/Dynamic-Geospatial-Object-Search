@@ -1,7 +1,8 @@
 param(
     [switch]$Once,
     [ValidateRange(0,1000000)][int]$MaxUpdates = 0,
-    [string]$OutputDir = 'data\nys-naip-2022-rgb-060m'
+    [string]$OutputDir = 'data\nys-naip-2022-rgb-060m',
+    [string]$Label = 'New York 2022 NAIP | 0.6 m/pixel | compressed RGB | 300 GB folder cap'
 )
 $ErrorActionPreference = 'Stop'
 $repositoryRoot = Split-Path $PSScriptRoot -Parent
@@ -20,7 +21,7 @@ function Format-RemainingTime([double]$Seconds) {
     return ('{0}s' -f [Math]::Ceiling($span.TotalSeconds))
 }
 
-Write-Host 'New York 2022 NAIP | 0.6 m/pixel | compressed RGB | 300 GB folder cap'
+Write-Host $Label
 Write-Host "Output: $jobRoot\imagery"
 if (-not $Once) { Write-Host 'Ctrl+C closes this monitor; the background download continues.' }
 try {

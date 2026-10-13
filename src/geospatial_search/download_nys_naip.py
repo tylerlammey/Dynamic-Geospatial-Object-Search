@@ -295,7 +295,7 @@ def encode(source, entry, quality, root, progress=None):
                              crs=source.crs,transform=source.transform,tiled=True,blockxsize=256,blockysize=256,
                              compress='JPEG',photometric='YCBCR',jpeg_quality=quality, BIGTIFF='NO') as target:
                 target.colorinterp=(ColorInterp.red,ColorInterp.green,ColorInterp.blue)
-                target.update_tags(SOURCE_URL=entry['url'],SOURCE_DATASET='NY_NAIP_2022_9986',
+                target.update_tags(SOURCE_URL=entry['url'],SOURCE_DATASET=entry.get('source_dataset','NY_NAIP_2022_9986'),
                                    SOURCE_ACQUISITION_DATE=entry['name'][-12:-4],JPEG_QUALITY=str(quality),
                                    ATTRIBUTION='Courtesy USDA-FSA; distributed by NOAA Digital Coast',
                                    RESOLUTION_M_PER_PIXEL='0.6',BANDS='RGB: source bands 1,2,3; NIR omitted')

@@ -18,7 +18,7 @@ from .bundles import selected_rows, top_matches, validate_bundle
 from .download_nys_naip import Budget, sha256
 from .embedding_control import gpu_access, idle_collection
 from .model import encode_text, load_model
-from .paths import EMBEDDINGS, IMAGERY, RESULTS, contained
+from .paths import EMBEDDINGS, IMAGERY, JOB, RESULTS, contained
 from .tiling import read_rgb
 from .search_index import IndexDependencyUnavailable,indexed_search,read_manifest,validate_exclusions,validate_options
 
@@ -127,16 +127,24 @@ def write_contact_sheet(paths, destination, budget):
     save_png(sheet,destination,budget)
 
 
+def imagery_job(imagery_dir):
+    imagery_dir=Path(imagery_dir).resolve()
+    return JOB if imagery_dir.is_relative_to(JOB) else imagery_dir.parent
+
+
 def run_search(args):
     if not 1 <= args.top_k <= 100:
         raise ValueError('Select between 1 and 100 rendered results')
     imagery_dir = args.imagery_dir.resolve()
-    job_root = imagery_dir.parent
+    job_root = imagery_job(imagery_dir)
     results_root = contained(job_root,args.output_dir)
     for name in ('imagery','metadata','records','temporary'):
         protected = job_root/name
         if results_root == protected or results_root.is_relative_to(protected):
             raise ValueError('Search output overlaps protected source folders')
+        source_protected=imagery_dir.parent/name
+        if results_root==source_protected or results_root.is_relative_to(source_protected):
+            raise ValueError('Search output overlaps protected source collection folders')
     budget = Budget(job_root)
     directory = args.collection_dir.resolve()
     root,collection = read_collection(directory,args.allow_partial)
@@ -192,7 +200,7 @@ def main(argv=None):
     directory=args.collection_dir.resolve()
     if not directory.is_dir():
         raise FileNotFoundError(f'Embedding collection does not exist: {directory}')
-    with idle_collection(directory), gpu_access(args.imagery_dir.resolve().parent):
+    with idle_collection(directory), gpu_access(imagery_job(args.imagery_dir)):
         try:
             return run_search(args)
         finally:
