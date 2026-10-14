@@ -132,6 +132,15 @@ Developer command resolution now selects one executable in PATH precedence
 order; the regression covers both validation and diagnostics under Windows
 PowerShell and PowerShell 7 when installed.
 
+The 2026-10-14 [test audit](TEST_AUDIT.md) reviewed all 140 Python methods,
+three browser programs, and CI/tooling. It found useful layered overlap rather
+than duplicate cases to delete, with missing boundary/adversarial coverage and
+several weak assertions/reporting claims. Its proposed runtime/test changes
+remain recommendations. The live UI check's conditional real search probe can
+race a finishing owner and start GPU inference; avoid that check during such
+ownership transitions until the probe is removed. Root guidance now requires
+waiting for local results and exact-pushed-revision GitHub test outcomes.
+
 ## Known limitations and discussed next steps
 
 - Data paths are checkout-relative, not yet a configurable external job root.

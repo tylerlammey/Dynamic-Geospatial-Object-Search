@@ -174,10 +174,36 @@ a fallback for production inference.
   compatibility changes; run `git diff --check`.
 - Run checks relevant to changed behavior. Add characterization/regression
   tests before changing masks, geometry, vector alignment, or ranking.
+- Wait for local test/build commands to finish and inspect their exit status
+  and final results. Starting a command is not evidence that checks passed.
 - Update authoritative docs and PROJECT_STATE for material changes. Record
   current validation separately from historical results.
 - Report behavior, checks run, skipped/unavailable tiers, and remaining limits.
   Commit/push only when authorized; stage explicit task-owned paths.
+
+## GitHub validation after a push
+
+After an authorized push, record the branch and full pushed commit SHA. Wait
+for the expected GitHub Actions test workflows for that exact revision to
+finish; inspect the applicable run, jobs, and required steps. A successful push
+or an older green commit does not establish that the pushed changes passed.
+Only completed successful required checks count as verified. Queued/running,
+cancelled, skipped, missing, timed-out, or inaccessible checks must be reported
+accurately and must not be called green. Explicitly optional checks remain
+optional; explain their scope rather than implying they ran.
+
+On failure, inspect the failed step/log, address issues within the authorized
+task scope, run relevant local checks, and wait again after any new push. Each
+new commit needs its own results; a rerun of an old SHA does not test new code.
+For an authorized PR merge, also verify the applicable merge-result checks.
+
+Use available connected tools, authenticated CLI/API access, or the GitHub UI.
+Poll with bounded waits/backoff and keep the user informed during the wait.
+If access or an external blocker prevents confirmation, report the exact SHA,
+run URL/status when available, and limitation; do not claim CI passed. Include
+the verified run link and result in the final handoff. This requirement does
+not authorize committing, pushing, merging, changing workflows, or GPU work
+beyond the user's existing scope.
 
 ## Git policy
 

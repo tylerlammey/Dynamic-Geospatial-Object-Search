@@ -133,3 +133,18 @@ remain separate work.
 Follow root subagent/model-tier rules, assign independent file ownership, review
 combined diffs, and validate integration. Historical PROJECT_STATE test counts
 are context, not evidence that today's checkout passes.
+
+## Wait for commit verification
+
+Finish and inspect local validation before an authorized commit. After an
+authorized push, follow the root guide's
+[GitHub validation policy](../AGENTS.md#github-validation-after-a-push): select
+the run for the exact pushed SHA and wait for the expected test workflows and
+required jobs to complete successfully. A previous revision's green run and a
+successful push are insufficient. A rerun uses the original revision; changes
+need a new commit/run. Include the run URL and outcome in the handoff, or state
+why verification remains unavailable. This policy does not expand Git scope.
+
+See [the test audit](TEST_AUDIT.md) for the current coverage inventory,
+redundancy assessment, and recommended improvements. Its findings are a dated
+review, not permission to implement the listed product or pipeline changes.
