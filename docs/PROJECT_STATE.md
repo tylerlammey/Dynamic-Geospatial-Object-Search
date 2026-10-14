@@ -116,7 +116,7 @@ Pause/resume, acquisition, and smoke-test procedures are in
 [nys-pipeline.md](nys-pipeline.md), [nys-naip-download.md](nys-naip-download.md),
 and [nys-gapfill.md](nys-gapfill.md). Frontend test/packaging procedures are in
 [../frontend/AGENTS.md](../frontend/AGENTS.md). Last relevant verification:
-2026-10-14 isolated validation passed 81 backend and 58 frontend service tests
+2026-10-14 isolated validation passed 82 backend and 58 frontend service tests
 with no skips, scoped Ruff lint/format, TypeScript/Vite, dependency consistency,
 and local documentation checks. Synthetic headless Edge smoke passed and its
 screenshot was inspected. The earlier Windows package was not rebuilt for these
@@ -125,6 +125,12 @@ Real-imagery UI and delayed single-step/rapid zoom checks also passed, with
 screenshots inspected, no browser runtime errors, and no real GPU inference.
 PowerShell scripts parsed successfully. The explicit GPU smoke mode was added
 but not run; no full embedding job was launched.
+
+The first GitHub Windows run passed dependency setup, synthetic suites, build,
+and docs but exposed duplicate Node PATH matches in the browser launcher.
+Developer command resolution now selects one executable in PATH precedence
+order; the regression covers both validation and diagnostics under Windows
+PowerShell and PowerShell 7 when installed.
 
 ## Known limitations and discussed next steps
 

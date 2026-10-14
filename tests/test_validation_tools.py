@@ -2,6 +2,7 @@
 
 import importlib.util
 import os
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -19,6 +20,17 @@ def load_tool(name):
 
 docs = load_tool("check_docs")
 runner = load_tool("run_tests")
+
+
+def native_invoker_harness():
+    script = str(ROOT / "scripts/validate.ps1").replace("'", "''")
+    return (
+        "$tokens=$null; $errors=$null; "
+        f"$ast=[System.Management.Automation.Language.Parser]::ParseFile('{script}',[ref]$tokens,[ref]$errors); "
+        "$node=$ast.Find({param($item) $item -is [System.Management.Automation.Language.FunctionDefinitionAst] "
+        "-and $item.Name -eq 'Invoke-CheckedNative'},$true); "
+        "${function:Invoke-TestNative}=$node.Body.GetScriptBlock(); $global:LASTEXITCODE=0; "
+    )
 
 
 class DocumentationValidationTests(unittest.TestCase):
@@ -70,14 +82,7 @@ class SyntheticValidationTests(unittest.TestCase):
 
 class PowerShellValidationTests(unittest.TestCase):
     def test_missing_native_tool_and_nonzero_exit_cannot_reuse_success_status(self):
-        script = str(ROOT / "scripts/validate.ps1").replace("'", "''")
-        harness = (
-            "$tokens=$null; $errors=$null; "
-            f"$ast=[System.Management.Automation.Language.Parser]::ParseFile('{script}',[ref]$tokens,[ref]$errors); "
-            "$node=$ast.Find({param($item) $item -is [System.Management.Automation.Language.FunctionDefinitionAst] "
-            "-and $item.Name -eq 'Invoke-CheckedNative'},$true); "
-            "${function:Invoke-TestNative}=$node.Body.GetScriptBlock(); $global:LASTEXITCODE=0; "
-        )
+        harness = native_invoker_harness()
         for invocation in (
             "Invoke-TestNative -Executable 'missing-tool-for-validation-regression' -Arguments @()",
             "Invoke-TestNative -Executable 'powershell.exe' -Arguments @('-NoProfile','-Command','exit 7')",
@@ -95,6 +100,51 @@ class PowerShellValidationTests(unittest.TestCase):
                 timeout=30,
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_duplicate_path_tools_use_first_executable_in_validation_and_diagnostics(self):
+        shells = ["powershell.exe"]
+        if modern_shell := shutil.which("pwsh.exe"):
+            shells.append(modern_shell)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            first, second = root / "first tools", root / "second tools"
+            for directory, marker in (
+                (first, "FIRST_NATIVE_MATCH"),
+                (second, "SECOND_NATIVE_MATCH"),
+            ):
+                directory.mkdir()
+                (directory / "agent-native-test.cmd").write_text(
+                    f"@echo {marker}\n@exit /b 0\n", encoding="utf-8"
+                )
+            environment = {
+                **os.environ,
+                "PATH": os.pathsep.join((str(first), str(second), os.environ["PATH"])),
+            }
+            doctor_script = str(ROOT / "scripts/doctor.ps1").replace("'", "''")
+            invocations = (
+                native_invoker_harness()
+                + "Invoke-TestNative -Executable 'agent-native-test.cmd' -Arguments @()",
+                f"& '{doctor_script}' -PythonExecutable 'agent-native-test.cmd'",
+            )
+            for shell in shells:
+                for invocation in invocations:
+                    with self.subTest(shell=shell, invocation=invocation):
+                        result = subprocess.run(
+                            [
+                                shell,
+                                "-NoProfile",
+                                "-NonInteractive",
+                                "-Command",
+                                "$ErrorActionPreference='Stop'; " + invocation,
+                            ],
+                            env=environment,
+                            capture_output=True,
+                            text=True,
+                            timeout=30,
+                        )
+                        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                        self.assertIn("FIRST_NATIVE_MATCH", result.stdout)
+                        self.assertNotIn("SECOND_NATIVE_MATCH", result.stdout)
 
     def test_setup_refuses_redirected_environment_before_dependency_install(self):
         with tempfile.TemporaryDirectory() as temporary:

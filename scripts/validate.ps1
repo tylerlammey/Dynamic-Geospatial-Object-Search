@@ -21,7 +21,8 @@ if (-not (Test-Path -LiteralPath $PythonExecutable)) {
 function Invoke-CheckedNative {
     param([string]$Executable, [string[]]$Arguments)
     # Fail before invocation if a tool is absent; a stale LASTEXITCODE is not success.
-    $nativeCommand = Get-Command $Executable -CommandType Application -ErrorAction Stop
+    # Runners may have several Node installations on PATH; invoke one path only.
+    $nativeCommand = Get-Command $Executable -CommandType Application -TotalCount 1 -ErrorAction Stop
     # unittest progress uses stderr; Windows PowerShell must use the exit status.
     $savedInvocationPreference = $ErrorActionPreference
     try {

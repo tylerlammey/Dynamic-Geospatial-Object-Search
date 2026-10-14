@@ -20,7 +20,7 @@ if (-not $PythonExecutable) {
 } elseif (-not [IO.Path]::IsPathRooted($PythonExecutable) -and (Test-Path -LiteralPath (Join-Path $RepositoryRoot $PythonExecutable))) {
     $PythonExecutable = Join-Path $RepositoryRoot $PythonExecutable
 }
-$pythonCommand = Get-Command $PythonExecutable -CommandType Application -ErrorAction Stop
+$pythonCommand = Get-Command $PythonExecutable -CommandType Application -TotalCount 1 -ErrorAction Stop
 $arguments = @('-B', (Join-Path $PSScriptRoot 'doctor.py'))
 foreach ($pair in @(@('--job-root', $JobRoot), @('--collection-dir', $CollectionDir), @('--config', $Config), @('--model-cache', $ModelCache))) {
     if ($pair[1]) { $arguments += $pair }
