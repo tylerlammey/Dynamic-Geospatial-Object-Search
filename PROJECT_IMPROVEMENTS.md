@@ -70,3 +70,31 @@ Evidence: [downloader](src/geospatial_search/download_nys_naip.py),
 [acquisition guide](docs/nys-naip-download.md),
 [pipeline guide](docs/nys-pipeline.md), and
 [search-index benchmarks](docs/nys-search-index.md).
+
+## Ground-truth retrieval benchmarks (2026-10-14)
+
+Evaluate retrieval against imagery with instance annotations before expanding
+country-wide acquisition. [RarePlanes](https://arxiv.org/html/2006.02963) is a
+strong aircraft benchmark: approximately 14,700 annotated aircraft appearances
+in real 0.31-0.39 m RGB imagery, with geographic polygons paired to each image.
+It is [free to download under CC BY-SA 4.0](https://registry.opendata.aws/rareplanes/).
+Use full-location RGB GeoTIFFs and background areas; the prepared crops all
+contain aircraft and would make search evaluation artificially easy. Preserve
+image/date identity because aircraft move and locations have repeat observations.
+See the [product and annotation guide](https://www.iqt.org/library/rareplanes-public-user-guide).
+
+Measure distinct-object recall at K returned chips, relevant-chip precision at
+K, and recall versus inspected chips/area and elapsed time. Count an aircraft
+once per image despite overlapping results, define visibility and evaluation
+boundaries, and report mask/grid coverage losses separately from ranking losses.
+Compare ANN with exact scoring to isolate index approximation from semantic
+retrieval quality; chip retrieval does not establish object localization accuracy.
+
+For broader classes, consider [xView](https://arxiv.org/html/1802.07856) (0.3 m;
+[CC BY-NC-SA 4.0](https://challenge.xviewdataset.org/rules)). For a European
+building benchmark, [SpaceNet 6 Rotterdam](https://spacenet.ai/rotterdam/) provides
+0.5 m, 8-bit RGB GeoTIFFs and footprint labels under
+[CC BY-SA 4.0](https://spacenet.ai/sn6-challenge/); hold out labeled RGB training
+areas because its public test set is SAR-only. These are proposals: ingestion
+needs separate dataset adapters/recipes for the current NYS/0.6 m assumptions;
+no benchmark data has been acquired or evaluation implemented.
