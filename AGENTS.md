@@ -183,7 +183,22 @@ a fallback for production inference.
 
 ## GitHub validation after a push
 
-After an authorized push, record the branch and full pushed commit SHA. Wait
+After an authorized push, record the branch and full pushed commit SHA.
+
+Documentation-only changes that cannot affect runtime, builds, dependencies,
+data contracts, or validation do not require waiting for GitHub Actions.
+Examples include prose edits to README/AGENTS files and additions to
+PROJECT_IMPROVEMENTS.md. Review the complete pushed diff, run
+`scripts/validate.ps1 -Mode Docs` and `git diff --check`, and report that local
+checks passed and GitHub validation was not awaited. This exception applies
+to this guidance update too; do not claim unobserved CI results passed.
+
+Use the full verification below when any pushed change affects code, tests,
+configuration, workflows, executable/generated inputs, or behavior-bearing
+contracts, even if stored in Markdown. If the user explicitly requests CI
+verification, wait for it regardless of the documentation-only exception.
+
+For changes requiring GitHub verification, wait
 for the expected GitHub Actions test workflows for that exact revision to
 finish; inspect the applicable run, jobs, and required steps. A successful push
 or an older green commit does not establish that the pushed changes passed.
