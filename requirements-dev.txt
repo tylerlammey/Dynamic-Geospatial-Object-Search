@@ -1,0 +1,15 @@
+# Isolated synthetic tests and developer tooling; no checkpoint downloads.
+# Install CPU torch/torchvision separately through scripts/setup-dev.ps1.
+-c constraints-dev.txt
+affine
+numpy
+rasterio
+pillow
+pyarrow
+pyproj
+shapely
+tqdm
+faiss-cpu
+threadpoolctl
+ruff
+open-clip-torch

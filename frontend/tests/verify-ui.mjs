@@ -11,9 +11,9 @@ const here=path.dirname(fileURLToPath(import.meta.url));const front=path.resolve
 const artifact=path.join(here,'artifacts');const profile=path.join(front,'.browser-profile',`ui-${Date.now()}`);const ready=path.join(front,'logs',`ui-test-${Date.now()}.json`);
 for(const directory of [artifact,profile,path.join(front,'temp'),path.join(front,'logs')])await mkdir(directory,{recursive:true});
 const env={...process.env,PYTHONDONTWRITEBYTECODE:'1',GDAL_PAM_ENABLED:'NO',TEMP:path.join(front,'temp'),TMP:path.join(front,'temp')};
-const reuseService=process.argv.includes('--existing-service');
-const service=reuseService?null:spawn(path.join(root,'.venv/Scripts/python.exe'),['-B',path.join(front,'service/server.py'),'--frontend',front,'--ready-file',ready],{windowsHide:true,env,stdio:['ignore','ignore','pipe']});
-let serviceLog='';service?.stderr.on('data',chunk=>{serviceLog+=chunk.toString();});
+const requireExisting=process.argv.includes('--existing-service');
+const autoService=process.argv.includes('--auto-service');
+let reuseService=false;let service;let serviceLog='';
 let session;let edge;let pageSocket;let browserSocket;let origin;
 let id=0;const pending=new Map();const runtimeErrors=[];const requestUrls=[];const tileRequests=[];const mockSearchRequests=[];const mockHistoryClearRequests=[];const mockModelRequests=[];let mockResults=null;let mockHistoryCleared=false;let mockStatus=null;let mockModelState='unloaded';let modelLoadingPolls=0;
 function connection(url){return new Promise((resolve,reject)=>{const ws=new WebSocket(url);ws.onopen=()=>resolve(ws);ws.onerror=reject;});}
@@ -39,14 +39,28 @@ async function click(selector){await evaluate(`document.querySelector(${JSON.str
 async function waitFor(expression,timeout=15000){for(let elapsed=0;elapsed<timeout;elapsed+=100){if(await evaluate(expression))return;await delay(100);}throw new Error(`UI condition timed out: ${expression}`);}
 async function screenshot(name){const image=await request(pageSocket,'Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(path.join(artifact,`${name}.png`),Buffer.from(image.data,'base64'));}
 async function api(route,body){return fetch(origin+route,{method:body===undefined?'GET':'POST',headers:{Authorization:`Bearer ${session.token}`,...(body===undefined?{}:{'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body)});}
+async function existingService(){
+  for(const name of await readdir(path.join(front,'logs'))){
+    if(!/^desktop-[a-f0-9-]+\.json$/.test(name))continue;
+    try{
+      const candidate=JSON.parse(await readFile(path.join(front,'logs',name),'utf8'));
+      if(!Number.isInteger(candidate.port)||candidate.port<1||candidate.port>65535||typeof candidate.token!=='string')continue;
+      const response=await fetch(`http://127.0.0.1:${candidate.port}/api/status`,{
+        headers:{Authorization:`Bearer ${candidate.token}`},signal:AbortSignal.timeout(2500)});
+      if(response.ok)return candidate;
+    }catch{}
+  }
+  return null;
+}
 
 try{
-  if(reuseService){
-    for(const name of await readdir(path.join(front,'logs'))){
-      if(!/^desktop-[a-f0-9-]+\.json$/.test(name))continue;
-      try{const candidate=JSON.parse(await readFile(path.join(front,'logs',name),'utf8'));const response=await fetch(`http://127.0.0.1:${candidate.port}/api/status`,{headers:{Authorization:`Bearer ${candidate.token}`}});if(response.ok){session=candidate;break;}}catch{}
-    }
-  }else for(let attempt=0;attempt<600;attempt++){if(service.exitCode!==null)throw new Error(serviceLog);try{session=JSON.parse(await readFile(ready,'utf8'));break;}catch{}await delay(100);}
+  if(requireExisting||autoService){session=await existingService();reuseService=!!session;}
+  if(requireExisting&&!session)throw new Error('No available desktop service; --existing-service never starts another owner.');
+  if(!session){
+    service=spawn(path.join(root,'.venv/Scripts/python.exe'),['-B',path.join(front,'service/server.py'),'--frontend',front,'--ready-file',ready],{windowsHide:true,env,stdio:['ignore','ignore','pipe']});
+    service.stderr.on('data',chunk=>{serviceLog+=chunk.toString();});
+    for(let attempt=0;attempt<600;attempt++){if(service.exitCode!==null)throw new Error(serviceLog);try{session=JSON.parse(await readFile(ready,'utf8'));break;}catch{}await delay(100);}
+  }
   assert.ok(session,'Service failed to start');origin=`http://127.0.0.1:${session.port}`;
   const status=await (await api('/api/status')).json();const config=await (await api('/api/config')).json();
   const history=await (await api('/api/history')).json();

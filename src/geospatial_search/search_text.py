@@ -52,11 +52,22 @@ def read_collection(directory: Path, allow_partial=False):
     return root,collection
 
 
-def exact_search_collection(directory: Path, collection: dict, query: np.ndarray, top_k: int):
+def exact_search_collection(directory: Path, collection: dict, query: np.ndarray, top_k: int,
+                            *, progress=None):
+    """Scan original vectors with optional per-call progress, retaining CLI tqdm.
+
+    Callbacks receive searching updates before each shard and a metadata update
+    after the successful scan. No renderer or callback is stored globally.
+    """
     if top_k <= 0 or collection['chip_count'] == 0:
         raise ValueError('Require a positive top-k and at least one published vector')
     matches = []
-    for entry in tqdm(collection['shards'],desc='Searching bundles',unit='tile'):
+    entries = collection['shards']
+    if progress is None:
+        entries = tqdm(entries,desc='Searching bundles',unit='tile')
+    for number, entry in enumerate(entries):
+        if progress is not None:
+            progress({'state':'searching','scanned_sources':number})
         shard = contained(directory/'shards',directory/'shards'/entry['shard_id'])
         run = validate_bundle(shard,collection['run_fingerprint'])
         if run['chip_count'] != entry['chip_count'] or run['source_uri'] != entry['source_uri']:
@@ -66,6 +77,8 @@ def exact_search_collection(directory: Path, collection: dict, query: np.ndarray
         matches.extend((entry['shard_id'],row_id,score) for row_id,score in candidates)
         matches = sorted(matches,key=lambda item:(-item[2],item[0],item[1]))[:top_k]
         del vectors
+    if progress is not None:
+        progress({'state':'metadata','scanned_sources':len(collection['shards'])})
     return matches
 
 
@@ -89,7 +102,8 @@ def search_collection(directory: Path, collection: dict, query: np.ndarray, top_
             except IndexDependencyUnavailable as exc:
                 if backend=='ann':raise
                 diagnostics['fallback_reason']=str(exc)
-    matches=exact_search_collection(directory,collection,query,min(collection['chip_count'],top_k+len(excluded)))
+    matches=exact_search_collection(directory,collection,query,min(collection['chip_count'],top_k+len(excluded)),
+                                    progress=progress)
     matches=[m for m in matches if (m[0],m[1]) not in excluded][:top_k]
     diagnostics.update(backend='exact',approximate=False,search_seconds=time.perf_counter()-started,
                        effort=effort,excluded_count=len(excluded))

@@ -1,22 +1,11 @@
 import L from 'leaflet';
-import type {Polygon} from 'geojson';
+import type {Chip, Configuration, ResultSet, Status} from './types';
+import {api, authenticatedUrl as url, token} from './api';
+import {createLocalTiles} from './local-tiles';
 import './style.css';
 
-type Chip={rank:number|null;score:number|null;shard_id:string;embedding_id:number|null;chip_id:string;source_uri:string;source_sha256:string;dataset_id?:string;release_year?:number;acquisition_date?:string;pixel_x:number;pixel_y:number;pixel_width:number;pixel_height:number;centroid_lon:number;centroid_lat:number;west:number;south:number;east:number;north:number;geometry:Polygon;crs_wkt:string};
-type ResultSet={query:string;result_id?:string;run_fingerprint:string;results:Chip[];searched_source_tiles:number;total_source_tiles:number;searched_chip_count:number;searched_source_uris?:string[];partial_collection:boolean;created_utc:number;search?:{backend:string;approximate:boolean;search_seconds:number}};
-type Status={state:string;collection_state:string;busy:boolean;published_sources:number;published_chips:number;total_sources:number;coverage:string[];run_fingerprint?:string;partial:boolean;error?:string;imagery_error?:string;model?:{state:string;error?:string;gpu?:string};cache:{bytes:number;limit_bytes:number;files:number};elapsed_hms?:string;eta_hms?:string;search_index?:{ready:boolean;algorithm:string};overview?:{state:string;ready:boolean;epoch:number;completed_sources?:number;total_sources?:number;eta_seconds?:number;error?:string}};
-type Configuration={imagery:{bounds:[number,number,number,number];count:number;datasets?:{dataset_id:string;release_year:number;sources:number}[]}|null;imagery_error?:string;sources:{uri:string;bounds:[number,number,number,number]}[];attribution:string};
 const $=<T extends HTMLElement=HTMLElement>(selector:string)=>{const value=document.querySelector<T>(selector);if(!value)throw new Error(`Missing UI control: ${selector}`);return value;};
 const escape=(value:unknown)=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
-const fragment=location.hash.slice(1);
-if(fragment)sessionStorage.setItem('session-token',fragment);
-const token=fragment||sessionStorage.getItem('session-token')||'';
-history.replaceState(null,'',location.pathname+location.search);
-const url=(route:string)=>`${route}${route.includes('?')?'&':'?'}token=${encodeURIComponent(token)}`;
-async function api<T>(route:string,value?:unknown):Promise<T>{
-  const response=await fetch(route,{method:value===undefined?'GET':'POST',headers:{Authorization:`Bearer ${token}`,...(value===undefined?{}:{'Content-Type':'application/json'})},body:value===undefined?undefined:JSON.stringify(value)});
-  const data=await response.json();if(!response.ok)throw new Error(data.error||`Local service returned ${response.status}`);return data as T;
-}
 const state:{results:Chip[];session:ResultSet|null;selected:Chip|null;page:number;coverage:boolean;status:Status|null;config:Configuration|null;bookmarks:Chip[];task:string|null;allowPartial:boolean}={results:[],session:null,selected:null,page:0,coverage:false,status:null,config:null,bookmarks:[],task:null,allowPartial:false};
 const PAGE=20;
 let baseOnly=false;
@@ -36,46 +25,13 @@ const coverageLayer=L.layerGroup();
 const selectedLayer=L.layerGroup().addTo(map);
 const footprints=L.layerGroup().addTo(map);
 
-type TileJob={img:HTMLImageElement;coords:L.Coords;done:L.DoneCallback;controller:AbortController;cancelled:boolean;objectUrl?:string};
-class TilePool{
-  queue:TileJob[]=[];active=0;failures=0;loaded=0;
-  enqueue(job:TileJob){this.queue.push(job);this.pump();}
-  pump(){
-    this.queue=this.queue.filter(job=>!job.cancelled);
-    while(this.active<4&&this.queue.length){const job=this.queue.shift()!;this.active++;void this.fetchTile(job).finally(()=>{this.active--;this.pump();});}
-    $('#tile-status').textContent=this.active+this.queue.length?`Loading local imagery · ${this.active} active${this.queue.length?` / ${this.queue.length} waiting`:''}`:this.failures?'Some tiles could not load. Pan or use Fit state to retry.':'';
-  }
-  async fetchTile(job:TileJob){
-    try{
-      if(job.cancelled)return;
-      const revision=`${state.status?.overview?.epoch||0}-${state.status?.overview?.ready?'ready':'preparing'}`;
-      const route=url(scoped(`/api/tiles/${job.coords.z}/${job.coords.x}/${job.coords.y}.png?display=${revision}`));
-      let response=await fetch(route,{signal:job.controller.signal});
-      for(let retry=0;response.status===503&&retry<2&&!job.cancelled;retry++){
-        await new Promise(resolve=>setTimeout(resolve,500*(retry+1)));response=await fetch(route,{signal:job.controller.signal});
-      }
-      if(!response.ok){const error=await response.json();throw new Error(error.error||'Tile read failed');}
-      const blob=await response.blob();if(job.cancelled)return;
-      job.objectUrl=URL.createObjectURL(blob);
-      job.img.onload=()=>{if(!job.cancelled){this.loaded++;job.done(undefined,job.img);}};
-      job.img.onerror=()=>{if(!job.cancelled)job.done(new Error('Tile image could not decode'),job.img);};
-      job.img.src=job.objectUrl;
-    }catch(error){if(!job.cancelled){this.failures++;job.done(error as Error,job.img);}}
-  }
-}
-const tilePool=new TilePool();
-const jobs=new WeakMap<HTMLElement,TileJob>();
-const LocalTiles=L.GridLayer.extend({
-  createTile(coords:L.Coords,done:L.DoneCallback){const img=document.createElement('img');img.alt='';img.setAttribute('role','presentation');const job={img,coords,done,controller:new AbortController(),cancelled:false};jobs.set(img,job);tilePool.enqueue(job);return img;},
-  _abortLoading(this:L.GridLayer & {_tiles:Record<string,{coords:L.Coords;loaded?:number}>;_tileZoom:number;_removeTile:(key:string)=>void}){
-    // Cancel unfinished requests from old zoom levels. Loaded tiles must stay
-    // available for Leaflet to scale beneath replacements until they fade in.
-    for(const [key,tile] of Object.entries(this._tiles||{}))if(tile.coords.z!==this._tileZoom&&!tile.loaded)this._removeTile(key);
-  }
+const tiles = createLocalTiles({
+  route: coords => {
+    const revision = `${state.status?.overview?.epoch || 0}-${state.status?.overview?.ready ? 'ready' : 'preparing'}`;
+    return url(scoped(`/api/tiles/${coords.z}/${coords.x}/${coords.y}.png?display=${revision}`));
+  },
+  report: message => { $('#tile-status').textContent = message; },
 });
-const TileClass=LocalTiles as typeof L.GridLayer;
-const tiles:L.GridLayer=new TileClass({tileSize:256,keepBuffer:1,updateWhenIdle:true,updateWhenZooming:false,bounds:[[-1,-180],[85,180]],minZoom:5,maxZoom:20});
-tiles.on('tileunload',(event:L.TileEvent)=>{const job=jobs.get(event.tile);if(job){job.cancelled=true;job.controller.abort();if(job.objectUrl)URL.revokeObjectURL(job.objectUrl);tilePool.pump();}});
 
 function geographicBounds(bounds:[number,number,number,number]):L.LatLngBounds{return L.latLngBounds([bounds[1],bounds[0]],[bounds[3],bounds[2]]);}
 function fitState(){const bounds=state.config?.imagery?.bounds;if(bounds)map.fitBounds(geographicBounds(bounds),{padding:[25,40],maxZoom:8});}
@@ -85,6 +41,7 @@ function previewUrl(row:Chip,context=false){return url(`/api/preview?source=${en
 function detailLevel(){
   const zoom=map.getZoom();
   $('#detail-level').textContent=zoom<=10?'Statewide aerial overview':zoom<14?'Aerial overview':zoom<18?'Downloaded aerial imagery':'Native-detail aerial imagery';
+  if(state.config?.synthetic)$('#detail-level').textContent='Generated synthetic imagery';
   const meters=156543.03392*Math.cos(map.getCenter().lat*Math.PI/180)/2**zoom;
   $('#coordinates').textContent=`Lon ${map.getCenter().lng.toFixed(5)} / Lat ${map.getCenter().lat.toFixed(5)}`;
   $('#display-resolution').textContent=`Display ≈ ${meters.toFixed(meters<1?2:1)} m/px`;
@@ -142,7 +99,8 @@ function renderSelection(){
   $('#selection').innerHTML=`<div class="selection-nav"><span>${isSearch?`Rank ${row.rank} of ${state.results.length}`:'Selected map location'}</span><button id="previous" aria-label="Previous result" ${isSearch?'':'disabled'}>←</button><button id="next" aria-label="Next result" ${isSearch?'':'disabled'}>→</button></div><div class="inspector-main"><div><div class="preview-label"><span>256 × 256 source pixels</span><span>Actual imagery</span></div><img class="selected-preview" src="${escape(previewUrl(row))}" alt="Selected actual NAIP chip"><div class="context-wrap"><img id="context-preview" src="${escape(previewUrl(row,true))}" alt="Surrounding imagery, gold chip outline" tabindex="0" role="button"><span>Surrounding imagery<br><span class="muted">Gold outline = selected chip</span></span></div></div><div><h3>${isSearch?`Match ${row.rank}`:'Map location'}</h3>${isSearch?`<div class="selection-score">${row.score!.toFixed(4)} <span class="small">SIMILARITY</span></div><p class="score-note">A ranking score, not detection confidence.</p>`:'<p class="score-note">Native chip from your downloaded imagery.</p>'}<dl class="details"><div><dt>Source</dt><dd>2022 NAIP · RGB</dd></div><div><dt>Native resolution</dt><dd>0.6 m / pixel</dd></div><div><dt>Chip width</dt><dd>153.6 m</dd></div><div><dt>Longitude</dt><dd>${row.centroid_lon.toFixed(6)}</dd></div><div><dt>Latitude</dt><dd>${row.centroid_lat.toFixed(6)}</dd></div><div><dt>Pixel window</dt><dd>${row.pixel_x}, ${row.pixel_y}<br>256 × 256</dd></div></dl><button class="bookmark" id="bookmark">${bookmarked?'★ Remove bookmark':'☆ Bookmark this chip'}</button></div></div><p class="inspector-foot">${escape(row.source_uri)}<br>${isSearch?`Shard ${escape(row.shard_id)} / row ${row.embedding_id}`:'Source grid preserved. Display map uses Web Mercator.'}</p>`;
   const cycle=(delta:number)=>{if(!isSearch)return;const index=state.results.findIndex(r=>chipKey(r)===chipKey(row));select(state.results[(index+delta+state.results.length)%state.results.length]);};
   $('#previous').addEventListener('click',()=>cycle(-1));$('#next').addEventListener('click',()=>cycle(1));
-  $('#selection .details div:first-child dd').textContent=row.release_year===2021?'Gap fill · 2021 release · RGB':'2022 NAIP · RGB';
+  $('#selection .details div:first-child dd').textContent=state.config?.synthetic?'Synthetic generated RGB':row.release_year===2021?'Gap fill · 2021 release · RGB':'2022 NAIP · RGB';
+  if(state.config?.synthetic)$('#selection .preview-label span:last-child').textContent='Generated imagery';
   if(row.acquisition_date){const acquired=document.createElement('div');acquired.innerHTML=`<dt>Acquired</dt><dd>${escape(row.acquisition_date)}</dd>`;$('#selection .details').append(acquired);}
   $('#bookmark').addEventListener('click',()=>run(async()=>{state.bookmarks=await api<Chip[]>('/api/bookmarks',row);renderSelection();}));
   const context=()=>openDialog('Surrounding actual imagery',`<img class="dialog-preview" src="${escape(previewUrl(row,true))}" alt="Selected chip and nearby imagery"><p>Gold outline: the original 256 × 256 pixel chip. This view shows surrounding native imagery; it does not change the embedding window.</p>`);
@@ -173,6 +131,11 @@ function renderStatus(){
   if(loading)$('#footer-worker').textContent='Loading GeoRSCLIP onto the GPU · imagery browsing remains available';
   else if(resident)$('#footer-worker').textContent='GeoRSCLIP stays on GPU · unload the model before embedding or CLI search';
   $('.search-meta').textContent=status.search_index?.ready?'GeoRSCLIP · fast search / exact candidate scores':'GeoRSCLIP · exact similarity search';
+  if(state.config?.synthetic){
+    $('#load-model').textContent=resident?'Mock model ready':'Enable mock model';
+    $('.search-meta').textContent='Mock queries · no semantic relevance';
+    $('#footer-worker').textContent='Synthetic development · no GPU model loaded';
+  }
   $('#cache-status').textContent=`Cache ${(status.cache.bytes/1e9).toFixed(2)} / ${(status.cache.limit_bytes/1e9).toFixed(2)} GB`;
   const overview=status.overview;
   if(overview){
@@ -203,7 +166,7 @@ async function refreshStatus(){
 async function pollModel(){
   await refreshStatus();
   if(['starting','loading'].includes(state.status?.model?.state||''))window.setTimeout(()=>run(pollModel),1000);
-  else if(state.status?.model?.state==='ready')toast('GeoRSCLIP is ready on the GPU. Searches will reuse this model.');
+  else if(state.status?.model?.state==='ready')toast(state.config?.synthetic?'Mock model enabled. No GPU model was loaded.':'GeoRSCLIP is ready on the GPU. Searches will reuse this model.');
 }
 $('#load-model').addEventListener('click',()=>run(async()=>{
   if(modelAction)return;modelAction=true;renderStatus();
@@ -212,7 +175,7 @@ $('#load-model').addEventListener('click',()=>run(async()=>{
 }));
 $('#unload-model').addEventListener('click',()=>run(async()=>{
   if(modelAction)return;modelAction=true;renderStatus();
-  try{await api('/api/model/unload',{});await refreshStatus();toast('Model unloaded; the GPU is available again.');}
+  try{await api('/api/model/unload',{});await refreshStatus();toast(state.config?.synthetic?'Mock model disabled.':'Model unloaded; the GPU is available again.');}
   finally{modelAction=false;renderStatus();}
 }));
 async function pollSearch(identifier:string){
@@ -288,7 +251,7 @@ $('#settings').addEventListener('click',()=>{
   });
 });
 $('#bookmarks').addEventListener('click',()=>run(async()=>{state.bookmarks=await api<Chip[]>('/api/bookmarks');openDialog('Bookmarked chips',state.bookmarks.length?`<div class="dialog-list">${state.bookmarks.map((r,i)=>`<button data-bookmark="${i}">${r.centroid_lon.toFixed(5)}, ${r.centroid_lat.toFixed(5)}<small>${escape(r.source_uri)}</small></button>`).join('')}</div>`:'<p>Select a native chip, then choose “Bookmark this chip.” Bookmarks are saved locally under frontend/state/.</p>');$('#dialog-content').querySelectorAll<HTMLButtonElement>('[data-bookmark]').forEach(button=>button.addEventListener('click',()=>{$<HTMLDialogElement>('#dialog').close();select(state.bookmarks[Number(button.dataset.bookmark)]);}));}));
-$('#settings').addEventListener('click',()=>{openDialog('Local imagery & cache',`<p><strong>New York State 2022 NAIP · RGB · native 0.6 m/pixel.</strong><br>Courtesy USDA-FSA; distributed by NOAA Digital Coast.</p><p>Statewide and county views use averaged photographic overviews cached from your downloaded TIFFs. Zoom 14 and above reads and reprojects the needed native windows. Sources stay in their original NAD83 UTM grids. Display downsampling changes what you see, not your search chips.</p><p><button id="prepare-overview" ${['starting','preparing'].includes(state.status?.overview?.state||'')?'disabled':''}>Prepare photographic overview</button></p><p>Cache: ${((state.status?.cache.bytes||0)/1e9).toFixed(2)} / ${((state.status?.cache.limit_bytes||5e9)/1e9).toFixed(2)} GB. The hard limit covers temporary cache writes. Set the limit in frontend/settings.json and relaunch.</p><p><button id="clear-cache">Clear frontend imagery cache…</button></p><p><label><input id="allow-partial" type="checkbox" ${state.allowPartial?'checked':''}> Allow published bundles from an idle interrupted collection</label></p><p class="muted">This does not permit queries while the worker or GPU is busy. Paused partial collections are already searchable. The frontend never sends pause signals.</p>`);$('#prepare-overview').addEventListener('click',()=>run(async()=>{await api('/api/overview/prepare',{confirm:'prepare-local-overview'});await refreshStatus();$<HTMLDialogElement>('#dialog').close();toast('Photographic overview preparation started. Native imagery browsing remains available.');}));$('#allow-partial').addEventListener('change',event=>{state.allowPartial=(event.target as HTMLInputElement).checked;});$('#clear-cache').addEventListener('click',()=>{openDialog('Clear frontend cache?', '<p>This deletes only generated frontend/cache/ tiles and previews. Original imagery, embeddings, bookmarks, and saved searches stay at their existing paths.</p><p><button id="confirm-cache" class="primary">Clear frontend cache</button></p>');$('#confirm-cache').addEventListener('click',()=>run(async()=>{await api('/api/cache/clear',{confirm:'frontend-cache-only'});$<HTMLDialogElement>('#dialog').close();await refreshStatus();toast('Frontend imagery cache cleared. Visible tiles will be regenerated when needed.');}));});});
+$('#settings').addEventListener('click',()=>{const intro=state.config?.synthetic?`<p><strong>Synthetic development imagery · generated RGB patterns.</strong><br>${escape(state.config.attribution)}</p>`:'<p><strong>New York State 2022 NAIP · RGB · native 0.6 m/pixel.</strong><br>Courtesy USDA-FSA; distributed by NOAA Digital Coast.</p>';openDialog('Local imagery & cache',`${intro}<p>Statewide and county views use averaged photographic overviews cached from your downloaded TIFFs. Zoom 14 and above reads and reprojects the needed native windows. Sources stay in their original NAD83 UTM grids. Display downsampling changes what you see, not your search chips.</p><p><button id="prepare-overview" ${['starting','preparing'].includes(state.status?.overview?.state||'')?'disabled':''}>Prepare photographic overview</button></p><p>Cache: ${((state.status?.cache.bytes||0)/1e9).toFixed(2)} / ${((state.status?.cache.limit_bytes||5e9)/1e9).toFixed(2)} GB. The hard limit covers temporary cache writes. Set the limit in frontend/settings.json and relaunch.</p><p><button id="clear-cache">Clear frontend imagery cache…</button></p><p><label><input id="allow-partial" type="checkbox" ${state.allowPartial?'checked':''}> Allow published bundles from an idle interrupted collection</label></p><p class="muted">This does not permit queries while the worker or GPU is busy. Paused partial collections are already searchable. The frontend never sends pause signals.</p>`);$('#prepare-overview').addEventListener('click',()=>run(async()=>{await api('/api/overview/prepare',{confirm:'prepare-local-overview'});await refreshStatus();$<HTMLDialogElement>('#dialog').close();toast('Photographic overview preparation started. Native imagery browsing remains available.');}));$('#allow-partial').addEventListener('change',event=>{state.allowPartial=(event.target as HTMLInputElement).checked;});$('#clear-cache').addEventListener('click',()=>{openDialog('Clear frontend cache?', '<p>This deletes only generated frontend/cache/ tiles and previews. Original imagery, embeddings, bookmarks, and saved searches stay at their existing paths.</p><p><button id="confirm-cache" class="primary">Clear frontend cache</button></p>');$('#confirm-cache').addEventListener('click',()=>run(async()=>{await api('/api/cache/clear',{confirm:'frontend-cache-only'});$<HTMLDialogElement>('#dialog').close();await refreshStatus();toast('Frontend imagery cache cleared. Visible tiles will be regenerated when needed.');}));});});
 document.addEventListener('keydown',event=>{if(event.ctrlKey&&event.key.toLowerCase()==='k'){event.preventDefault();$('#query').focus();}});
 for(const side of ['left','right']){
   const handle=$(`.resize-handle.${side}`);let dragging=false;
@@ -300,6 +263,18 @@ for(const side of ['left','right']){
 new ResizeObserver(()=>map.invalidateSize({pan:false})).observe($('#map'));
 async function start(){
   state.config=await api<Configuration>(scoped('/api/config'));
+  if(state.config.synthetic){
+    $('#synthetic-banner').classList.remove('hidden');
+    $('#synthetic-banner').textContent='SYNTHETIC DEVELOPMENT · Generated imagery and mocked model/query results. Scores do not measure semantic relevance.';
+    $('.brand small').textContent='Synthetic development workspace';
+    $('.local-pill').textContent='SYNTHETIC IMAGERY';
+    $('#load-model').title='Enable the development mock; no model or GPU inference';
+    $('#unload-model').title='Disable the development mock';
+    $('#unload-model').textContent='Disable mock model';
+    $('.status-footer span:last-child').textContent='Generated pixels · synthetic 0.6 m/px grid';
+    map.attributionControl.removeAttribution('Courtesy USDA-FSA; distributed by NOAA Digital Coast');
+    map.attributionControl.addAttribution(escape(state.config.attribution));
+  }
   if(state.config.imagery){
     const extent=geographicBounds(state.config.imagery.bounds);
     (tiles.options as L.GridLayerOptions).bounds=extent.pad(.025);

@@ -1,0 +1,38 @@
+name: Offline validation
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-synthetic:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install isolated CPU test environment
+        shell: pwsh
+        run: ./scripts/setup-dev.ps1 -PythonExecutable (Get-Command python).Source
+      - name: Install frontend build dependencies
+        working-directory: frontend
+        run: npm ci --ignore-scripts
+      - name: Validate synthetic suites and UI build
+        shell: pwsh
+        run: ./scripts/validate.ps1 -Mode Offline
+      - name: Check documentation
+        shell: pwsh
+        run: ./scripts/validate.ps1 -Mode Docs
+      - name: Verify synthetic browser workflow with installed Edge
+        shell: pwsh
+        run: ./scripts/validate.ps1 -Mode SyntheticBrowser

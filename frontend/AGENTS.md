@@ -3,6 +3,10 @@
 These instructions apply under `frontend/` and supplement the root AGENTS.md.
 For a new substantial frontend task, read `../docs/PROJECT_STATE.md`. Use
 `README.md` here for architecture, operation, and detailed testing instructions.
+UI and service work also follows `ui/AGENTS.md` and `service/AGENTS.md`.
+Root subagent/model-tier rules apply here; coordinate file ownership and shared
+services through the parent. For asset-free work use the isolated synthetic
+workflow in [../docs/DEVELOPMENT.md](../docs/DEVELOPMENT.md).
 
 ## Scope and invariants
 

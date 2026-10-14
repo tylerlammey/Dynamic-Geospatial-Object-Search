@@ -204,12 +204,6 @@ class ExactRetrieval:
                         verify_model_contract(stored,loaded)
                     query_vector=encode_text(model,query,config['arch'],device,config['amp'])
                     atomic_json(vector_path,{'run_fingerprint':root['run_fingerprint'],'vector':query_vector.tolist()},self.frontend)
-                def progress_iterator(entries,**kwargs):
-                    for number,entry in enumerate(entries):
-                        progress({'state':'searching','scanned_sources':number,'searched_source_tiles':total,'total_source_tiles':collection.get('total_sources',3805)})
-                        yield entry
-                    progress({'state':'metadata','scanned_sources':total,'searched_source_tiles':total,'total_source_tiles':collection.get('total_sources',3805)})
-                search_text.tqdm=progress_iterator
                 matches,search_details=federated_search(entries,query_vector,top_k,
                     backend=backend,effort=effort,exclude_ids=seen,
                     progress=lambda value:progress({'searched_source_tiles':total,'total_source_tiles':collection.get('total_sources',3805),**value}))

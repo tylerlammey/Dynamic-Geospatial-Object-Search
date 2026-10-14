@@ -9,6 +9,7 @@ model-cache/
 
 # Python environments and bytecode
 .venv/
+.venv-dev/
 .venv-tmp/
 venv/
 env/

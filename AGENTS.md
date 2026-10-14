@@ -2,17 +2,70 @@
 
 ## Starting a new task
 
-For a new substantial task, read docs/PROJECT_STATE.md for the current project
-snapshot, operating commands, limitations, and discussed next steps. This file
-does not authorize starting the listed future work. Live manifests, collection
-catalogs, configuration, and OS locks take precedence over dated snapshots.
-Frontend work also follows frontend/AGENTS.md.
+1. Read [docs/PROJECT_STATE.md](docs/PROJECT_STATE.md) for a substantial task.
+   Inspect `git status --short` and preserve unrelated local changes.
+2. Find the applicable scoped `AGENTS.md` before editing. Frontend work also
+   follows [frontend/AGENTS.md](frontend/AGENTS.md).
+3. Use the task map below to find relevant code, contracts, and checks. Read
+   detailed operating guides when the task involves their pipeline operations.
+4. Identify active owners before work involving data, environments, GPU, or
+   services. [scripts/doctor.ps1](scripts/doctor.ps1) observes prerequisites
+   without repairs, model loading, downloads, or job writes by default.
+
+Explicit user instructions govern scope. Scoped guides supplement this root
+guide. Project-state snapshots and discussed future work do not authorize new
+work; live manifests, collection catalogs, configuration, and OS locks take
+precedence over dated observations. A fresh clone/worktree has no production
+dataset: start with [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 Update docs/PROJECT_STATE.md after material changes to architecture, data,
 models, operating commands, known limitations, or agreed next steps. Date local
 observations; keep credentials, session tokens, PIDs, and temporary plans out
 of that document. Keep durable engineering rules here or in scoped AGENTS.md
 files, and temporary working notes under the ignored temp/ folder.
+
+## Task map
+
+| Task | Code and context | Checks |
+| --- | --- | --- |
+| Acquisition, budget, provenance | `download_nys_naip.py`; [download guide](docs/nys-naip-download.md) | Backend offline suite |
+| Tiling, masks, embedding, pause/resume | `tiling.py`, `model.py`, `bundles.py`, `embed_georsclip.py`, `embedding_control.py`; [pipeline guide](docs/nys-pipeline.md) | Backend suite; explicit GPU smoke before a full GPU run |
+| Retrieval and index | `search_text.py`, `search_index.py`, `federated.py`; [index guide](docs/nys-search-index.md) | Backend and affected service suites |
+| Supplement | `gapfill*.py`, `*_gapfill.py`; [gap-fill guide](docs/nys-gapfill.md) | Backend and affected service suites |
+| UI/map | `frontend/ui/`; [UI guide](frontend/ui/AGENTS.md) | TypeScript/build; applicable browser checks |
+| Service/cache/history/workers | `frontend/service/`; [service guide](frontend/service/AGENTS.md) | Frontend suite; applicable browser checks |
+| Developer tooling/CI | `scripts/`, `.github/`; [development guide](docs/DEVELOPMENT.md) | Offline validation and Docs mode |
+| Documentation only | Authoritative guide for the subject | Docs mode; no GPU or full rebuild |
+
+Code names without a directory above are under `src/geospatial_search/`.
+See [architecture](docs/ARCHITECTURE.md) for request/ownership boundaries and
+[contracts](docs/CONTRACTS.md) for validators and persisted formats.
+
+## Subagents and delegation
+
+Use subagents when a task can be divided easily into independent, bounded
+subtasks and delegation is likely to reduce elapsed time or improve review
+quality. Examples include independent investigations, separate test areas,
+documentation review, and implementation in separate files. Keep small or
+tightly coupled tasks with the parent.
+
+Spawned agents must never use a higher model tier than their parent. Prefer
+inheriting the parent's model. Explicit model selection requires a verified
+equal or lower tier using the current runtime/provider's documented tier
+mapping. Do not infer tier from names, version numbers, or reasoning settings.
+If ordering is unavailable, inherit; if inheritance cannot be guaranteed, do
+not spawn. Apply this rule recursively to every descendant.
+
+Give each subagent an objective, relevant instructions, permitted files or
+responsibility, dependencies, acceptance criteria, and required validation.
+Assign separate file ownership for concurrent edits. Configuration, shared
+contracts, dependencies, and PROJECT_STATE have one coordinated editor.
+Preserve unrelated local changes. Coordinate GPU, services, environments, and
+fingerprinted code through the parent; no competing owners or unapproved jobs.
+
+Subagents report findings, changed files, validation, and unresolved issues.
+The parent reviews/integrates the work, resolves conflicts, runs combined
+validation, and owns the final result. Delegation does not expand user scope.
 
 ## Scope
 
@@ -29,6 +82,13 @@ and search must remain available. Globally qualify rows by
 (dataset_id, shard_id, embedding_id).
 
 ## Code and configuration
+
+The source bytes of `embed_georsclip.py`, `tiling.py`, `model.py`, and
+`bundles.py` participate in recipe compatibility. Formatting is a compatibility
+change too. Do not run bulk formatters over these files or edit an active
+worker's checkout. The supplement fingerprints additional adapter files;
+consult `build_recipe` and the recorded recipe before changing them. Keep
+readability refactors incremental and start outside the frozen core.
 
 - configs/nys-georsclip.json: shared default grid and pinned GeoRSCLIP checkpoint.
 - src/geospatial_search/download_nys_naip.py: acquisition and shared folder budget.
@@ -98,6 +158,26 @@ or ranking, add meaningful tests. Run:
     .\.venv\Scripts\python.exe -B -m unittest discover -s tests -v
 Before a full GPU run, use scripts/embed-nys.ps1 -SmokeTest and verify text search.
 Do not launch the full embedding job merely to prepare or review the pipeline.
+
+For coordinated developer validation, use `scripts/validate.ps1 -Mode Offline`;
+it defaults to the isolated `.venv-dev`, includes both synthetic suites and the
+UI build, and requires the ANN dependencies so index coverage cannot silently
+skip. `-Mode Docs` checks local documentation links/command paths and whitespace.
+`Browser` and `GpuSmoke` are explicit local tiers with additional prerequisites.
+See [development commands](docs/DEVELOPMENT.md); validation never installs
+dependencies. CPU PyTorch is allowed only for synthetic tensor tests, never as
+a fallback for production inference.
+
+## Completing a task
+
+- Review the diff for unintended data, credentials, unrelated edits, and
+  compatibility changes; run `git diff --check`.
+- Run checks relevant to changed behavior. Add characterization/regression
+  tests before changing masks, geometry, vector alignment, or ranking.
+- Update authoritative docs and PROJECT_STATE for material changes. Record
+  current validation separately from historical results.
+- Report behavior, checks run, skipped/unavailable tiers, and remaining limits.
+  Commit/push only when authorized; stage explicit task-owned paths.
 
 ## Git policy
 

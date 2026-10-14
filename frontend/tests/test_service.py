@@ -289,6 +289,10 @@ class SearchContract(Fixtures):
         try:
             with patch('geospatial_search.model.load_model',return_value=(object(),None,'synthetic',contract)) as loader,patch('geospatial_search.model.encode_text',return_value=np.array([1,0],dtype=np.float32)):
                 result=adapter.text({'query':'test','top_k':3},updates.append)
+                self.assertIs(search_text.tqdm,original_tqdm,'Frontend retrieval must not replace CLI progress globally')
+                self.assertEqual([p for p in updates if p['state'] in ('searching','metadata')],
+                    [{'searched_source_tiles':1,'total_source_tiles':3805,'state':'searching','scanned_sources':0},
+                     {'searched_source_tiles':1,'total_source_tiles':3805,'state':'metadata','scanned_sources':1}])
                 self.assertEqual([r['embedding_id'] for r in result['results']],[0,1,2])
                 self.assertAlmostEqual(result['results'][1]['score'],.8,places=3)
                 self.assertEqual(result['searched_source_tiles'],1)
@@ -324,7 +328,7 @@ class SearchContract(Fixtures):
                 self.assertFalse(status_snapshot(collection,inventory.job)['busy'],'Failed preload must release both locks')
             self.assertTrue(any(p['state']=='searching' for p in updates))
             self.assertEqual(json.loads((collection/'collection.json').read_text()),catalog)
-        finally:search_text.tqdm=original_tqdm
+        finally:self.assertIs(search_text.tqdm,original_tqdm,'Search progress renderer must remain unchanged even after failure')
 
     def test_queries_and_contract_mismatch_fail_closed(self):
         self.assertEqual(validate_query({'query':' baseball field ','top_k':25}),('baseball field',25,False))

@@ -8,6 +8,21 @@ For a new development task, start with the [current project state](docs/PROJECT_
 and the repository's [agent guide](AGENTS.md). Frontend-specific instructions
 are in [frontend/AGENTS.md](frontend/AGENTS.md).
 
+For code changes without the statewide dataset or a GPU, use the
+[isolated development workflow](docs/DEVELOPMENT.md):
+
+```powershell
+.\scripts\setup-dev.ps1
+Push-Location frontend
+try { npm.cmd ci --ignore-scripts --no-audit --no-fund } finally { Pop-Location }
+.\scripts\validate.ps1 -Mode Offline
+.\frontend\scripts\dev-synthetic.ps1
+```
+
+This creates an independent CPU test environment and synthetic UI fixtures.
+See [architecture](docs/ARCHITECTURE.md), [contracts](docs/CONTRACTS.md), and the
+read-only `scripts/doctor.ps1` command for navigation and prerequisites.
+
 ## Run
 
 Use Python 3.12. Install the appropriate GPU PyTorch build first; this machine

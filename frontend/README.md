@@ -1,5 +1,13 @@
 # NYS Imagery Search desktop
 
+For development without local NYS imagery or a GPU, follow the
+[isolated setup and synthetic UI workflow](../docs/DEVELOPMENT.md). Use
+`scripts/validate.ps1 -Mode Offline` at the repository root for both synthetic
+suites and the UI build, and `-Mode SyntheticBrowser` for the fixture UI smoke.
+The separate `scripts/dev-synthetic.ps1` here serves generated imagery and mock
+model/search responses with a persistent synthetic banner. See
+[architecture](../docs/ARCHITECTURE.md) and [contracts](../docs/CONTRACTS.md).
+
 The desktop has ranked results on the left, a zoomable local imagery
 map in the center, and a native-chip/context inspector on the right. It reads
 the existing NYS 2022 NAIP TIFFs and compatible published GeoRSCLIP bundles.
