@@ -10,6 +10,15 @@ to change the pipeline.
 Reviewed from repository code and operating guides. No new imagery or GPU
 experiment was run.
 
+**Recommended order for future acquisition: download -> embed -> compress.**
+Validate each downloaded TIFF, embed its original downloaded RGB windows,
+publish and verify the embedding bundle, then compress the imagery for storage
+and display before deleting the temporary source. This preserves more input
+information for inference than download -> compress -> embed. It does not
+require retaining the entire original statewide dataset: process a bounded
+number of TIFFs at a time within the shared budget. The expected benefit is
+avoiding additional pixel loss; improved search accuracy remains to be measured.
+
 ### Should embeddings have come before lossy compression?
 
 **Preferably, for preserving the downloaded RGB signal.** The downloader reads
