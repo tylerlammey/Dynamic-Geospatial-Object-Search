@@ -1,9 +1,16 @@
-# Imagery pipeline: known limitations and improvements
+# Project improvements
 
-Reviewed 2026-10-14 from repository code and operating guides. Recommendations
-below are proposed work; no new imagery or GPU experiment was run.
+A running list of known flaws, limitations, and areas for improvement across the
+project. Add future findings here with concise reasoning, supporting evidence,
+and a proposed improvement. These entries are recommendations, not authorization
+to change the pipeline.
 
-## Should embeddings have come before lossy compression?
+## Imagery acquisition and embedding (2026-10-14)
+
+Reviewed from repository code and operating guides. No new imagery or GPU
+experiment was run.
+
+### Should embeddings have come before lossy compression?
 
 **Preferably, for preserving the downloaded RGB signal.** The downloader reads
 provider TIFFs, writes JPEG/YCBCR RGB at quality 83 (falling to 80, 77, or 75 to
@@ -19,7 +26,7 @@ impact is unmeasured, and compression made statewide storage practical under
 the 300 GB cap. Model preprocessing also resizes chips to 224 pixels. Compare
 representative source/compressed chip pairs before considering re-embedding.
 
-## Should embedding have overlapped downloading?
+### Should embedding have overlapped downloading?
 
 **Potentially, for earlier results and shorter total elapsed time.** Once a
 complete source TIFF is downloaded and validated, a bounded GPU consumer could
@@ -31,7 +38,7 @@ The current pipeline requires `completion.json` and all 3,805 base tiles before
 embedding. Running both existing launchers together is not a supported shortcut;
 safe overlap needs explicit orchestration, source retention, and shared budgets.
 
-## Known limitations and areas for improvement
+### Known limitations and areas for improvement
 
 | Limitation or evidence gap | Improvement and reasoning |
 | --- | --- |
