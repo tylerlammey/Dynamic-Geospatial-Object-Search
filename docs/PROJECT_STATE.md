@@ -9,7 +9,7 @@ and active OS locks before acting. Update this document after material changes.
 
 Local semantic search over NYS aerial imagery, with an Electron desktop map,
 native-chip inspector, saved searches, and GPU model preload. Agent-development
-improvements are on `remote`; `main` remains the existing development baseline.
+improvements and standalone model-selection benchmarks are now on `main`.
 `prototyping` was previously merged and removed.
 
 | Collection | Source TIFFs | Published vectors | Local state |
@@ -142,6 +142,15 @@ ownership transitions until the probe is removed. Root guidance now requires
 waiting for local results and exact-pushed-revision GitHub test outcomes.
 
 ## Known limitations and discussed next steps
+
+- 2026-10-26: standalone model research/benchmarks live in
+  [../benchmarks/model_selection/README.md](../benchmarks/model_selection/README.md).
+  They reference existing embedded native windows and isolate new dependencies,
+  checkpoints, scripts and results. Decision gating, adaptive ANN feedback and
+  bounding-box detection remain planned, not application functionality. The
+  small assistant-created annotation audit is exploratory and not human-verified
+  accuracy/calibration evidence; see its report for measured compatibility and
+  limitations. No production recipe, retrieval defaults or environment changed.
 
 - Data paths are checkout-relative, not yet a configurable external job root.
   A fresh clone/worktree lacks local imagery, vectors, weights, environments,

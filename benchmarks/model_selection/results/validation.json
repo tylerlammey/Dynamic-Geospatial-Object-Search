@@ -1,0 +1,13 @@
+{
+  "date_local": "2026-10-26",
+  "standalone_tests": {"passed": 35, "exit_code": 0, "log": "local/validation-benchmark-tests.log"},
+  "repository_offline": {"backend_passed": 82, "frontend_service_passed": 58, "skips": 0, "typescript_vite": "passed", "scoped_lint_format": "passed", "exit_code": 0, "log": "local/validation-offline-host.log"},
+  "benchmark_lint_format": {"ruff_check": "passed", "ruff_format_check": "passed", "python_files": 25},
+  "docs": {"mode": "Docs with explicit benchmark Markdown files", "passed": true},
+  "whitespace": {"git_diff_check": "passed"},
+  "protected_core": {"sha256_unchanged_across_all_nine_runs": true, "files": ["embed_georsclip.py", "tiling.py", "model.py", "bundles.py"]},
+  "final_candidates": {"completed_on_rx9070xt": 9, "same_image_query_ids_each": 108, "status_artifact": "results/final-run-status.json"},
+  "final_ownership": {"gpu": "idle", "base_collection": "idle", "supplement": "idle", "frontend": "idle"},
+  "skipped": {"browser": "UI unchanged", "pipeline_gpu_smoke": "No embedding pipeline change/full embedding run; standalone model GPU experiments performed", "github_ci": "Not run during model measurement; the later main push requires exact-revision Actions verification"},
+  "sandbox_limitations": "GPU allocation failed inside restricted sandbox and passed on host. Initial Offline attempt hit default sandbox temp permissions; successful host validation used temp directories inside benchmark/local. Neither failure was treated as a model/test success."
+}

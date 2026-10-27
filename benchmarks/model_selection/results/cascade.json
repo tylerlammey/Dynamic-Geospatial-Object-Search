@@ -1,0 +1,2070 @@
+{
+  "warning": "Convenience sample and assistant annotations; estimates exclude cold loads, extra ANN calls, scheduling and selection-dependent batch fill.",
+  "paired_recall": "Actual detector predictions removed on rejected tiles; no independence assumption.",
+  "pairs": [
+    {
+      "gate": "peekaboolean",
+      "detector": "gdino",
+      "threshold": 0.05,
+      "accepted_fraction_all_audit_pairs": 0.9537037037037037,
+      "tile_false_negatives": 0,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.6123362336233624,
+        "ap50_95": 0.3219667950832904,
+        "objects": 15,
+        "tp_at_score_threshold": 13,
+        "fp_at_score_threshold": 105,
+        "precision50_at_score_threshold": 0.11016949152542373,
+        "recall50_at_score_threshold": 0.8666666666666667,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.933993399339934,
+            "ap50_95": 0.4311286190786041,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 46,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 12,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.9030153015301533,
+            "ap50_95": 0.5347717661712671,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 47,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.636083608360836,
+        "ap50_95": 0.33635964239377,
+        "objects": 15,
+        "tp_at_score_threshold": 13,
+        "fp_at_score_threshold": 103,
+        "precision50_at_score_threshold": 0.11206896551724138,
+        "recall50_at_score_threshold": 0.8666666666666667,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.933993399339934,
+            "ap50_95": 0.4311286190786041,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 46,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 12,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.9742574257425741,
+            "ap50_95": 0.5779503081027058,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 45,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 157.533899997361,
+          "maximum_accepted_fraction_to_save_compute": 0.8619573307993056,
+          "estimated_cascade_ms_per_candidate": 171.98706393160305,
+          "estimated_speedup": 0.9159636567783385
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 125.06772502092645,
+          "maximum_accepted_fraction_to_save_compute": 0.9303745230333084,
+          "estimated_cascade_ms_per_candidate": 127.98545257397497,
+          "estimated_speedup": 0.9772026625341494
+        },
+        "8": {
+          "decision_ms_per_tile": 5.959287504083477,
+          "direct_detector_ms_per_tile": 116.0377625055844,
+          "maximum_accepted_fraction_to_save_compute": 0.9486435503804489,
+          "estimated_cascade_ms_per_candidate": 116.62493137515008,
+          "estimated_speedup": 0.9949653229147297
+        }
+      }
+    },
+    {
+      "gate": "peekaboolean",
+      "detector": "gdino",
+      "threshold": 0.1,
+      "accepted_fraction_all_audit_pairs": 0.9074074074074074,
+      "tile_false_negatives": 1,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.6123362336233624,
+        "ap50_95": 0.3219667950832904,
+        "objects": 15,
+        "tp_at_score_threshold": 13,
+        "fp_at_score_threshold": 105,
+        "precision50_at_score_threshold": 0.11016949152542373,
+        "recall50_at_score_threshold": 0.8666666666666667,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.933993399339934,
+            "ap50_95": 0.4311286190786041,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 46,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 12,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.9030153015301533,
+            "ap50_95": 0.5347717661712671,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 47,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.636083608360836,
+        "ap50_95": 0.33635964239377,
+        "objects": 15,
+        "tp_at_score_threshold": 13,
+        "fp_at_score_threshold": 94,
+        "precision50_at_score_threshold": 0.12149532710280374,
+        "recall50_at_score_threshold": 0.8666666666666667,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.933993399339934,
+            "ap50_95": 0.4311286190786041,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 46,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 3,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.9742574257425741,
+            "ap50_95": 0.5779503081027058,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 45,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 157.533899997361,
+          "maximum_accepted_fraction_to_save_compute": 0.8619573307993056,
+          "estimated_cascade_ms_per_candidate": 164.69382782061413,
+          "estimated_speedup": 0.9565258278467377
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 125.06772502092645,
+          "maximum_accepted_fraction_to_save_compute": 0.9303745230333084,
+          "estimated_cascade_ms_per_candidate": 122.19528011930244,
+          "estimated_speedup": 1.023507003697848
+        },
+        "8": {
+          "decision_ms_per_tile": 5.959287504083477,
+          "direct_detector_ms_per_tile": 116.0377625055844,
+          "maximum_accepted_fraction_to_save_compute": 0.9486435503804489,
+          "estimated_cascade_ms_per_candidate": 111.25281274063228,
+          "estimated_speedup": 1.0430096969872342
+        }
+      }
+    },
+    {
+      "gate": "peekaboolean",
+      "detector": "gdino",
+      "threshold": 0.5,
+      "accepted_fraction_all_audit_pairs": 0.7685185185185185,
+      "tile_false_negatives": 4,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.6123362336233624,
+        "ap50_95": 0.3219667950832904,
+        "objects": 15,
+        "tp_at_score_threshold": 13,
+        "fp_at_score_threshold": 105,
+        "precision50_at_score_threshold": 0.11016949152542373,
+        "recall50_at_score_threshold": 0.8666666666666667,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.933993399339934,
+            "ap50_95": 0.4311286190786041,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 46,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 12,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.9030153015301533,
+            "ap50_95": 0.5347717661712671,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 47,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.5656765676567655,
+        "ap50_95": 0.30948178586921876,
+        "objects": 15,
+        "tp_at_score_threshold": 12,
+        "fp_at_score_threshold": 79,
+        "precision50_at_score_threshold": 0.13186813186813187,
+        "recall50_at_score_threshold": 0.8,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.7227722772277227,
+            "ap50_95": 0.3504950495049505,
+            "tp_at_score_threshold": 4,
+            "fp_at_score_threshold": 34,
+            "recall50_at_score_threshold": 0.8,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.9742574257425741,
+            "ap50_95": 0.5779503081027058,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 45,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 157.533899997361,
+          "maximum_accepted_fraction_to_save_compute": 0.8619573307993056,
+          "estimated_cascade_ms_per_candidate": 142.8141194876473,
+          "estimated_speedup": 1.1030695043495813
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 125.06772502092645,
+          "maximum_accepted_fraction_to_save_compute": 0.9303745230333084,
+          "estimated_cascade_ms_per_candidate": 104.82476275528488,
+          "estimated_speedup": 1.1931124071599293
+        },
+        "8": {
+          "decision_ms_per_tile": 5.959287504083477,
+          "direct_detector_ms_per_tile": 116.0377625055844,
+          "maximum_accepted_fraction_to_save_compute": 0.9486435503804489,
+          "estimated_cascade_ms_per_candidate": 95.1364568370789,
+          "estimated_speedup": 1.2196981721139664
+        }
+      }
+    },
+    {
+      "gate": "peekaboolean",
+      "detector": "owlv2",
+      "threshold": 0.05,
+      "accepted_fraction_all_audit_pairs": 0.9537037037037037,
+      "tile_false_negatives": 0,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.5964796479647964,
+        "ap50_95": 0.3398019801980197,
+        "objects": 15,
+        "tp_at_score_threshold": 12,
+        "fp_at_score_threshold": 35,
+        "precision50_at_score_threshold": 0.2553191489361702,
+        "recall50_at_score_threshold": 0.8,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.8151815181518149,
+            "ap50_95": 0.41986798679867976,
+            "tp_at_score_threshold": 4,
+            "fp_at_score_threshold": 5,
+            "recall50_at_score_threshold": 0.8,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.9742574257425741,
+            "ap50_95": 0.5995379537953794,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 30,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.5964796479647964,
+        "ap50_95": 0.3398019801980197,
+        "objects": 15,
+        "tp_at_score_threshold": 12,
+        "fp_at_score_threshold": 35,
+        "precision50_at_score_threshold": 0.2553191489361702,
+        "recall50_at_score_threshold": 0.8,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.8151815181518149,
+            "ap50_95": 0.41986798679867976,
+            "tp_at_score_threshold": 4,
+            "fp_at_score_threshold": 5,
+            "recall50_at_score_threshold": 0.8,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.9742574257425741,
+            "ap50_95": 0.5995379537953794,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 30,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 41.039499919861555,
+          "maximum_accepted_fraction_to_save_compute": 0.4701105011587494,
+          "estimated_cascade_ms_per_candidate": 60.8859231169508,
+          "estimated_speedup": 0.6740392166023685
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 32.83025001292117,
+          "maximum_accepted_fraction_to_save_compute": 0.734759863105099,
+          "estimated_cascade_ms_per_candidate": 40.01823103856252,
+          "estimated_speedup": 0.8203823397712198
+        },
+        "8": {
+          "decision_ms_per_tile": 5.959287504083477,
+          "direct_detector_ms_per_tile": 30.278874997748062,
+          "maximum_accepted_fraction_to_save_compute": 0.8031866274910581,
+          "estimated_cascade_ms_per_candidate": 34.836362733417275,
+          "estimated_speedup": 0.8691744092072684
+        }
+      }
+    },
+    {
+      "gate": "peekaboolean",
+      "detector": "owlv2",
+      "threshold": 0.1,
+      "accepted_fraction_all_audit_pairs": 0.9074074074074074,
+      "tile_false_negatives": 1,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.5964796479647964,
+        "ap50_95": 0.3398019801980197,
+        "objects": 15,
+        "tp_at_score_threshold": 12,
+        "fp_at_score_threshold": 35,
+        "precision50_at_score_threshold": 0.2553191489361702,
+        "recall50_at_score_threshold": 0.8,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.8151815181518149,
+            "ap50_95": 0.41986798679867976,
+            "tp_at_score_threshold": 4,
+            "fp_at_score_threshold": 5,
+            "recall50_at_score_threshold": 0.8,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.9742574257425741,
+            "ap50_95": 0.5995379537953794,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 30,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.5964796479647964,
+        "ap50_95": 0.3398019801980197,
+        "objects": 15,
+        "tp_at_score_threshold": 12,
+        "fp_at_score_threshold": 35,
+        "precision50_at_score_threshold": 0.2553191489361702,
+        "recall50_at_score_threshold": 0.8,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.8151815181518149,
+            "ap50_95": 0.41986798679867976,
+            "tp_at_score_threshold": 4,
+            "fp_at_score_threshold": 5,
+            "recall50_at_score_threshold": 0.8,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.9742574257425741,
+            "ap50_95": 0.5995379537953794,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 30,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 41.039499919861555,
+          "maximum_accepted_fraction_to_save_compute": 0.4701105011587494,
+          "estimated_cascade_ms_per_candidate": 58.985946268809066,
+          "estimated_speedup": 0.6957504713552872
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 32.83025001292117,
+          "maximum_accepted_fraction_to_save_compute": 0.734759863105099,
+          "estimated_cascade_ms_per_candidate": 38.49831205648284,
+          "estimated_speedup": 0.8527711543496825
+        },
+        "8": {
+          "decision_ms_per_tile": 5.959287504083477,
+          "direct_detector_ms_per_tile": 30.278874997748062,
+          "maximum_accepted_fraction_to_save_compute": 0.8031866274910581,
+          "estimated_cascade_ms_per_candidate": 33.43456296500301,
+          "estimated_speedup": 0.9056159947250364
+        }
+      }
+    },
+    {
+      "gate": "peekaboolean",
+      "detector": "owlv2",
+      "threshold": 0.5,
+      "accepted_fraction_all_audit_pairs": 0.7685185185185185,
+      "tile_false_negatives": 4,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.5964796479647964,
+        "ap50_95": 0.3398019801980197,
+        "objects": 15,
+        "tp_at_score_threshold": 12,
+        "fp_at_score_threshold": 35,
+        "precision50_at_score_threshold": 0.2553191489361702,
+        "recall50_at_score_threshold": 0.8,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.8151815181518149,
+            "ap50_95": 0.41986798679867976,
+            "tp_at_score_threshold": 4,
+            "fp_at_score_threshold": 5,
+            "recall50_at_score_threshold": 0.8,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.9742574257425741,
+            "ap50_95": 0.5995379537953794,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 30,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.592079207920792,
+        "ap50_95": 0.3372497249724972,
+        "objects": 15,
+        "tp_at_score_threshold": 12,
+        "fp_at_score_threshold": 35,
+        "precision50_at_score_threshold": 0.2553191489361702,
+        "recall50_at_score_threshold": 0.8,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.801980198019802,
+            "ap50_95": 0.41221122112211217,
+            "tp_at_score_threshold": 4,
+            "fp_at_score_threshold": 5,
+            "recall50_at_score_threshold": 0.8,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.9742574257425741,
+            "ap50_95": 0.5995379537953794,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 30,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 41.039499919861555,
+          "maximum_accepted_fraction_to_save_compute": 0.4701105011587494,
+          "estimated_cascade_ms_per_candidate": 53.286015724383844,
+          "estimated_speedup": 0.7701739257844672
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 32.83025001292117,
+          "maximum_accepted_fraction_to_save_compute": 0.734759863105099,
+          "estimated_cascade_ms_per_candidate": 33.93855511024378,
+          "estimated_speedup": 0.9673437748388973
+        },
+        "8": {
+          "decision_ms_per_tile": 5.959287504083477,
+          "direct_detector_ms_per_tile": 30.278874997748062,
+          "maximum_accepted_fraction_to_save_compute": 0.8031866274910581,
+          "estimated_cascade_ms_per_candidate": 29.22916365976023,
+          "estimated_speedup": 1.0359131499692196
+        }
+      }
+    },
+    {
+      "gate": "peekaboolean",
+      "detector": "llmdet",
+      "threshold": 0.05,
+      "accepted_fraction_all_audit_pairs": 0.9537037037037037,
+      "tile_false_negatives": 0,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.6796141152576797,
+        "ap50_95": 0.3615809569100125,
+        "objects": 15,
+        "tp_at_score_threshold": 14,
+        "fp_at_score_threshold": 76,
+        "precision50_at_score_threshold": 0.15555555555555556,
+        "recall50_at_score_threshold": 0.9333333333333333,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.5,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 1.0,
+            "ap50_95": 0.458464148910819,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 31,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.03884234577303884,
+            "ap50_95": 0.0077684691546077685,
+            "tp_at_score_threshold": 1,
+            "fp_at_score_threshold": 22,
+            "recall50_at_score_threshold": 0.5,
+            "small_objects": 2,
+            "small_matched50": 1,
+            "small_recall50_at_score_threshold": 0.5
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 1.0,
+            "ap50_95": 0.6185102526646107,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 23,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.6796141152576797,
+        "ap50_95": 0.3617185686754656,
+        "objects": 15,
+        "tp_at_score_threshold": 14,
+        "fp_at_score_threshold": 72,
+        "precision50_at_score_threshold": 0.16279069767441862,
+        "recall50_at_score_threshold": 0.9333333333333333,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.5,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 1.0,
+            "ap50_95": 0.458464148910819,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 31,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.03884234577303884,
+            "ap50_95": 0.0077684691546077685,
+            "tp_at_score_threshold": 1,
+            "fp_at_score_threshold": 22,
+            "recall50_at_score_threshold": 0.5,
+            "small_objects": 2,
+            "small_matched50": 1,
+            "small_recall50_at_score_threshold": 0.5
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 1.0,
+            "ap50_95": 0.61892308796097,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 19,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 240.6791999237612,
+          "maximum_accepted_fraction_to_save_compute": 0.9096457024449164,
+          "estimated_cascade_ms_per_candidate": 251.2830444169662,
+          "estimated_speedup": 0.9578011937979806
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 206.1758249765262,
+          "maximum_accepted_fraction_to_save_compute": 0.9577646893921125,
+          "estimated_cascade_ms_per_candidate": 205.33854790200067,
+          "estimated_speedup": 1.0040775445384231
+        }
+      }
+    },
+    {
+      "gate": "peekaboolean",
+      "detector": "llmdet",
+      "threshold": 0.1,
+      "accepted_fraction_all_audit_pairs": 0.9074074074074074,
+      "tile_false_negatives": 1,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.6796141152576797,
+        "ap50_95": 0.3615809569100125,
+        "objects": 15,
+        "tp_at_score_threshold": 14,
+        "fp_at_score_threshold": 76,
+        "precision50_at_score_threshold": 0.15555555555555556,
+        "recall50_at_score_threshold": 0.9333333333333333,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.5,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 1.0,
+            "ap50_95": 0.458464148910819,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 31,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.03884234577303884,
+            "ap50_95": 0.0077684691546077685,
+            "tp_at_score_threshold": 1,
+            "fp_at_score_threshold": 22,
+            "recall50_at_score_threshold": 0.5,
+            "small_objects": 2,
+            "small_matched50": 1,
+            "small_recall50_at_score_threshold": 0.5
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 1.0,
+            "ap50_95": 0.6185102526646107,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 23,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.6666666666666666,
+        "ap50_95": 0.359129078957263,
+        "objects": 15,
+        "tp_at_score_threshold": 13,
+        "fp_at_score_threshold": 59,
+        "precision50_at_score_threshold": 0.18055555555555555,
+        "recall50_at_score_threshold": 0.8666666666666667,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 1.0,
+            "ap50_95": 0.458464148910819,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 31,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 9,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 1.0,
+            "ap50_95": 0.61892308796097,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 19,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 240.6791999237612,
+          "maximum_accepted_fraction_to_save_compute": 0.9096457024449164,
+          "estimated_cascade_ms_per_candidate": 240.1404888649402,
+          "estimated_speedup": 1.002243316241119
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 206.1758249765262,
+          "maximum_accepted_fraction_to_save_compute": 0.9577646893921125,
+          "estimated_cascade_ms_per_candidate": 195.79337081975407,
+          "estimated_speedup": 1.0530276082040089
+        }
+      }
+    },
+    {
+      "gate": "peekaboolean",
+      "detector": "llmdet",
+      "threshold": 0.5,
+      "accepted_fraction_all_audit_pairs": 0.7685185185185185,
+      "tile_false_negatives": 4,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.6796141152576797,
+        "ap50_95": 0.3615809569100125,
+        "objects": 15,
+        "tp_at_score_threshold": 14,
+        "fp_at_score_threshold": 76,
+        "precision50_at_score_threshold": 0.15555555555555556,
+        "recall50_at_score_threshold": 0.9333333333333333,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.5,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 1.0,
+            "ap50_95": 0.458464148910819,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 31,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.03884234577303884,
+            "ap50_95": 0.0077684691546077685,
+            "tp_at_score_threshold": 1,
+            "fp_at_score_threshold": 22,
+            "recall50_at_score_threshold": 0.5,
+            "small_objects": 2,
+            "small_matched50": 1,
+            "small_recall50_at_score_threshold": 0.5
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 1.0,
+            "ap50_95": 0.6185102526646107,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 23,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.6006600660066007,
+        "ap50_95": 0.3265678745568165,
+        "objects": 15,
+        "tp_at_score_threshold": 12,
+        "fp_at_score_threshold": 43,
+        "precision50_at_score_threshold": 0.21818181818181817,
+        "recall50_at_score_threshold": 0.8,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.801980198019802,
+            "ap50_95": 0.36078053570947966,
+            "tp_at_score_threshold": 4,
+            "fp_at_score_threshold": 24,
+            "recall50_at_score_threshold": 0.8,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 1.0,
+            "ap50_95": 0.61892308796097,
+            "tp_at_score_threshold": 8,
+            "fp_at_score_threshold": 19,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 240.6791999237612,
+          "maximum_accepted_fraction_to_save_compute": 0.9096457024449164,
+          "estimated_cascade_ms_per_candidate": 206.71282220886226,
+          "estimated_speedup": 1.1643167431606123
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 206.1758249765262,
+          "maximum_accepted_fraction_to_save_compute": 0.9577646893921125,
+          "estimated_cascade_ms_per_candidate": 167.15783957301431,
+          "estimated_speedup": 1.2334200148983672
+        }
+      }
+    },
+    {
+      "gate": "peekaboolean",
+      "detector": "omdet",
+      "threshold": 0.05,
+      "accepted_fraction_all_audit_pairs": 0.9537037037037037,
+      "tile_false_negatives": 0,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.4010459564335697,
+        "ap50_95": 0.19760779027737108,
+        "objects": 15,
+        "tp_at_score_threshold": 11,
+        "fp_at_score_threshold": 69,
+        "precision50_at_score_threshold": 0.1375,
+        "recall50_at_score_threshold": 0.7333333333333333,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 1.0,
+            "ap50_95": 0.4844554455445545,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 10,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.007013201320132015,
+            "ap50_95": 0.0035066006600660074,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 5,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.19612466798057696,
+            "ap50_95": 0.10486132462749272,
+            "tp_at_score_threshold": 6,
+            "fp_at_score_threshold": 54,
+            "recall50_at_score_threshold": 0.75,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.40585248837995347,
+        "ap50_95": 0.20031224119315652,
+        "objects": 15,
+        "tp_at_score_threshold": 11,
+        "fp_at_score_threshold": 68,
+        "precision50_at_score_threshold": 0.13924050632911392,
+        "recall50_at_score_threshold": 0.7333333333333333,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 1.0,
+            "ap50_95": 0.4844554455445545,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 10,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.007013201320132015,
+            "ap50_95": 0.0035066006600660074,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 5,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.2105442638197283,
+            "ap50_95": 0.11297467737484908,
+            "tp_at_score_threshold": 6,
+            "fp_at_score_threshold": 53,
+            "recall50_at_score_threshold": 0.75,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 42.50530002173036,
+          "maximum_accepted_fraction_to_save_compute": 0.48838380074688614,
+          "estimated_cascade_ms_per_candidate": 62.28386210299235,
+          "estimated_speedup": 0.6824448354124824
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 28.10075000161305,
+          "maximum_accepted_fraction_to_save_compute": 0.6901185908838312,
+          "estimated_cascade_ms_per_candidate": 35.50768936111126,
+          "estimated_speedup": 0.7913990041939919
+        },
+        "8": {
+          "decision_ms_per_tile": 5.959287504083477,
+          "direct_detector_ms_per_tile": 25.998500001151115,
+          "maximum_accepted_fraction_to_save_compute": 0.7707834104344626,
+          "estimated_cascade_ms_per_candidate": 30.75415324592204,
+          "estimated_speedup": 0.8453654956212615
+        }
+      }
+    },
+    {
+      "gate": "peekaboolean",
+      "detector": "omdet",
+      "threshold": 0.1,
+      "accepted_fraction_all_audit_pairs": 0.9074074074074074,
+      "tile_false_negatives": 1,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.4010459564335697,
+        "ap50_95": 0.19760779027737108,
+        "objects": 15,
+        "tp_at_score_threshold": 11,
+        "fp_at_score_threshold": 69,
+        "precision50_at_score_threshold": 0.1375,
+        "recall50_at_score_threshold": 0.7333333333333333,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 1.0,
+            "ap50_95": 0.4844554455445545,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 10,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.007013201320132015,
+            "ap50_95": 0.0035066006600660074,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 5,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.19612466798057696,
+            "ap50_95": 0.10486132462749272,
+            "tp_at_score_threshold": 6,
+            "fp_at_score_threshold": 54,
+            "recall50_at_score_threshold": 0.75,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.4035147546065761,
+        "ap50_95": 0.19914337430646786,
+        "objects": 15,
+        "tp_at_score_threshold": 11,
+        "fp_at_score_threshold": 64,
+        "precision50_at_score_threshold": 0.14666666666666667,
+        "recall50_at_score_threshold": 0.7333333333333333,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 1.0,
+            "ap50_95": 0.4844554455445545,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 10,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 1,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.2105442638197283,
+            "ap50_95": 0.11297467737484908,
+            "tp_at_score_threshold": 6,
+            "fp_at_score_threshold": 53,
+            "recall50_at_score_threshold": 0.75,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 42.50530002173036,
+          "maximum_accepted_fraction_to_save_compute": 0.48838380074688614,
+          "estimated_cascade_ms_per_candidate": 60.316024139023355,
+          "estimated_speedup": 0.7047099113124438
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 28.10075000161305,
+          "maximum_accepted_fraction_to_save_compute": 0.6901185908838312,
+          "estimated_cascade_ms_per_candidate": 34.206728712888435,
+          "estimated_speedup": 0.8214977303873325
+        },
+        "8": {
+          "decision_ms_per_tile": 5.959287504083477,
+          "direct_detector_ms_per_tile": 25.998500001151115,
+          "maximum_accepted_fraction_to_save_compute": 0.7707834104344626,
+          "estimated_cascade_ms_per_candidate": 29.55051898660949,
+          "estimated_speedup": 0.8797984229289532
+        }
+      }
+    },
+    {
+      "gate": "peekaboolean",
+      "detector": "omdet",
+      "threshold": 0.5,
+      "accepted_fraction_all_audit_pairs": 0.7685185185185185,
+      "tile_false_negatives": 4,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.4010459564335697,
+        "ap50_95": 0.19760779027737108,
+        "objects": 15,
+        "tp_at_score_threshold": 11,
+        "fp_at_score_threshold": 69,
+        "precision50_at_score_threshold": 0.1375,
+        "recall50_at_score_threshold": 0.7333333333333333,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 1.0,
+            "ap50_95": 0.4844554455445545,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 10,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.007013201320132015,
+            "ap50_95": 0.0035066006600660074,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 5,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.19612466798057696,
+            "ap50_95": 0.10486132462749272,
+            "tp_at_score_threshold": 6,
+            "fp_at_score_threshold": 54,
+            "recall50_at_score_threshold": 0.75,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.3375081539465101,
+        "ap50_95": 0.16645360532957015,
+        "objects": 15,
+        "tp_at_score_threshold": 10,
+        "fp_at_score_threshold": 56,
+        "precision50_at_score_threshold": 0.15151515151515152,
+        "recall50_at_score_threshold": 0.6666666666666666,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.801980198019802,
+            "ap50_95": 0.3863861386138614,
+            "tp_at_score_threshold": 4,
+            "fp_at_score_threshold": 3,
+            "recall50_at_score_threshold": 0.8,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.2105442638197283,
+            "ap50_95": 0.11297467737484908,
+            "tp_at_score_threshold": 6,
+            "fp_at_score_threshold": 53,
+            "recall50_at_score_threshold": 0.75,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 42.50530002173036,
+          "maximum_accepted_fraction_to_save_compute": 0.48838380074688614,
+          "estimated_cascade_ms_per_candidate": 54.41251024711636,
+          "estimated_speedup": 0.7811677834507363
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 28.10075000161305,
+          "maximum_accepted_fraction_to_save_compute": 0.6901185908838312,
+          "estimated_cascade_ms_per_candidate": 30.303846768219955,
+          "estimated_speedup": 0.9272997654899271
+        },
+        "8": {
+          "decision_ms_per_tile": 5.959287504083477,
+          "direct_detector_ms_per_tile": 25.998500001151115,
+          "maximum_accepted_fraction_to_save_compute": 0.7707834104344626,
+          "estimated_cascade_ms_per_candidate": 25.939616208671833,
+          "estimated_speedup": 1.0022700332960053
+        }
+      }
+    },
+    {
+      "gate": "peekaboolean",
+      "detector": "sam3lite",
+      "threshold": 0.05,
+      "accepted_fraction_all_audit_pairs": 0.9537037037037037,
+      "tile_false_negatives": 0,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.5607694980024317,
+        "ap50_95": 0.3098939799995037,
+        "objects": 15,
+        "tp_at_score_threshold": 12,
+        "fp_at_score_threshold": 31,
+        "precision50_at_score_threshold": 0.27906976744186046,
+        "recall50_at_score_threshold": 0.8,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.8144867118290774,
+            "ap50_95": 0.40969254820218853,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 21,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.8678217821782177,
+            "ap50_95": 0.5199893917963225,
+            "tp_at_score_threshold": 7,
+            "fp_at_score_threshold": 10,
+            "recall50_at_score_threshold": 0.875,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.5607694980024317,
+        "ap50_95": 0.3098939799995037,
+        "objects": 15,
+        "tp_at_score_threshold": 12,
+        "fp_at_score_threshold": 31,
+        "precision50_at_score_threshold": 0.27906976744186046,
+        "recall50_at_score_threshold": 0.8,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.8144867118290774,
+            "ap50_95": 0.40969254820218853,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 21,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.8678217821782177,
+            "ap50_95": 0.5199893917963225,
+            "tp_at_score_threshold": 7,
+            "fp_at_score_threshold": 10,
+            "recall50_at_score_threshold": 0.875,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 147.51719997730106,
+          "maximum_accepted_fraction_to_save_compute": 0.852583969539978,
+          "estimated_cascade_ms_per_candidate": 162.43410002358291,
+          "estimated_speedup": 0.9081664499996236
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 131.20374997379258,
+          "maximum_accepted_fraction_to_save_compute": 0.9336307078916539,
+          "estimated_cascade_ms_per_candidate": 133.83740229754176,
+          "estimated_speedup": 0.9803220005877419
+        },
+        "8": {
+          "decision_ms_per_tile": 5.959287504083477,
+          "direct_detector_ms_per_tile": 128.0706374964211,
+          "maximum_accepted_fraction_to_save_compute": 0.9534687449006412,
+          "estimated_cascade_ms_per_candidate": 128.10072882011474,
+          "estimated_speedup": 0.9997650963896085
+        }
+      }
+    },
+    {
+      "gate": "peekaboolean",
+      "detector": "sam3lite",
+      "threshold": 0.1,
+      "accepted_fraction_all_audit_pairs": 0.9074074074074074,
+      "tile_false_negatives": 1,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.5607694980024317,
+        "ap50_95": 0.3098939799995037,
+        "objects": 15,
+        "tp_at_score_threshold": 12,
+        "fp_at_score_threshold": 31,
+        "precision50_at_score_threshold": 0.27906976744186046,
+        "recall50_at_score_threshold": 0.8,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.8144867118290774,
+            "ap50_95": 0.40969254820218853,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 21,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.8678217821782177,
+            "ap50_95": 0.5199893917963225,
+            "tp_at_score_threshold": 7,
+            "fp_at_score_threshold": 10,
+            "recall50_at_score_threshold": 0.875,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.5607694980024317,
+        "ap50_95": 0.3098939799995037,
+        "objects": 15,
+        "tp_at_score_threshold": 12,
+        "fp_at_score_threshold": 31,
+        "precision50_at_score_threshold": 0.27906976744186046,
+        "recall50_at_score_threshold": 0.8,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.8144867118290774,
+            "ap50_95": 0.40969254820218853,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 21,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.8678217821782177,
+            "ap50_95": 0.5199893917963225,
+            "tp_at_score_threshold": 7,
+            "fp_at_score_threshold": 10,
+            "recall50_at_score_threshold": 0.875,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 147.51719997730106,
+          "maximum_accepted_fraction_to_save_compute": 0.852583969539978,
+          "estimated_cascade_ms_per_candidate": 155.6046000246338,
+          "estimated_speedup": 0.9480259578055377
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 131.20374997379258,
+          "maximum_accepted_fraction_to_save_compute": 0.9336307078916539,
+          "estimated_cascade_ms_per_candidate": 127.76315461356987,
+          "estimated_speedup": 1.0269294803390623
+        },
+        "8": {
+          "decision_ms_per_tile": 5.959287504083477,
+          "direct_detector_ms_per_tile": 128.0706374964211,
+          "maximum_accepted_fraction_to_save_compute": 0.9534687449006412,
+          "estimated_cascade_ms_per_candidate": 122.17153263972486,
+          "estimated_speedup": 1.0482854289312413
+        }
+      }
+    },
+    {
+      "gate": "peekaboolean",
+      "detector": "sam3lite",
+      "threshold": 0.5,
+      "accepted_fraction_all_audit_pairs": 0.7685185185185185,
+      "tile_false_negatives": 4,
+      "tile_positive_count": 74,
+      "direct_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.5607694980024317,
+        "ap50_95": 0.3098939799995037,
+        "objects": 15,
+        "tp_at_score_threshold": 12,
+        "fp_at_score_threshold": 31,
+        "precision50_at_score_threshold": 0.27906976744186046,
+        "recall50_at_score_threshold": 0.8,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.8144867118290774,
+            "ap50_95": 0.40969254820218853,
+            "tp_at_score_threshold": 5,
+            "fp_at_score_threshold": 21,
+            "recall50_at_score_threshold": 1.0,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.8678217821782177,
+            "ap50_95": 0.5199893917963225,
+            "tp_at_score_threshold": 7,
+            "fp_at_score_threshold": 10,
+            "recall50_at_score_threshold": 0.875,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "cascade_boxes": {
+        "method": "Custom COCO-style 101-point AP; no crowd/ignore/area AP support",
+        "exhaustive_records": 19,
+        "excluded_nonexhaustive_records": 0,
+        "max_detections_per_tile_query": 100,
+        "score_threshold_for_recall": 0.1,
+        "ap50": 0.5070957095709571,
+        "ap50_95": 0.2792703913248468,
+        "objects": 15,
+        "tp_at_score_threshold": 11,
+        "fp_at_score_threshold": 29,
+        "precision50_at_score_threshold": 0.275,
+        "recall50_at_score_threshold": 0.7333333333333333,
+        "small_objects": 2,
+        "small_recall50_at_score_threshold": 0.0,
+        "by_query": {
+          "airplane": {
+            "tiles": 8,
+            "objects": 5,
+            "ap50": 0.6534653465346535,
+            "ap50_95": 0.3178217821782178,
+            "tp_at_score_threshold": 4,
+            "fp_at_score_threshold": 19,
+            "recall50_at_score_threshold": 0.8,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          },
+          "boat": {
+            "tiles": 4,
+            "objects": 2,
+            "ap50": 0.0,
+            "ap50_95": 0.0,
+            "tp_at_score_threshold": 0,
+            "fp_at_score_threshold": 0,
+            "recall50_at_score_threshold": 0.0,
+            "small_objects": 2,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": 0.0
+          },
+          "swimming pool": {
+            "tiles": 7,
+            "objects": 8,
+            "ap50": 0.8678217821782177,
+            "ap50_95": 0.5199893917963225,
+            "tp_at_score_threshold": 7,
+            "fp_at_score_threshold": 10,
+            "recall50_at_score_threshold": 0.875,
+            "small_objects": 0,
+            "small_matched50": 0,
+            "small_recall50_at_score_threshold": null
+          }
+        }
+      },
+      "costs": {
+        "1": {
+          "decision_ms_per_tile": 21.746400045230985,
+          "direct_detector_ms_per_tile": 147.51719997730106,
+          "maximum_accepted_fraction_to_save_compute": 0.852583969539978,
+          "estimated_cascade_ms_per_candidate": 135.11610002778644,
+          "estimated_speedup": 1.091781067888759
+        },
+        "4": {
+          "decision_ms_per_tile": 8.707900007721037,
+          "direct_detector_ms_per_tile": 131.20374997379258,
+          "maximum_accepted_fraction_to_save_compute": 0.9336307078916539,
+          "estimated_cascade_ms_per_candidate": 109.54041156165422,
+          "estimated_speedup": 1.197765720461487
+        },
+        "8": {
+          "decision_ms_per_tile": 5.959287504083477,
+          "direct_detector_ms_per_tile": 128.0706374964211,
+          "maximum_accepted_fraction_to_save_compute": 0.9534687449006412,
+          "estimated_cascade_ms_per_candidate": 104.38394409855526,
+          "estimated_speedup": 1.2269189347310139
+        }
+      }
+    }
+  ]
+}

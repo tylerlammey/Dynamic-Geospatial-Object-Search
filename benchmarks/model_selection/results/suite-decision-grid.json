@@ -1,0 +1,9 @@
+[
+  {
+    "model": "peekaboolean",
+    "exit_code": 0,
+    "wall_seconds": 35.9017077999888,
+    "benchmark_status": "ok",
+    "log": "local/peekaboolean.log"
+  }
+]

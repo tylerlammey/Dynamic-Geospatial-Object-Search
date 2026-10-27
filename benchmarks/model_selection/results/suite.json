@@ -1,0 +1,58 @@
+[
+  {
+    "model": "peekaboolean",
+    "exit_code": 0,
+    "wall_seconds": 20.13886960002128,
+    "benchmark_status": "ok",
+    "log": "local/peekaboolean.log"
+  },
+  {
+    "model": "intern",
+    "exit_code": 0,
+    "wall_seconds": 355.74316670000553,
+    "benchmark_status": "ok",
+    "log": "local/intern.log"
+  },
+  {
+    "model": "d3",
+    "exit_code": 0,
+    "wall_seconds": 346.5781692999881,
+    "benchmark_status": "ok",
+    "log": "local/d3.log"
+  },
+  {
+    "model": "blip",
+    "exit_code": 0,
+    "wall_seconds": 15.428487700060941,
+    "benchmark_status": "ok",
+    "log": "local/blip.log"
+  },
+  {
+    "model": "gdino",
+    "exit_code": 0,
+    "wall_seconds": 89.12247719999868,
+    "benchmark_status": "ok",
+    "log": "local/gdino.log"
+  },
+  {
+    "model": "owlv2",
+    "exit_code": 0,
+    "wall_seconds": 31.429644600022584,
+    "benchmark_status": "ok",
+    "log": "local/owlv2.log"
+  },
+  {
+    "model": "llmdet",
+    "exit_code": 0,
+    "wall_seconds": 405.8690319999587,
+    "benchmark_status": "ok",
+    "log": "local/llmdet.log"
+  },
+  {
+    "model": "omdet",
+    "exit_code": 1,
+    "wall_seconds": 11.146938599995337,
+    "benchmark_status": "failed",
+    "log": "local/omdet.log"
+  }
+]

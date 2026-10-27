@@ -1,0 +1,16 @@
+[
+  {
+    "model": "omdet",
+    "exit_code": 0,
+    "wall_seconds": 25.67133990000002,
+    "benchmark_status": "ok",
+    "log": "local/omdet.log"
+  },
+  {
+    "model": "sam3lite",
+    "exit_code": 0,
+    "wall_seconds": 155.86402959993575,
+    "benchmark_status": "ok",
+    "log": "local/sam3lite.log"
+  }
+]

@@ -1,0 +1,9034 @@
+{
+  "status": "ok",
+  "model": "intern",
+  "protocol": {
+    "warmup": 2,
+    "repeats": 3,
+    "baseline_repeats": 3,
+    "events": false
+  },
+  "manifest_sha256": "241271d3b8f0839a9e3dd8cceabf2915dddf5fc6852f0613757cee374443d826",
+  "sample_id": "9f18a490b31cbf7be56f",
+  "timing_note": "Per-scope synchronized diagnostic; nested times are inclusive and not additive. Compare uninstrumented forwards to estimate instrumentation overhead.",
+  "environment": {
+    "date_utc": "2026-10-27T00:18:07Z",
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "gpu": "AMD Radeon RX 9070 XT",
+    "gpu_total_bytes": 17095983104,
+    "hip": "7.2.53211-158bd99533",
+    "packages": {
+      "torch": "2.9.1+rocm7.2.1",
+      "torchvision": "0.24.1+rocm7.2.1",
+      "transformers": "5.17.0",
+      "numpy": "2.5.3",
+      "pillow": "12.3.0",
+      "peft": "0.21.0",
+      "accelerate": "1.13.0",
+      "huggingface-hub": "1.32.0"
+    },
+    "cpu_threads": 8,
+    "pinned_memory": false,
+    "core_sha256": {
+      "embed_georsclip.py": "c0ccf532746d591c08afc757f71c867c2b43e6f55ceb55e0960a4e3d7b536831",
+      "tiling.py": "dd73c1dd806c6e699099cbeb84c0f26719bd7f70fdb52e3c2a0064cf47f4c19c",
+      "model.py": "eedf7ab7012e6e594b997a68da87ff177f7ec6cd1133b909bc4783dd9a7140b5",
+      "bundles.py": "461eaf63828a1c6b83ab37e17161141f9a010cac7da5fe4121d2f97dc853d6eb"
+    },
+    "benchmark_code_sha256": {
+      "adapters_decision.py": "9aa2aa82ca0e22ae558f3d18e8d14ed59797d188144d323614a253bd8480d3a3",
+      "adapters_detection.py": "60c7f0abd62ead33bd5663577744255da45e83209943dd9b27dfae979beeec2e",
+      "adapter_d3.py": "aa2d51561d7c88b4ff18ff88eadb9ced93a5c3d214b1844da8917a8b18053a2c",
+      "analyze_cascade.py": "de3b93c99ba23410d258ac33aaa36057c47340da038e08a1ec05fde3486b79bc",
+      "annotate_exploratory.py": "a2e05731673a79584c6b68ef380e0ee4f9c50d46d94ceddb51f4b4e5acf68ffe",
+      "audit_split.py": "074e022350ac036763ccbc0a99ebe9fac638d613bda4e193d4507c82541c00bc",
+      "compare_variants.py": "bf478fe73ed01fbacbe7ab0281c7fa8997f02e7036ee6463f67b1dc70584fe17",
+      "dataset.py": "974cb487fa5655b0a40bfec7eb36855c4a29c85ac203fb28a6b50b65130b2194",
+      "download_models.py": "1335c48c167b270c37046bd11b153459e8795d0c93630fba0c7569987a27f0ce",
+      "evaluate.py": "f18a596ce5e878e9b2b7dd7a1919c5facdee6be37c084ba1cea5c18e95cfd66b",
+      "fetch_sources.py": "1882dd4721b1032adc5513fb1e2635d6c9a1ffd51c83a98e4011117ed6b4d7c3",
+      "metrics.py": "388429649b1b477adc697e319632b7602f4e8ad95b3f56e0c4b9d4c7e9fa5279",
+      "probe_gpu.py": "e45dff8056ec845fbdca0e3f9a6c39426882058df5f8d38bfa576ce9d6a35871",
+      "profile_intern.py": "9cf496b372c9f4fa5206bfae094c7a590cc77315cb629d7c1638c3f976a8b6e2",
+      "run.py": "4a5cec387e53771c47ea53a983f7981db2bb9284a0845e840edf8f35c6028816",
+      "solvers.py": "05b7028517856003dccf2a7c5d7bf1335b29184b48d55e87c18b35137af93bf1",
+      "suite.py": "06897fce1f0923280546cfae7615bf1daf1997e411601f55d98cad8802b9f971",
+      "summarize_results.py": "72643813571e7c59ae4add7da8e1b027c8b65fc7571a53d6ceebb2aab42a9726",
+      "test_adapter_d3.py": "b5627243ef2cf3bca5e5e7612398106cbc070c24448f19a9d4cc69c5fa0b1ed9",
+      "test_metrics.py": "97bb350161ffdd7bbeb129fe2a603c4004f7a05024fa9efa6bcd5a45a406cbd4",
+      "test_solvers.py": "cc5506342c472f2bad0d48377b868c15ce680953791b450271a7c4e77539a14a"
+    }
+  },
+  "baseline": [
+    {
+      "forward_wall_ms": 2182.88430001121,
+      "answers": [
+        {
+          "probability": 0.7227653861045837,
+          "score_kind": "published_temperature_binary_decision"
+        }
+      ]
+    },
+    {
+      "forward_wall_ms": 2194.386799936183,
+      "answers": [
+        {
+          "probability": 0.7227653861045837,
+          "score_kind": "published_temperature_binary_decision"
+        }
+      ]
+    },
+    {
+      "forward_wall_ms": 2125.9108000667766,
+      "answers": [
+        {
+          "probability": 0.7227653861045837,
+          "score_kind": "published_temperature_binary_decision"
+        }
+      ]
+    }
+  ],
+  "instrumented": [
+    {
+      "forward_wall_ms": 2215.113200014457,
+      "answers": [
+        {
+          "probability": 0.7227653861045837,
+          "score_kind": "published_temperature_binary_decision"
+        }
+      ]
+    },
+    {
+      "forward_wall_ms": 2200.5186000606045,
+      "answers": [
+        {
+          "probability": 0.7227653861045837,
+          "score_kind": "published_temperature_binary_decision"
+        }
+      ]
+    },
+    {
+      "forward_wall_ms": 2304.918700014241,
+      "answers": [
+        {
+          "probability": 0.7227653861045837,
+          "score_kind": "published_temperature_binary_decision"
+        }
+      ]
+    }
+  ],
+  "source_read_ms": [
+    19.107400090433657
+  ],
+  "load_seconds": 2.811628600000404,
+  "model_info": {
+    "kind": "decision",
+    "dtype": "bfloat16",
+    "temperature": 2.747760550703,
+    "source_calibration": "Published non-aerial temperature, not NYS calibration",
+    "linear_patch_projection": true,
+    "generation": false,
+    "state": "An aerial image tile.",
+    "processor": {
+      "size": {
+        "longest_edge": 16777216,
+        "shortest_edge": 65536
+      },
+      "patch_size": 16,
+      "temporal_patch_size": 2,
+      "merge_size": 2,
+      "image_mean": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "image_std": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "image_processor_type": "Qwen2VLImageProcessor",
+      "do_convert_rgb": true,
+      "do_resize": true,
+      "resample": 3,
+      "do_rescale": true,
+      "rescale_factor": 0.00392156862745098,
+      "do_normalize": true
+    }
+  },
+  "source": {
+    "module": "transformers.models.qwen3_5.modeling_qwen3_5",
+    "qualname": "torch_chunk_gated_delta_rule",
+    "path": "C:\\Users\\Tyler\\Documents\\github\\Dynamic-Geospatial-Object-Search\\.venv\\Lib\\site-packages\\transformers\\models\\qwen3_5\\modeling_qwen3_5.py",
+    "sha256": "762feb6c7426a7f15b5bf830df54c07438bf9e7c27b8cdb23179045920412c3b"
+  },
+  "torchdynamo_exporting": false,
+  "input_shapes": {
+    "input_ids": [
+      1,
+      261
+    ],
+    "attention_mask": [
+      1,
+      261
+    ],
+    "mm_token_type_ids": [
+      1,
+      261
+    ],
+    "pixel_values": [
+      256,
+      1536
+    ],
+    "image_grid_thw": [
+      1,
+      3
+    ],
+    "decision_positions": [
+      1
+    ]
+  },
+  "operator_sources": {
+    "operator.torch_chunk_gated_delta_rule": {
+      "module": "transformers.models.qwen3_5.modeling_qwen3_5",
+      "qualname": "torch_chunk_gated_delta_rule",
+      "path": "C:\\Users\\Tyler\\Documents\\github\\Dynamic-Geospatial-Object-Search\\.venv\\Lib\\site-packages\\transformers\\models\\qwen3_5\\modeling_qwen3_5.py",
+      "sha256": "762feb6c7426a7f15b5bf830df54c07438bf9e7c27b8cdb23179045920412c3b"
+    },
+    "operator.causal_conv1d_fn": {
+      "module": "transformers.models.qwen3_5.modeling_qwen3_5",
+      "qualname": "causal_conv1d_fn",
+      "path": "C:\\Users\\Tyler\\Documents\\github\\Dynamic-Geospatial-Object-Search\\.venv\\Lib\\site-packages\\transformers\\models\\qwen3_5\\modeling_qwen3_5.py",
+      "sha256": "762feb6c7426a7f15b5bf830df54c07438bf9e7c27b8cdb23179045920412c3b"
+    },
+    "operator.causal_conv1d_update": {
+      "module": "transformers.models.qwen3_5.modeling_qwen3_5",
+      "qualname": "causal_conv1d_update",
+      "path": "C:\\Users\\Tyler\\Documents\\github\\Dynamic-Geospatial-Object-Search\\.venv\\Lib\\site-packages\\transformers\\models\\qwen3_5\\modeling_qwen3_5.py",
+      "sha256": "762feb6c7426a7f15b5bf830df54c07438bf9e7c27b8cdb23179045920412c3b"
+    },
+    "operator.torch_recurrent_gated_delta_rule": {
+      "module": "transformers.models.qwen3_5.modeling_qwen3_5",
+      "qualname": "torch_recurrent_gated_delta_rule",
+      "path": "C:\\Users\\Tyler\\Documents\\github\\Dynamic-Geospatial-Object-Search\\.venv\\Lib\\site-packages\\transformers\\models\\qwen3_5\\modeling_qwen3_5.py",
+      "sha256": "762feb6c7426a7f15b5bf830df54c07438bf9e7c27b8cdb23179045920412c3b"
+    },
+    "operator.solve_triangular": {
+      "module": "torch._C._linalg",
+      "qualname": "linalg_solve_triangular",
+      "path": null
+    }
+  },
+  "calls": [
+    {
+      "iteration": 0,
+      "label": "module.visual.patch_embed",
+      "wall_ms": 0.18810003530234098,
+      "inputs": [
+        {
+          "shape": [
+            256,
+            1536
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.visual",
+      "wall_ms": 14.243899961002171,
+      "inputs": [
+        {
+          "shape": [
+            256,
+            1536
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.3991000121459365,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 57.42450000252575,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.733999888412654,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 115.18799990881234,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.0.linear_attn",
+      "wall_ms": 116.791500011459,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.0.mlp",
+      "wall_ms": 0.5034999921917915,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.5979000125080347,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.0964999711141,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.68189995735884,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 113.01239999011159,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.1.linear_attn",
+      "wall_ms": 114.90619997493923,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.1.mlp",
+      "wall_ms": 0.5037999944761395,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6244999822229147,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.36030000075698,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.86089992336929,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 113.47139999270439,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.2.linear_attn",
+      "wall_ms": 115.42840010952204,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.2.mlp",
+      "wall_ms": 0.5291000707075,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5Attention.layers.3.self_attn",
+      "wall_ms": 1.3818000443279743,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.3.mlp",
+      "wall_ms": 0.5598000716418028,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6117000011727214,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.65939990244806,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.65890001505613,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 112.55710001569241,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.4.linear_attn",
+      "wall_ms": 114.50809997040778,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.4.mlp",
+      "wall_ms": 0.5168999778106809,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6074999691918492,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.89800008945167,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.69010001979768,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 112.80919995624572,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.5.linear_attn",
+      "wall_ms": 114.73449994809926,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.5.mlp",
+      "wall_ms": 0.5179001018404961,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.5959999980404973,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.35909999161959,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.593500030227005,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 114.18270005378872,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.6.linear_attn",
+      "wall_ms": 116.11350008752197,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.6.mlp",
+      "wall_ms": 0.5219000158831477,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5Attention.layers.7.self_attn",
+      "wall_ms": 1.3943000230938196,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.7.mlp",
+      "wall_ms": 0.5035999929532409,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6134000141173601,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.37349998485297,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.550400003790855,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 113.1732000503689,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.8.linear_attn",
+      "wall_ms": 115.09429989382625,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.8.mlp",
+      "wall_ms": 0.5270999390631914,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.61039999127388,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.809699999168515,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 59.63609996251762,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 117.77279991656542,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.9.linear_attn",
+      "wall_ms": 119.70759998075664,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.9.mlp",
+      "wall_ms": 0.5114000523462892,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6427000043913722,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 57.953599956817925,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 57.97209998127073,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 119.40989992581308,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.10.linear_attn",
+      "wall_ms": 121.4316999539733,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.10.mlp",
+      "wall_ms": 0.6077999714761972,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5Attention.layers.11.self_attn",
+      "wall_ms": 1.394700026139617,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.11.mlp",
+      "wall_ms": 0.5174999823793769,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.5985000170767307,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.63710001297295,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.88760005775839,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 114.90160005632788,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.12.linear_attn",
+      "wall_ms": 116.8028999818489,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.12.mlp",
+      "wall_ms": 0.5071000196039677,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6324000423774123,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 66.43699994310737,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 62.121300026774406,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 131.98349997401237,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.13.linear_attn",
+      "wall_ms": 134.00149997323751,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.13.mlp",
+      "wall_ms": 0.5347999976947904,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6562001071870327,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 65.70549996104091,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 62.91869992855936,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 132.07900000270456,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.14.linear_attn",
+      "wall_ms": 134.1468000318855,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.14.mlp",
+      "wall_ms": 0.5172999808564782,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5Attention.layers.15.self_attn",
+      "wall_ms": 1.3933000154793262,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.15.mlp",
+      "wall_ms": 0.5015999777242541,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6676999619230628,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 59.216100024059415,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 56.41329998616129,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 118.98439994547516,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.16.linear_attn",
+      "wall_ms": 121.03250005748123,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.16.mlp",
+      "wall_ms": 0.5178999854251742,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6417999975383282,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 65.29759999830276,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 61.33649998810142,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 130.06609992589802,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.17.linear_attn",
+      "wall_ms": 132.1020000614226,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.17.mlp",
+      "wall_ms": 0.5703000351786613,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6324000423774123,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 62.13100010063499,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 57.368400041013956,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 122.84089997410774,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.18.linear_attn",
+      "wall_ms": 124.83990006148815,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.18.mlp",
+      "wall_ms": 0.5128999473527074,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5Attention.layers.19.self_attn",
+      "wall_ms": 1.3682000571861863,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.19.mlp",
+      "wall_ms": 0.44269999489188194,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.434999936260283,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.99569994956255,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 57.003799942322075,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 116.17930000647902,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.20.linear_attn",
+      "wall_ms": 117.81089997384697,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.20.mlp",
+      "wall_ms": 0.521100009791553,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6118000019341707,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 56.924100033938885,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.43850001413375,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 115.58600002899766,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.21.linear_attn",
+      "wall_ms": 117.48849996365607,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.21.mlp",
+      "wall_ms": 0.5030001047998667,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6129000103101134,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.9838999286294,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.55900000035763,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 113.80000005010515,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.22.linear_attn",
+      "wall_ms": 115.70220009889454,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.22.mlp",
+      "wall_ms": 0.5014999769628048,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5Attention.layers.23.self_attn",
+      "wall_ms": 1.3675999362021685,
+      "inputs": []
+    },
+    {
+      "iteration": 0,
+      "label": "module.Qwen3_5MLP.layers.23.mlp",
+      "wall_ms": 0.5282999482005835,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 0,
+      "label": "module.language_model",
+      "wall_ms": 2197.8135000681505,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.visual.patch_embed",
+      "wall_ms": 0.21199998445808887,
+      "inputs": [
+        {
+          "shape": [
+            256,
+            1536
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.visual",
+      "wall_ms": 17.90370000526309,
+      "inputs": [
+        {
+          "shape": [
+            256,
+            1536
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6174999289214611,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 57.75260005611926,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.89079996570945,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 116.95599998347461,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.0.linear_attn",
+      "wall_ms": 118.96670004352927,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.0.mlp",
+      "wall_ms": 0.5137999542057514,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6200999487191439,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 56.35990004520863,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.43139996007085,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 115.06320000626147,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.1.linear_attn",
+      "wall_ms": 117.07739997655153,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.1.mlp",
+      "wall_ms": 0.5002999678254128,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6136000156402588,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 56.863300036638975,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.446600028313696,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 114.54340000636876,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.2.linear_attn",
+      "wall_ms": 116.47510004695505,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.2.mlp",
+      "wall_ms": 0.5024999845772982,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5Attention.layers.3.self_attn",
+      "wall_ms": 1.4027999714016914,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.3.mlp",
+      "wall_ms": 0.49839995335787535,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6023000460118055,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 57.1009999839589,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.22939993534237,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 115.63290003687143,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.4.linear_attn",
+      "wall_ms": 117.56259994581342,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.4.mlp",
+      "wall_ms": 0.5278999451547861,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6518000736832619,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.48019998241216,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.47009997442365,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 113.21800004225224,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.5.linear_attn",
+      "wall_ms": 115.1789000723511,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.5.mlp",
+      "wall_ms": 0.5221000174060464,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.606300076469779,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.08199997711927,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.1706999540329,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 113.44220000319183,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.6.linear_attn",
+      "wall_ms": 115.37629994563758,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.6.mlp",
+      "wall_ms": 0.5021999822929502,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5Attention.layers.7.self_attn",
+      "wall_ms": 1.3626000145450234,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.7.mlp",
+      "wall_ms": 0.5158999701961875,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.5891999462619424,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 58.075199951417744,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 57.98580008558929,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 119.39659994095564,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.8.linear_attn",
+      "wall_ms": 121.29859998822212,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.8.mlp",
+      "wall_ms": 0.5137000698596239,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6189000559970737,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 83.72820005752146,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 63.886099960654974,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 151.00940002594143,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.9.linear_attn",
+      "wall_ms": 153.05690001696348,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.9.mlp",
+      "wall_ms": 0.5180999869480729,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6412999937310815,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 61.21199997141957,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 57.245400035753846,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 121.72269995789975,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.10.linear_attn",
+      "wall_ms": 123.6845999956131,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.10.mlp",
+      "wall_ms": 0.5055000074207783,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5Attention.layers.11.self_attn",
+      "wall_ms": 1.378699904307723,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.11.mlp",
+      "wall_ms": 0.5019999807700515,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6553999846801162,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.319199920631945,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.562300025485456,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 114.14820002391934,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.12.linear_attn",
+      "wall_ms": 116.13760003820062,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.12.mlp",
+      "wall_ms": 0.4946999251842499,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6286000134423375,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.414400063455105,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.45230007171631,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 113.03310003131628,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.13.linear_attn",
+      "wall_ms": 114.93769998196512,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.13.mlp",
+      "wall_ms": 0.5109000485390425,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.604800065048039,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 56.40000000130385,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 56.06199998874217,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 115.72869995143265,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.14.linear_attn",
+      "wall_ms": 117.64370009768754,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.14.mlp",
+      "wall_ms": 0.49810006748884916,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5Attention.layers.15.self_attn",
+      "wall_ms": 1.3626000145450234,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.15.mlp",
+      "wall_ms": 0.4977000644430518,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.4691999638453126,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 57.137500029057264,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.61449995730072,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 115.85140007082373,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.16.linear_attn",
+      "wall_ms": 117.60009999852628,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.16.mlp",
+      "wall_ms": 0.5159999709576368,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.3816999960690737,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.929899983108044,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.67000003065914,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 113.6019000550732,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.17.linear_attn",
+      "wall_ms": 115.17310002818704,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.17.mlp",
+      "wall_ms": 0.5191999953240156,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6302000256255269,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.76210010237992,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.62640000041574,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 112.70030005834997,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.18.linear_attn",
+      "wall_ms": 114.62959996424615,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.18.mlp",
+      "wall_ms": 0.5033999914303422,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5Attention.layers.19.self_attn",
+      "wall_ms": 1.3766000047326088,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.19.mlp",
+      "wall_ms": 0.6531000835821033,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.610999995842576,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 57.771299965679646,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.5912998970598,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 116.67720007244498,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.20.linear_attn",
+      "wall_ms": 118.61040000803769,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.20.mlp",
+      "wall_ms": 0.5131999496370554,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6288000149652362,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.53169997781515,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.69459998514503,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 113.46360004972667,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.21.linear_attn",
+      "wall_ms": 115.38289999589324,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.21.mlp",
+      "wall_ms": 0.5160999717190862,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.5987000185996294,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.26809999719262,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.28560001403093,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 113.80139994435012,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.22.linear_attn",
+      "wall_ms": 115.75150000862777,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.22.mlp",
+      "wall_ms": 0.5447999574244022,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5Attention.layers.23.self_attn",
+      "wall_ms": 1.3787000207230449,
+      "inputs": []
+    },
+    {
+      "iteration": 1,
+      "label": "module.Qwen3_5MLP.layers.23.mlp",
+      "wall_ms": 0.4968999419361353,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "label": "module.language_model",
+      "wall_ms": 2179.3917999602854,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.visual.patch_embed",
+      "wall_ms": 0.20619994029402733,
+      "inputs": [
+        {
+          "shape": [
+            256,
+            1536
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.visual",
+      "wall_ms": 14.85909998882562,
+      "inputs": [
+        {
+          "shape": [
+            256,
+            1536
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.3867000341415405,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.93919998500496,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.3525000102818,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 113.26160002499819,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.0.linear_attn",
+      "wall_ms": 114.81290007941425,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.0.mlp",
+      "wall_ms": 0.5080000264570117,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6332999328151345,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.77530008647591,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.27160002384335,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 113.26510005164891,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.1.linear_attn",
+      "wall_ms": 115.15460000373423,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.1.mlp",
+      "wall_ms": 0.5126999458298087,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6056000711396337,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.62680005095899,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.602099931798875,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 113.5521000251174,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.2.linear_attn",
+      "wall_ms": 115.45709997881204,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.2.mlp",
+      "wall_ms": 0.4928000271320343,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5Attention.layers.3.self_attn",
+      "wall_ms": 1.344999996945262,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.3.mlp",
+      "wall_ms": 0.5134000675752759,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6443000165745616,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 56.84450000990182,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.76789996121079,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 115.94739998690784,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.4.linear_attn",
+      "wall_ms": 118.00070002209395,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.4.mlp",
+      "wall_ms": 0.5393000319600105,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6283000111579895,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.69660006929189,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 56.10349995549768,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 114.10060001071543,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.5.linear_attn",
+      "wall_ms": 116.07300001196563,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.5.mlp",
+      "wall_ms": 0.5174000980332494,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6194000598043203,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.38709997199476,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 57.461699936538935,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 116.12100002821535,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.6.linear_attn",
+      "wall_ms": 118.1111999321729,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.6.mlp",
+      "wall_ms": 0.5449999589473009,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5Attention.layers.7.self_attn",
+      "wall_ms": 1.3764000032097101,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.7.mlp",
+      "wall_ms": 0.5147000774741173,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.7201998960226774,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 56.526899919845164,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 59.89499995484948,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 119.94689994025975,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.8.linear_attn",
+      "wall_ms": 122.22010002005845,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.8.mlp",
+      "wall_ms": 0.5376000190153718,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6420999998226762,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 62.26719997357577,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 59.59029996301979,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 125.24059996940196,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.9.linear_attn",
+      "wall_ms": 127.28759995661676,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.9.mlp",
+      "wall_ms": 0.5322999786585569,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6382000865414739,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 82.89169997442514,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 121.68450001627207,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 208.99239997379482,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.10.linear_attn",
+      "wall_ms": 211.13470010459423,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.10.mlp",
+      "wall_ms": 0.6942000472918153,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5Attention.layers.11.self_attn",
+      "wall_ms": 1.6746999463066459,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.11.mlp",
+      "wall_ms": 0.7133999606594443,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.7025001104921103,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 81.95910009089857,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 56.719399988651276,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 142.1834999928251,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.12.linear_attn",
+      "wall_ms": 144.45830008480698,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.12.mlp",
+      "wall_ms": 0.5156999686732888,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6413999944925308,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 56.313199922442436,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 57.99140001181513,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 117.59540007915348,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.13.linear_attn",
+      "wall_ms": 119.6316999848932,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.13.mlp",
+      "wall_ms": 0.5237000295892358,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6175000453367829,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 58.22679994162172,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.98809996061027,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 116.53739993926138,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.14.linear_attn",
+      "wall_ms": 118.47699992358685,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.14.mlp",
+      "wall_ms": 0.5273000570014119,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5Attention.layers.15.self_attn",
+      "wall_ms": 1.3735999818891287,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.15.mlp",
+      "wall_ms": 0.5097000394016504,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6035999394953251,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 56.50830001104623,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.73370000254363,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 114.51570002827793,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.16.linear_attn",
+      "wall_ms": 116.45760003011674,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.16.mlp",
+      "wall_ms": 0.522000016644597,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6160000339150429,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.78639998566359,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 57.82539991196245,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 116.9083999702707,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.17.linear_attn",
+      "wall_ms": 118.84350003674626,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.17.mlp",
+      "wall_ms": 0.5121000576764345,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.636699958704412,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 56.35430000256747,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.956600069999695,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 114.60860003717244,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.18.linear_attn",
+      "wall_ms": 116.57389998435974,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.18.mlp",
+      "wall_ms": 0.5097000394016504,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5Attention.layers.19.self_attn",
+      "wall_ms": 1.3419999741017818,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.19.mlp",
+      "wall_ms": 0.5246000364422798,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6089999806135893,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 56.37870007194579,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.406900006346405,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 115.14040001202375,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.20.linear_attn",
+      "wall_ms": 117.08570003975183,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.20.mlp",
+      "wall_ms": 0.5365000106394291,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6278000073507428,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.78169990237802,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 54.76259998977184,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 112.77499992866069,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.21.linear_attn",
+      "wall_ms": 114.76169992238283,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.21.mlp",
+      "wall_ms": 0.4912000149488449,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.causal_conv1d_fn",
+      "wall_ms": 0.6000999128445983,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            6144,
+            261
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            6144,
+            4
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 55.347199901007116,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.solve_triangular",
+      "wall_ms": 67.05299997702241,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            64
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            16,
+            5,
+            64,
+            128
+          ],
+          "dtype": "torch.float32",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "operator.torch_chunk_gated_delta_rule",
+      "wall_ms": 125.40449993684888,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        },
+        {
+          "shape": [
+            1,
+            261,
+            16,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5GatedDeltaNet.layers.22.linear_attn",
+      "wall_ms": 127.26849992759526,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.22.mlp",
+      "wall_ms": 0.43320003896951675,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5Attention.layers.23.self_attn",
+      "wall_ms": 1.169299939647317,
+      "inputs": []
+    },
+    {
+      "iteration": 2,
+      "label": "module.Qwen3_5MLP.layers.23.mlp",
+      "wall_ms": 0.5009999731555581,
+      "inputs": [
+        {
+          "shape": [
+            1,
+            261,
+            1024
+          ],
+          "dtype": "torch.bfloat16",
+          "device": "cuda:0"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "label": "module.language_model",
+      "wall_ms": 2287.303199991584,
+      "inputs": []
+    }
+  ],
+  "summary": {
+    "module.visual.patch_embed": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.20619994029402733,
+      "call_sum_ms": 0.6062999600544572,
+      "per_forward_sum_ms": [
+        0.18810003530234098,
+        0.21199998445808887,
+        0.20619994029402733
+      ],
+      "per_forward_sum_median_ms": 0.20619994029402733
+    },
+    "module.visual": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 14.85909998882562,
+      "call_sum_ms": 47.00669995509088,
+      "per_forward_sum_ms": [
+        14.243899961002171,
+        17.90370000526309,
+        14.85909998882562
+      ],
+      "per_forward_sum_median_ms": 14.85909998882562
+    },
+    "operator.causal_conv1d_fn": {
+      "calls": 54,
+      "calls_per_forward": 18.0,
+      "call_median_ms": 0.617499987129122,
+      "call_sum_ms": 32.73400035686791,
+      "per_forward_sum_ms": [
+        10.791900102049112,
+        10.769400163553655,
+        11.172700091265142
+      ],
+      "per_forward_sum_median_ms": 10.791900102049112
+    },
+    "operator.solve_triangular": {
+      "calls": 108,
+      "calls_per_forward": 36.0,
+      "call_median_ms": 55.77714997343719,
+      "call_sum_ms": 6275.968699133955,
+      "per_forward_sum_ms": [
+        2068.687599617988,
+        2051.503899972886,
+        2155.777199543081
+      ],
+      "per_forward_sum_median_ms": 2068.687599617988
+    },
+    "operator.torch_chunk_gated_delta_rule": {
+      "calls": 54,
+      "calls_per_forward": 18.0,
+      "call_median_ms": 115.386999968905,
+      "call_sum_ms": 6454.084299970418,
+      "per_forward_sum_ms": [
+        2127.99749977421,
+        2109.990200260654,
+        2216.096599935554
+      ],
+      "per_forward_sum_median_ms": 2127.99749977421
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.0.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 116.791500011459,
+      "call_sum_ms": 350.5711001344025,
+      "per_forward_sum_ms": [
+        116.791500011459,
+        118.96670004352927,
+        114.81290007941425
+      ],
+      "per_forward_sum_median_ms": 116.791500011459
+    },
+    "module.Qwen3_5MLP.layers.0.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5080000264570117,
+      "call_sum_ms": 1.5252999728545547,
+      "per_forward_sum_ms": [
+        0.5034999921917915,
+        0.5137999542057514,
+        0.5080000264570117
+      ],
+      "per_forward_sum_median_ms": 0.5080000264570117
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.1.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 115.15460000373423,
+      "call_sum_ms": 347.138199955225,
+      "per_forward_sum_ms": [
+        114.90619997493923,
+        117.07739997655153,
+        115.15460000373423
+      ],
+      "per_forward_sum_median_ms": 115.15460000373423
+    },
+    "module.Qwen3_5MLP.layers.1.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5037999944761395,
+      "call_sum_ms": 1.516799908131361,
+      "per_forward_sum_ms": [
+        0.5037999944761395,
+        0.5002999678254128,
+        0.5126999458298087
+      ],
+      "per_forward_sum_median_ms": 0.5037999944761395
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.2.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 115.45709997881204,
+      "call_sum_ms": 347.36060013528913,
+      "per_forward_sum_ms": [
+        115.42840010952204,
+        116.47510004695505,
+        115.45709997881204
+      ],
+      "per_forward_sum_median_ms": 115.45709997881204
+    },
+    "module.Qwen3_5MLP.layers.2.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5024999845772982,
+      "call_sum_ms": 1.5244000824168324,
+      "per_forward_sum_ms": [
+        0.5291000707075,
+        0.5024999845772982,
+        0.4928000271320343
+      ],
+      "per_forward_sum_median_ms": 0.5024999845772982
+    },
+    "module.Qwen3_5Attention.layers.3.self_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 1.3818000443279743,
+      "call_sum_ms": 4.129600012674928,
+      "per_forward_sum_ms": [
+        1.3818000443279743,
+        1.4027999714016914,
+        1.344999996945262
+      ],
+      "per_forward_sum_median_ms": 1.3818000443279743
+    },
+    "module.Qwen3_5MLP.layers.3.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5134000675752759,
+      "call_sum_ms": 1.571600092574954,
+      "per_forward_sum_ms": [
+        0.5598000716418028,
+        0.49839995335787535,
+        0.5134000675752759
+      ],
+      "per_forward_sum_median_ms": 0.5134000675752759
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.4.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 117.56259994581342,
+      "call_sum_ms": 350.07139993831515,
+      "per_forward_sum_ms": [
+        114.50809997040778,
+        117.56259994581342,
+        118.00070002209395
+      ],
+      "per_forward_sum_median_ms": 117.56259994581342
+    },
+    "module.Qwen3_5MLP.layers.4.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5278999451547861,
+      "call_sum_ms": 1.5840999549254775,
+      "per_forward_sum_ms": [
+        0.5168999778106809,
+        0.5278999451547861,
+        0.5393000319600105
+      ],
+      "per_forward_sum_median_ms": 0.5278999451547861
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.5.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 115.1789000723511,
+      "call_sum_ms": 345.986400032416,
+      "per_forward_sum_ms": [
+        114.73449994809926,
+        115.1789000723511,
+        116.07300001196563
+      ],
+      "per_forward_sum_median_ms": 115.1789000723511
+    },
+    "module.Qwen3_5MLP.layers.5.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5179001018404961,
+      "call_sum_ms": 1.5574002172797918,
+      "per_forward_sum_ms": [
+        0.5179001018404961,
+        0.5221000174060464,
+        0.5174000980332494
+      ],
+      "per_forward_sum_median_ms": 0.5179001018404961
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.6.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 116.11350008752197,
+      "call_sum_ms": 349.60099996533245,
+      "per_forward_sum_ms": [
+        116.11350008752197,
+        115.37629994563758,
+        118.1111999321729
+      ],
+      "per_forward_sum_median_ms": 116.11350008752197
+    },
+    "module.Qwen3_5MLP.layers.6.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5219000158831477,
+      "call_sum_ms": 1.5690999571233988,
+      "per_forward_sum_ms": [
+        0.5219000158831477,
+        0.5021999822929502,
+        0.5449999589473009
+      ],
+      "per_forward_sum_median_ms": 0.5219000158831477
+    },
+    "module.Qwen3_5Attention.layers.7.self_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 1.3764000032097101,
+      "call_sum_ms": 4.133300040848553,
+      "per_forward_sum_ms": [
+        1.3943000230938196,
+        1.3626000145450234,
+        1.3764000032097101
+      ],
+      "per_forward_sum_median_ms": 1.3764000032097101
+    },
+    "module.Qwen3_5MLP.layers.7.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5147000774741173,
+      "call_sum_ms": 1.5342000406235456,
+      "per_forward_sum_ms": [
+        0.5035999929532409,
+        0.5158999701961875,
+        0.5147000774741173
+      ],
+      "per_forward_sum_median_ms": 0.5147000774741173
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.8.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 121.29859998822212,
+      "call_sum_ms": 358.6129999021068,
+      "per_forward_sum_ms": [
+        115.09429989382625,
+        121.29859998822212,
+        122.22010002005845
+      ],
+      "per_forward_sum_median_ms": 121.29859998822212
+    },
+    "module.Qwen3_5MLP.layers.8.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5270999390631914,
+      "call_sum_ms": 1.5784000279381871,
+      "per_forward_sum_ms": [
+        0.5270999390631914,
+        0.5137000698596239,
+        0.5376000190153718
+      ],
+      "per_forward_sum_median_ms": 0.5270999390631914
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.9.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 127.28759995661676,
+      "call_sum_ms": 400.0520999543369,
+      "per_forward_sum_ms": [
+        119.70759998075664,
+        153.05690001696348,
+        127.28759995661676
+      ],
+      "per_forward_sum_median_ms": 127.28759995661676
+    },
+    "module.Qwen3_5MLP.layers.9.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5180999869480729,
+      "call_sum_ms": 1.561800017952919,
+      "per_forward_sum_ms": [
+        0.5114000523462892,
+        0.5180999869480729,
+        0.5322999786585569
+      ],
+      "per_forward_sum_median_ms": 0.5180999869480729
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.10.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 123.6845999956131,
+      "call_sum_ms": 456.2510000541806,
+      "per_forward_sum_ms": [
+        121.4316999539733,
+        123.6845999956131,
+        211.13470010459423
+      ],
+      "per_forward_sum_median_ms": 123.6845999956131
+    },
+    "module.Qwen3_5MLP.layers.10.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.6077999714761972,
+      "call_sum_ms": 1.8075000261887908,
+      "per_forward_sum_ms": [
+        0.6077999714761972,
+        0.5055000074207783,
+        0.6942000472918153
+      ],
+      "per_forward_sum_median_ms": 0.6077999714761972
+    },
+    "module.Qwen3_5Attention.layers.11.self_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 1.394700026139617,
+      "call_sum_ms": 4.448099876753986,
+      "per_forward_sum_ms": [
+        1.394700026139617,
+        1.378699904307723,
+        1.6746999463066459
+      ],
+      "per_forward_sum_median_ms": 1.394700026139617
+    },
+    "module.Qwen3_5MLP.layers.11.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5174999823793769,
+      "call_sum_ms": 1.7328999238088727,
+      "per_forward_sum_ms": [
+        0.5174999823793769,
+        0.5019999807700515,
+        0.7133999606594443
+      ],
+      "per_forward_sum_median_ms": 0.5174999823793769
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.12.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 116.8028999818489,
+      "call_sum_ms": 377.3988001048565,
+      "per_forward_sum_ms": [
+        116.8028999818489,
+        116.13760003820062,
+        144.45830008480698
+      ],
+      "per_forward_sum_median_ms": 116.8028999818489
+    },
+    "module.Qwen3_5MLP.layers.12.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5071000196039677,
+      "call_sum_ms": 1.5174999134615064,
+      "per_forward_sum_ms": [
+        0.5071000196039677,
+        0.4946999251842499,
+        0.5156999686732888
+      ],
+      "per_forward_sum_median_ms": 0.5071000196039677
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.13.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 119.6316999848932,
+      "call_sum_ms": 368.57089994009584,
+      "per_forward_sum_ms": [
+        134.00149997323751,
+        114.93769998196512,
+        119.6316999848932
+      ],
+      "per_forward_sum_median_ms": 119.6316999848932
+    },
+    "module.Qwen3_5MLP.layers.13.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5237000295892358,
+      "call_sum_ms": 1.5694000758230686,
+      "per_forward_sum_ms": [
+        0.5347999976947904,
+        0.5109000485390425,
+        0.5237000295892358
+      ],
+      "per_forward_sum_median_ms": 0.5237000295892358
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.14.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 118.47699992358685,
+      "call_sum_ms": 370.2675000531599,
+      "per_forward_sum_ms": [
+        134.1468000318855,
+        117.64370009768754,
+        118.47699992358685
+      ],
+      "per_forward_sum_median_ms": 118.47699992358685
+    },
+    "module.Qwen3_5MLP.layers.14.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5172999808564782,
+      "call_sum_ms": 1.5427001053467393,
+      "per_forward_sum_ms": [
+        0.5172999808564782,
+        0.49810006748884916,
+        0.5273000570014119
+      ],
+      "per_forward_sum_median_ms": 0.5172999808564782
+    },
+    "module.Qwen3_5Attention.layers.15.self_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 1.3735999818891287,
+      "call_sum_ms": 4.129500011913478,
+      "per_forward_sum_ms": [
+        1.3933000154793262,
+        1.3626000145450234,
+        1.3735999818891287
+      ],
+      "per_forward_sum_median_ms": 1.3735999818891287
+    },
+    "module.Qwen3_5MLP.layers.15.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5015999777242541,
+      "call_sum_ms": 1.5090000815689564,
+      "per_forward_sum_ms": [
+        0.5015999777242541,
+        0.4977000644430518,
+        0.5097000394016504
+      ],
+      "per_forward_sum_median_ms": 0.5015999777242541
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.16.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 117.60009999852628,
+      "call_sum_ms": 355.09020008612424,
+      "per_forward_sum_ms": [
+        121.03250005748123,
+        117.60009999852628,
+        116.45760003011674
+      ],
+      "per_forward_sum_median_ms": 117.60009999852628
+    },
+    "module.Qwen3_5MLP.layers.16.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5178999854251742,
+      "call_sum_ms": 1.5558999730274081,
+      "per_forward_sum_ms": [
+        0.5178999854251742,
+        0.5159999709576368,
+        0.522000016644597
+      ],
+      "per_forward_sum_median_ms": 0.5178999854251742
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.17.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 118.84350003674626,
+      "call_sum_ms": 366.1186001263559,
+      "per_forward_sum_ms": [
+        132.1020000614226,
+        115.17310002818704,
+        118.84350003674626
+      ],
+      "per_forward_sum_median_ms": 118.84350003674626
+    },
+    "module.Qwen3_5MLP.layers.17.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5191999953240156,
+      "call_sum_ms": 1.6016000881791115,
+      "per_forward_sum_ms": [
+        0.5703000351786613,
+        0.5191999953240156,
+        0.5121000576764345
+      ],
+      "per_forward_sum_median_ms": 0.5191999953240156
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.18.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 116.57389998435974,
+      "call_sum_ms": 356.04340001009405,
+      "per_forward_sum_ms": [
+        124.83990006148815,
+        114.62959996424615,
+        116.57389998435974
+      ],
+      "per_forward_sum_median_ms": 116.57389998435974
+    },
+    "module.Qwen3_5MLP.layers.18.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5097000394016504,
+      "call_sum_ms": 1.5259999781847,
+      "per_forward_sum_ms": [
+        0.5128999473527074,
+        0.5033999914303422,
+        0.5097000394016504
+      ],
+      "per_forward_sum_median_ms": 0.5097000394016504
+    },
+    "module.Qwen3_5Attention.layers.19.self_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 1.3682000571861863,
+      "call_sum_ms": 4.086800036020577,
+      "per_forward_sum_ms": [
+        1.3682000571861863,
+        1.3766000047326088,
+        1.3419999741017818
+      ],
+      "per_forward_sum_median_ms": 1.3682000571861863
+    },
+    "module.Qwen3_5MLP.layers.19.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5246000364422798,
+      "call_sum_ms": 1.620400114916265,
+      "per_forward_sum_ms": [
+        0.44269999489188194,
+        0.6531000835821033,
+        0.5246000364422798
+      ],
+      "per_forward_sum_median_ms": 0.5246000364422798
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.20.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 117.81089997384697,
+      "call_sum_ms": 353.5070000216365,
+      "per_forward_sum_ms": [
+        117.81089997384697,
+        118.61040000803769,
+        117.08570003975183
+      ],
+      "per_forward_sum_median_ms": 117.81089997384697
+    },
+    "module.Qwen3_5MLP.layers.20.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.521100009791553,
+      "call_sum_ms": 1.5707999700680375,
+      "per_forward_sum_ms": [
+        0.521100009791553,
+        0.5131999496370554,
+        0.5365000106394291
+      ],
+      "per_forward_sum_median_ms": 0.521100009791553
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.21.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 115.38289999589324,
+      "call_sum_ms": 347.63309988193214,
+      "per_forward_sum_ms": [
+        117.48849996365607,
+        115.38289999589324,
+        114.76169992238283
+      ],
+      "per_forward_sum_median_ms": 115.38289999589324
+    },
+    "module.Qwen3_5MLP.layers.21.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5030001047998667,
+      "call_sum_ms": 1.5103000914677978,
+      "per_forward_sum_ms": [
+        0.5030001047998667,
+        0.5160999717190862,
+        0.4912000149488449
+      ],
+      "per_forward_sum_median_ms": 0.5030001047998667
+    },
+    "module.Qwen3_5GatedDeltaNet.layers.22.linear_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 115.75150000862777,
+      "call_sum_ms": 358.72220003511757,
+      "per_forward_sum_ms": [
+        115.70220009889454,
+        115.75150000862777,
+        127.26849992759526
+      ],
+      "per_forward_sum_median_ms": 115.75150000862777
+    },
+    "module.Qwen3_5MLP.layers.22.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5014999769628048,
+      "call_sum_ms": 1.4794999733567238,
+      "per_forward_sum_ms": [
+        0.5014999769628048,
+        0.5447999574244022,
+        0.43320003896951675
+      ],
+      "per_forward_sum_median_ms": 0.5014999769628048
+    },
+    "module.Qwen3_5Attention.layers.23.self_attn": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 1.3675999362021685,
+      "call_sum_ms": 3.9155998965725303,
+      "per_forward_sum_ms": [
+        1.3675999362021685,
+        1.3787000207230449,
+        1.169299939647317
+      ],
+      "per_forward_sum_median_ms": 1.3675999362021685
+    },
+    "module.Qwen3_5MLP.layers.23.mlp": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 0.5009999731555581,
+      "call_sum_ms": 1.5261998632922769,
+      "per_forward_sum_ms": [
+        0.5282999482005835,
+        0.4968999419361353,
+        0.5009999731555581
+      ],
+      "per_forward_sum_median_ms": 0.5009999731555581
+    },
+    "module.language_model": {
+      "calls": 3,
+      "calls_per_forward": 1.0,
+      "call_median_ms": 2197.8135000681505,
+      "call_sum_ms": 6664.50850002002,
+      "per_forward_sum_ms": [
+        2197.8135000681505,
+        2179.3917999602854,
+        2287.303199991584
+      ],
+      "per_forward_sum_median_ms": 2197.8135000681505
+    }
+  },
+  "module_family_summary": {
+    "module.Qwen3_5GatedDeltaNet": {
+      "calls": 54,
+      "calls_per_forward": 18.0,
+      "call_median_ms": 117.28710000170395,
+      "call_sum_ms": 6558.996500330977,
+      "per_forward_sum_ms": [
+        2162.643000134267,
+        2144.543700153008,
+        2251.809800043702
+      ],
+      "per_forward_sum_median_ms": 2162.643000134267
+    },
+    "module.Qwen3_5MLP": {
+      "calls": 72,
+      "calls_per_forward": 24.0,
+      "call_median_ms": 0.515200023073703,
+      "call_sum_ms": 37.59280045051128,
+      "per_forward_sum_ms": [
+        12.478800141252577,
+        12.386499787680805,
+        12.727500521577895
+      ],
+      "per_forward_sum_median_ms": 12.478800141252577
+    },
+    "module.Qwen3_5Attention": {
+      "calls": 18,
+      "calls_per_forward": 6.0,
+      "call_median_ms": 1.3765000039711595,
+      "call_sum_ms": 24.842899874784052,
+      "per_forward_sum_ms": [
+        8.299900102429092,
+        8.261999930255115,
+        8.280999842099845
+      ],
+      "per_forward_sum_median_ms": 8.280999842099845
+    }
+  },
+  "baseline_forward_median_ms": 2182.88430001121,
+  "instrumented_forward_median_ms": 2215.113200014457,
+  "instrumentation_wall_ratio": 1.0147643647458005,
+  "maximum_probability_spread": 0.0
+}

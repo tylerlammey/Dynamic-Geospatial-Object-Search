@@ -1,0 +1,237 @@
+{
+  "model": "intern-neumann",
+  "status": "ok",
+  "manifest_sha256": "241271d3b8f0839a9e3dd8cceabf2915dddf5fc6852f0613757cee374443d826",
+  "environment": {
+    "date_utc": "2026-10-27T00:19:24Z",
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "gpu": "AMD Radeon RX 9070 XT",
+    "gpu_total_bytes": 17095983104,
+    "hip": "7.2.53211-158bd99533",
+    "packages": {
+      "torch": "2.9.1+rocm7.2.1",
+      "torchvision": "0.24.1+rocm7.2.1",
+      "transformers": "5.17.0",
+      "numpy": "2.5.3",
+      "pillow": "12.3.0",
+      "peft": "0.21.0",
+      "accelerate": "1.13.0",
+      "huggingface-hub": "1.32.0"
+    },
+    "cpu_threads": 8,
+    "pinned_memory": false,
+    "core_sha256": {
+      "embed_georsclip.py": "c0ccf532746d591c08afc757f71c867c2b43e6f55ceb55e0960a4e3d7b536831",
+      "tiling.py": "dd73c1dd806c6e699099cbeb84c0f26719bd7f70fdb52e3c2a0064cf47f4c19c",
+      "model.py": "eedf7ab7012e6e594b997a68da87ff177f7ec6cd1133b909bc4783dd9a7140b5",
+      "bundles.py": "461eaf63828a1c6b83ab37e17161141f9a010cac7da5fe4121d2f97dc853d6eb"
+    },
+    "benchmark_code_sha256": {
+      "adapters_decision.py": "9aa2aa82ca0e22ae558f3d18e8d14ed59797d188144d323614a253bd8480d3a3",
+      "adapters_detection.py": "60c7f0abd62ead33bd5663577744255da45e83209943dd9b27dfae979beeec2e",
+      "adapter_d3.py": "aa2d51561d7c88b4ff18ff88eadb9ced93a5c3d214b1844da8917a8b18053a2c",
+      "analyze_cascade.py": "de3b93c99ba23410d258ac33aaa36057c47340da038e08a1ec05fde3486b79bc",
+      "annotate_exploratory.py": "a2e05731673a79584c6b68ef380e0ee4f9c50d46d94ceddb51f4b4e5acf68ffe",
+      "audit_split.py": "074e022350ac036763ccbc0a99ebe9fac638d613bda4e193d4507c82541c00bc",
+      "compare_variants.py": "bf478fe73ed01fbacbe7ab0281c7fa8997f02e7036ee6463f67b1dc70584fe17",
+      "dataset.py": "974cb487fa5655b0a40bfec7eb36855c4a29c85ac203fb28a6b50b65130b2194",
+      "download_models.py": "2cd00d901fe4b4bb6a23e30682a8d79b4fa26b83dc003d0f45b4564aee4d1d9e",
+      "evaluate.py": "f18a596ce5e878e9b2b7dd7a1919c5facdee6be37c084ba1cea5c18e95cfd66b",
+      "fetch_sources.py": "a19a67abb9413c664d561cebc3734d0c4f3c8d7cb0aae173ce878c8c829bc662",
+      "metrics.py": "388429649b1b477adc697e319632b7602f4e8ad95b3f56e0c4b9d4c7e9fa5279",
+      "probe_gpu.py": "e45dff8056ec845fbdca0e3f9a6c39426882058df5f8d38bfa576ce9d6a35871",
+      "profile_intern.py": "9cf496b372c9f4fa5206bfae094c7a590cc77315cb629d7c1638c3f976a8b6e2",
+      "run.py": "4a5cec387e53771c47ea53a983f7981db2bb9284a0845e840edf8f35c6028816",
+      "solvers.py": "05b7028517856003dccf2a7c5d7bf1335b29184b48d55e87c18b35137af93bf1",
+      "suite.py": "06897fce1f0923280546cfae7615bf1daf1997e411601f55d98cad8802b9f971",
+      "summarize_results.py": "72643813571e7c59ae4add7da8e1b027c8b65fc7571a53d6ceebb2aab42a9726",
+      "test_adapter_d3.py": "b5627243ef2cf3bca5e5e7612398106cbc070c24448f19a9d4cc69c5fa0b1ed9",
+      "test_metrics.py": "97bb350161ffdd7bbeb129fe2a603c4004f7a05024fa9efa6bcd5a45a406cbd4",
+      "test_solvers.py": "cc5506342c472f2bad0d48377b868c15ce680953791b450271a7c4e77539a14a"
+    }
+  },
+  "protocol": {
+    "model": "intern-neumann",
+    "dtype": null,
+    "batches": [
+      1
+    ],
+    "warmup": 2,
+    "repeats": 3,
+    "limit": 8,
+    "tag": "smoke-fast",
+    "co_resident": null,
+    "with_retriever": false
+  },
+  "timing_scope": "synchronized serial CPU preparation + H2D + forward + postprocess; source TIFF decoding separate",
+  "batches": [
+    {
+      "batch_size": 1,
+      "status": "ok",
+      "warmup": [
+        {
+          "preprocess_ms": 55.630499962717295,
+          "transfer_ms": 1.6475999727845192,
+          "forward_wall_ms": 6870.513400062919,
+          "forward_device_ms": 6713.41796875,
+          "postprocess_ms": 0.17310003750026226,
+          "total_ms": 6927.964600035921
+        },
+        {
+          "preprocess_ms": 2.521199989132583,
+          "transfer_ms": 0.9443999733775854,
+          "forward_wall_ms": 2238.132100086659,
+          "forward_device_ms": 2237.850830078125,
+          "postprocess_ms": 0.15410000924021006,
+          "total_ms": 2241.7518000584096
+        }
+      ],
+      "trials": [
+        {
+          "preprocess_ms": 2.4037000257521868,
+          "transfer_ms": 0.9009999921545386,
+          "forward_wall_ms": 2381.4620000775903,
+          "forward_device_ms": 2381.21240234375,
+          "postprocess_ms": 0.13489997945725918,
+          "total_ms": 2384.9016000749543
+        },
+        {
+          "preprocess_ms": 2.494500018656254,
+          "transfer_ms": 0.8782000513747334,
+          "forward_wall_ms": 2230.0194998970255,
+          "forward_device_ms": 2229.65478515625,
+          "postprocess_ms": 0.16550009604543447,
+          "total_ms": 2233.557700063102
+        },
+        {
+          "preprocess_ms": 2.6114999782294035,
+          "transfer_ms": 0.942499958910048,
+          "forward_wall_ms": 2162.4799000564963,
+          "forward_device_ms": 2162.205322265625,
+          "postprocess_ms": 0.1354999840259552,
+          "total_ms": 2166.1693999776617
+        }
+      ],
+      "first_batch_ms": 6927.964600035921,
+      "summary": {
+        "preprocess_ms": {
+          "median": 2.494500018656254,
+          "p95": 2.5997999822720885,
+          "mean": 2.5032333408792815,
+          "min": 2.4037000257521868,
+          "max": 2.6114999782294035
+        },
+        "transfer_ms": {
+          "median": 0.9009999921545386,
+          "p95": 0.9383499622344971,
+          "mean": 0.90723333414644,
+          "min": 0.8782000513747334,
+          "max": 0.942499958910048
+        },
+        "forward_wall_ms": {
+          "median": 2230.0194998970255,
+          "p95": 2366.317750059534,
+          "mean": 2257.987133343704,
+          "min": 2162.4799000564963,
+          "max": 2381.4620000775903
+        },
+        "forward_device_ms": {
+          "median": 2229.65478515625,
+          "p95": 2366.056640625,
+          "mean": 2257.6908365885415,
+          "min": 2162.205322265625,
+          "max": 2381.21240234375
+        },
+        "postprocess_ms": {
+          "median": 0.1354999840259552,
+          "p95": 0.16250008484348655,
+          "mean": 0.14530001984288296,
+          "min": 0.13489997945725918,
+          "max": 0.16550009604543447
+        },
+        "total_ms": {
+          "median": 2233.557700063102,
+          "p95": 2369.767210073769,
+          "mean": 2261.5429000385725,
+          "min": 2166.1693999776617,
+          "max": 2384.9016000749543
+        },
+        "throughput_tiles_second": 0.44217600293275183,
+        "median_amortized_ms_per_tile": 2233.557700063102
+      },
+      "peak_allocated_bytes": 1895225856,
+      "peak_reserved_bytes": 1948254208
+    }
+  ],
+  "source_read_ms": {
+    "read_ms": {
+      "median": 4.513999971095473,
+      "p95": 18.40813499293289,
+      "mean": 7.020174991339445,
+      "min": 3.0592000111937523,
+      "max": 25.008399970829487
+    },
+    "total_ms": {
+      "median": 4.513999971095473,
+      "p95": 18.40813499293289,
+      "mean": 7.020174991339445,
+      "min": 3.0592000111937523,
+      "max": 25.008399970829487
+    },
+    "throughput_tiles_second": 142.44659160685688,
+    "median_amortized_ms_per_tile": 4.513999971095473
+  },
+  "load_seconds": 6.728736600023694,
+  "model_info": {
+    "kind": "decision",
+    "dtype": "bfloat16",
+    "temperature": 2.747760550703,
+    "source_calibration": "Published non-aerial temperature, not NYS calibration",
+    "linear_patch_projection": true,
+    "generation": false,
+    "state": "An aerial image tile.",
+    "processor": {
+      "size": {
+        "longest_edge": 16777216,
+        "shortest_edge": 65536
+      },
+      "patch_size": 16,
+      "temporal_patch_size": 2,
+      "merge_size": 2,
+      "image_mean": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "image_std": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "image_processor_type": "Qwen2VLImageProcessor",
+      "do_convert_rgb": true,
+      "do_resize": true,
+      "resample": 3,
+      "do_rescale": true,
+      "rescale_factor": 0.00392156862745098,
+      "do_normalize": true
+    },
+    "experimental_solver": "FP32 Neumann unit-triangular inverse with residual guard and native fallback",
+    "experimental_solver_last_forward": {
+      "calls": 36,
+      "optimized_calls": 0,
+      "fallback_calls": 36,
+      "inverse_builds": 18,
+      "inverse_cache_hits": 0,
+      "rejected_inverse_cache_hits": 18,
+      "rejected_inverses": 18,
+      "maximum_checked_inverse_residual": 14747339776.0
+    }
+  },
+  "resident_allocated_bytes": 1736535552,
+  "load_peak_allocated_bytes": 1736535552,
+  "parameter_count": 852985920,
+  "prediction_file": "local/intern-neumann-smoke-fast-predictions.json",
+  "prediction_count": 8
+}

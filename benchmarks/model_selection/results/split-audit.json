@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "input_pairs": 108,
+  "unique_qualified_tiles": 96,
+  "unique_sources": 80,
+  "catalog_sha256": {
+    "nys_naip_2022_rgb060": "aa9a2f3bb16fe90e315261ebeb9895732bf55923a3b6a6c3f1f70e273cfe2af2"
+  },
+  "geometry": "Published GeoParquet WKB polygons in EPSG:4326; no bounds-only approximation",
+  "overlap_threshold_fraction": 0.001,
+  "cross_split_positive_area_intersections": 0,
+  "maximum_cross_split_overlap_fraction": 0.0,
+  "cross_split_overlap_pairs_above_threshold": [],
+  "cross_split_shared_sources": [],
+  "cross_split_shared_tiles": [],
+  "cross_split_shared_group_ids": [],
+  "query_class_counts_by_split": {
+    "calibration": {
+      "airplane": {
+        "positive": 0,
+        "negative": 1,
+        "unknown": 0
+      },
+      "airplane on a runway": {
+        "positive": 1,
+        "negative": 2,
+        "unknown": 0
+      },
+      "baseball field": {
+        "positive": 4,
+        "negative": 0,
+        "unknown": 0
+      },
+      "boat": {
+        "positive": 0,
+        "negative": 1,
+        "unknown": 0
+      },
+      "cargo ship": {
+        "positive": 4,
+        "negative": 0,
+        "unknown": 0
+      },
+      "electrical substation": {
+        "positive": 3,
+        "negative": 2,
+        "unknown": 0
+      },
+      "fighter jet": {
+        "positive": 0,
+        "negative": 1,
+        "unknown": 0
+      },
+      "highway interchange": {
+        "positive": 2,
+        "negative": 0,
+        "unknown": 2
+      },
+      "industrial warehouse": {
+        "positive": 5,
+        "negative": 0,
+        "unknown": 0
+      },
+      "parking lot": {
+        "positive": 2,
+        "negative": 0,
+        "unknown": 0
+      },
+      "solar farm": {
+        "positive": 1,
+        "negative": 0,
+        "unknown": 0
+      },
+      "swimming pool": {
+        "positive": 6,
+        "negative": 0,
+        "unknown": 0
+      },
+      "tennis courts": {
+        "positive": 7,
+        "negative": 0,
+        "unknown": 0
+      },
+      "water treatment plant": {
+        "positive": 4,
+        "negative": 0,
+        "unknown": 0
+      }
+    },
+    "test": {
+      "airplane": {
+        "positive": 4,
+        "negative": 3,
+        "unknown": 0
+      },
+      "airplane on a runway": {
+        "positive": 0,
+        "negative": 5,
+        "unknown": 0
+      },
+      "baseball field": {
+        "positive": 3,
+        "negative": 1,
+        "unknown": 0
+      },
+      "boat": {
+        "positive": 2,
+        "negative": 1,
+        "unknown": 0
+      },
+      "cargo ship": {
+        "positive": 3,
+        "negative": 1,
+        "unknown": 0
+      },
+      "electrical substation": {
+        "positive": 3,
+        "negative": 0,
+        "unknown": 0
+      },
+      "fighter jet": {
+        "positive": 0,
+        "negative": 7,
+        "unknown": 0
+      },
+      "highway interchange": {
+        "positive": 3,
+        "negative": 1,
+        "unknown": 0
+      },
+      "industrial warehouse": {
+        "positive": 2,
+        "negative": 1,
+        "unknown": 0
+      },
+      "parking lot": {
+        "positive": 5,
+        "negative": 0,
+        "unknown": 1
+      },
+      "solar farm": {
+        "positive": 6,
+        "negative": 1,
+        "unknown": 0
+      },
+      "swimming pool": {
+        "positive": 1,
+        "negative": 1,
+        "unknown": 0
+      },
+      "tennis courts": {
+        "positive": 0,
+        "negative": 1,
+        "unknown": 0
+      },
+      "water treatment plant": {
+        "positive": 3,
+        "negative": 1,
+        "unknown": 0
+      }
+    }
+  },
+  "leakage_detected": false,
+  "limitations": [
+    "Area ratios use WGS84 planar coordinates, not geodesic square meters.",
+    "No observed overlap does not establish geographic independence or validate labels.",
+    "Distinct nearby tiles may remain correlated despite having disjoint footprints.",
+    "Class counts include paired queries on reused tiles; they are not independent image counts."
+  ],
+  "manifest_sha256": "241271d3b8f0839a9e3dd8cceabf2915dddf5fc6852f0613757cee374443d826",
+  "audit_code_sha256": "074e022350ac036763ccbc0a99ebe9fac638d613bda4e193d4507c82541c00bc"
+}

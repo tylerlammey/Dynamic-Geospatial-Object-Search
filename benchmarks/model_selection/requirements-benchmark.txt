@@ -1,0 +1,5 @@
+# Overlay only. Never pip-install torch/torchvision over the GPU runtime.
+# Install with .venv/Scripts/python.exe -m pip install --no-deps --target
+# benchmarks/model_selection/dependencies -r benchmarks/model_selection/requirements-benchmark.txt
+peft==0.21.0
+accelerate==1.13.0

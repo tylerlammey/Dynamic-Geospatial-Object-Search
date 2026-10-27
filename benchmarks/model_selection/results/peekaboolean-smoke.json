@@ -1,0 +1,59 @@
+{
+  "model": "peekaboolean",
+  "status": "native_crash_in_restricted_sandbox",
+  "manifest_sha256": "43d6c5d3d4234d7de955fb2d9280b61b71c2439bc17cfc2cfee2fd6471adcbae",
+  "environment": {
+    "date_utc": "2026-10-26T23:49:36Z",
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "gpu": "AMD Radeon RX 9070 XT",
+    "gpu_total_bytes": 17095983104,
+    "hip": "7.2.53211-158bd99533",
+    "packages": {
+      "torch": "2.9.1+rocm7.2.1",
+      "torchvision": "0.24.1+rocm7.2.1",
+      "transformers": "5.17.0",
+      "numpy": "2.5.3",
+      "pillow": "12.3.0",
+      "peft": "0.21.0",
+      "accelerate": "1.13.0",
+      "huggingface-hub": "1.32.0"
+    },
+    "cpu_threads": 8,
+    "pinned_memory": false,
+    "core_sha256": {
+      "embed_georsclip.py": "c0ccf532746d591c08afc757f71c867c2b43e6f55ceb55e0960a4e3d7b536831",
+      "tiling.py": "dd73c1dd806c6e699099cbeb84c0f26719bd7f70fdb52e3c2a0064cf47f4c19c",
+      "model.py": "eedf7ab7012e6e594b997a68da87ff177f7ec6cd1133b909bc4783dd9a7140b5",
+      "bundles.py": "461eaf63828a1c6b83ab37e17161141f9a010cac7da5fe4121d2f97dc853d6eb"
+    },
+    "benchmark_code_sha256": {
+      "adapters_decision.py": "253abaa1054edca6543275fa5efcdd46c9a8bff01da1c6a4ed2ab4d7a4ec179a",
+      "adapters_detection.py": "1afe3b27ebcd6d09e15306294b67f8a04dd306401e941695b7ca9a9246c5ed01",
+      "adapter_d3.py": "6ffe55ef3f605e411a1a0cdd86048909329e08166cd19971994c194dc3305928",
+      "dataset.py": "a83a24eba4dccfb8583977669c50d4dddc9b48443d5fc18ef3378fe9ca78bf8d",
+      "download_models.py": "5e30b0caac465a1857486742edc440e72ffb6b0b2b34be2d24b075453fc290dc",
+      "fetch_sources.py": "f2b65d7fd011b849602ea476e667bbdd5d13331a4bad699414f844cb15401b6f",
+      "metrics.py": "08d2ed7ad471f1e4da860b0d0670f9e57edd1a262f3af84795be08c7df59cea7",
+      "run.py": "5597aaaf27c4873d76e8dad98fe5691147959773f9ad5f695c1406b014e7d180",
+      "test_adapter_d3.py": "a1734e57495822414c6b62956fe050aea10497826eba752308b11239d55f9ffb",
+      "test_metrics.py": "afa637b79078e2d61a26019cfc0601e652d3ac2910aee1cd1f495c4bd1ec32c2"
+    }
+  },
+  "protocol": {
+    "model": "peekaboolean",
+    "dtype": null,
+    "batches": [
+      1,
+      4
+    ],
+    "warmup": 2,
+    "repeats": 3,
+    "limit": 8,
+    "tag": "smoke",
+    "co_resident": null
+  },
+  "timing_scope": "synchronized serial CPU preparation + H2D + forward + postprocess; source TIFF decoding separate",
+  "batches": [],
+  "diagnosis": "Minimal ordinary allocation also failed in sandbox and succeeded on host; no inference measurements from this attempt."
+}

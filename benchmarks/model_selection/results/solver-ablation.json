@@ -1,0 +1,15 @@
+{
+  "outcome": "rejected optimization: residual guard used native fallback for all observed solves",
+  "warm_median_ms": 2233.557700063102,
+  "operator_stats_last_forward": {
+    "calls": 36,
+    "optimized_calls": 0,
+    "fallback_calls": 36,
+    "inverse_builds": 18,
+    "inverse_cache_hits": 0,
+    "rejected_inverse_cache_hits": 18,
+    "rejected_inverses": 18,
+    "maximum_checked_inverse_residual": 14747339776.0
+  },
+  "scope": "8 pairs only; not a model-selection configuration"
+}

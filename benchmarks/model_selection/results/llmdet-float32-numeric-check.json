@@ -1,0 +1,409 @@
+{
+  "model": "llmdet",
+  "status": "ok",
+  "manifest_sha256": "241271d3b8f0839a9e3dd8cceabf2915dddf5fc6852f0613757cee374443d826",
+  "environment": {
+    "date_utc": "2026-10-27T00:25:03Z",
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "gpu": "AMD Radeon RX 9070 XT",
+    "gpu_total_bytes": 17095983104,
+    "hip": "7.2.53211-158bd99533",
+    "packages": {
+      "torch": "2.9.1+rocm7.2.1",
+      "torchvision": "0.24.1+rocm7.2.1",
+      "transformers": "5.17.0",
+      "numpy": "2.5.3",
+      "pillow": "12.3.0",
+      "peft": "0.21.0",
+      "accelerate": "1.13.0",
+      "huggingface-hub": "1.32.0"
+    },
+    "cpu_threads": 8,
+    "pinned_memory": false,
+    "core_sha256": {
+      "embed_georsclip.py": "c0ccf532746d591c08afc757f71c867c2b43e6f55ceb55e0960a4e3d7b536831",
+      "tiling.py": "dd73c1dd806c6e699099cbeb84c0f26719bd7f70fdb52e3c2a0064cf47f4c19c",
+      "model.py": "eedf7ab7012e6e594b997a68da87ff177f7ec6cd1133b909bc4783dd9a7140b5",
+      "bundles.py": "461eaf63828a1c6b83ab37e17161141f9a010cac7da5fe4121d2f97dc853d6eb"
+    },
+    "benchmark_code_sha256": {
+      "adapters_decision.py": "9aa2aa82ca0e22ae558f3d18e8d14ed59797d188144d323614a253bd8480d3a3",
+      "adapters_detection.py": "1f06ea53187406d98194395f0fc4c8e0b7480c93ed0227d1d5a2f74bf9a30b95",
+      "adapter_d3.py": "aa2d51561d7c88b4ff18ff88eadb9ced93a5c3d214b1844da8917a8b18053a2c",
+      "adapter_sam3lite.py": "cc90ad1c44c5d85f9d7269ea7148bede0f319acb9edfcbdc33298471e1e13f86",
+      "analyze_cascade.py": "0265b853ee3f6a24067d368202e8f647b80b025652e36ac88586a9218e0e480e",
+      "annotate_exploratory.py": "a2e05731673a79584c6b68ef380e0ee4f9c50d46d94ceddb51f4b4e5acf68ffe",
+      "audit_split.py": "074e022350ac036763ccbc0a99ebe9fac638d613bda4e193d4507c82541c00bc",
+      "compare_variants.py": "bf478fe73ed01fbacbe7ab0281c7fa8997f02e7036ee6463f67b1dc70584fe17",
+      "dataset.py": "974cb487fa5655b0a40bfec7eb36855c4a29c85ac203fb28a6b50b65130b2194",
+      "download_models.py": "2cd00d901fe4b4bb6a23e30682a8d79b4fa26b83dc003d0f45b4564aee4d1d9e",
+      "evaluate.py": "3916c51d02566685f9c262c069b63ba779937f7dcdb64d0f18d31f0ea55c000d",
+      "fetch_sources.py": "a19a67abb9413c664d561cebc3734d0c4f3c8d7cb0aae173ce878c8c829bc662",
+      "metrics.py": "388429649b1b477adc697e319632b7602f4e8ad95b3f56e0c4b9d4c7e9fa5279",
+      "probe_gpu.py": "e45dff8056ec845fbdca0e3f9a6c39426882058df5f8d38bfa576ce9d6a35871",
+      "profile_intern.py": "9cf496b372c9f4fa5206bfae094c7a590cc77315cb629d7c1638c3f976a8b6e2",
+      "run.py": "39ee9b5b8a6ee9cddb0f9ec5e88cd4748622545c0993c1ef507ca2e46ea77bf1",
+      "solvers.py": "05b7028517856003dccf2a7c5d7bf1335b29184b48d55e87c18b35137af93bf1",
+      "suite.py": "06897fce1f0923280546cfae7615bf1daf1997e411601f55d98cad8802b9f971",
+      "summarize_results.py": "f7b138c33a83c749e8d216a23cd73aae12a47bf828aa6828a631df1dd2b5bc70",
+      "test_adapter_d3.py": "b5627243ef2cf3bca5e5e7612398106cbc070c24448f19a9d4cc69c5fa0b1ed9",
+      "test_metrics.py": "97bb350161ffdd7bbeb129fe2a603c4004f7a05024fa9efa6bcd5a45a406cbd4",
+      "test_solvers.py": "cc5506342c472f2bad0d48377b868c15ce680953791b450271a7c4e77539a14a"
+    }
+  },
+  "protocol": {
+    "model": "llmdet",
+    "dtype": "float32",
+    "batches": [
+      1
+    ],
+    "warmup": 2,
+    "repeats": 3,
+    "limit": 8,
+    "tag": "numeric-check",
+    "co_resident": null,
+    "with_retriever": false
+  },
+  "timing_scope": "synchronized serial CPU preparation + H2D + forward + postprocess; source TIFF decoding separate",
+  "batches": [
+    {
+      "batch_size": 1,
+      "status": "ok",
+      "warmup": [
+        {
+          "preprocess_ms": 10.837399982847273,
+          "transfer_ms": 3.6776000633835793,
+          "forward_wall_ms": 7750.390899949707,
+          "forward_device_ms": 7749.8310546875,
+          "postprocess_ms": 177.79190000146627,
+          "total_ms": 7942.697799997404
+        },
+        {
+          "preprocess_ms": 2.6936000213027,
+          "transfer_ms": 2.775499946437776,
+          "forward_wall_ms": 1082.2594000492245,
+          "forward_device_ms": 1082.1318359375,
+          "postprocess_ms": 2.2881999611854553,
+          "total_ms": 1090.0166999781504
+        }
+      ],
+      "trials": [
+        {
+          "preprocess_ms": 2.8999000787734985,
+          "transfer_ms": 1.6191999893635511,
+          "forward_wall_ms": 1072.2396000055596,
+          "forward_device_ms": 1072.1265869140625,
+          "postprocess_ms": 2.3204999743029475,
+          "total_ms": 1079.0792000479996
+        },
+        {
+          "preprocess_ms": 2.8651999309659004,
+          "transfer_ms": 1.5906000044196844,
+          "forward_wall_ms": 1072.6774000795558,
+          "forward_device_ms": 1072.5667724609375,
+          "postprocess_ms": 2.370100002735853,
+          "total_ms": 1079.5033000176772
+        },
+        {
+          "preprocess_ms": 2.9832000145688653,
+          "transfer_ms": 1.6093999147415161,
+          "forward_wall_ms": 1068.8095000805333,
+          "forward_device_ms": 1068.6910400390625,
+          "postprocess_ms": 2.3569000186398625,
+          "total_ms": 1075.7590000284836
+        }
+      ],
+      "first_batch_ms": 7942.697799997404,
+      "summary": {
+        "preprocess_ms": {
+          "median": 2.8999000787734985,
+          "p95": 2.9748700209893286,
+          "mean": 2.9161000081027546,
+          "min": 2.8651999309659004,
+          "max": 2.9832000145688653
+        },
+        "transfer_ms": {
+          "median": 1.6093999147415161,
+          "p95": 1.6182199819013476,
+          "mean": 1.6063999695082505,
+          "min": 1.5906000044196844,
+          "max": 1.6191999893635511
+        },
+        "forward_wall_ms": {
+          "median": 1072.2396000055596,
+          "p95": 1072.6336200721562,
+          "mean": 1071.242166721883,
+          "min": 1068.8095000805333,
+          "max": 1072.6774000795558
+        },
+        "forward_device_ms": {
+          "median": 1072.1265869140625,
+          "p95": 1072.52275390625,
+          "mean": 1071.1281331380208,
+          "min": 1068.6910400390625,
+          "max": 1072.5667724609375
+        },
+        "postprocess_ms": {
+          "median": 2.3569000186398625,
+          "p95": 2.368780004326254,
+          "mean": 2.349166665226221,
+          "min": 2.3204999743029475,
+          "max": 2.370100002735853
+        },
+        "total_ms": {
+          "median": 1079.0792000479996,
+          "p95": 1079.4608900207095,
+          "mean": 1078.1138333647202,
+          "min": 1075.7590000284836,
+          "max": 1079.5033000176772
+        },
+        "throughput_tiles_second": 0.927545838901879,
+        "median_amortized_ms_per_tile": 1079.0792000479996
+      },
+      "peak_allocated_bytes": 5533135360,
+      "peak_reserved_bytes": 5895094272
+    }
+  ],
+  "source_read_ms": {
+    "read_ms": {
+      "median": 4.079699981957674,
+      "p95": 13.752439926611252,
+      "mean": 5.715924969990738,
+      "min": 2.9154999647289515,
+      "max": 18.734199926257133
+    },
+    "total_ms": {
+      "median": 4.079699981957674,
+      "p95": 13.752439926611252,
+      "mean": 5.715924969990738,
+      "min": 2.9154999647289515,
+      "max": 18.734199926257133
+    },
+    "throughput_tiles_second": 174.94981219139768,
+    "median_amortized_ms_per_tile": 4.079699981957674
+  },
+  "load_seconds": 5.00560619996395,
+  "model_info": {
+    "key": "llmdet",
+    "model_type": "mm-grounding-dino",
+    "architecture": "MMGroundingDinoForObjectDetection",
+    "dtype": "float32",
+    "source_image": "RGB uint8; original 256 x 256 embedding window",
+    "prompt_policy": "one lowercased period-terminated query per image",
+    "processor_class": "GroundingDinoProcessor",
+    "image_processor_class": "GroundingDinoImageProcessor",
+    "image_processor": {
+      "do_convert_annotations": true,
+      "do_normalize": true,
+      "do_pad": true,
+      "do_rescale": true,
+      "do_resize": true,
+      "format": "coco_detection",
+      "image_mean": [
+        0.485,
+        0.456,
+        0.406
+      ],
+      "image_processor_type": "GroundingDinoImageProcessor",
+      "image_std": [
+        0.229,
+        0.224,
+        0.225
+      ],
+      "resample": 2,
+      "rescale_factor": 0.00392156862745098,
+      "size": {
+        "longest_edge": 1333,
+        "shortest_edge": 800
+      }
+    },
+    "model_config": {
+      "transformers_version": "5.17.0",
+      "architectures": [
+        "MMGroundingDinoForObjectDetection"
+      ],
+      "output_hidden_states": false,
+      "return_dict": true,
+      "dtype": "float32",
+      "chunk_size_feed_forward": 0,
+      "is_encoder_decoder": true,
+      "id2label": {
+        "0": "LABEL_0",
+        "1": "LABEL_1"
+      },
+      "label2id": {
+        "LABEL_0": 0,
+        "LABEL_1": 1
+      },
+      "problem_type": null,
+      "backbone_config": {
+        "architectures": null,
+        "output_hidden_states": false,
+        "return_dict": true,
+        "dtype": null,
+        "chunk_size_feed_forward": 0,
+        "is_encoder_decoder": false,
+        "id2label": {
+          "0": "LABEL_0",
+          "1": "LABEL_1"
+        },
+        "label2id": {
+          "LABEL_0": 0,
+          "LABEL_1": 1
+        },
+        "problem_type": null,
+        "image_size": 224,
+        "patch_size": 4,
+        "num_channels": 3,
+        "embed_dim": 192,
+        "depths": [
+          2,
+          2,
+          18,
+          2
+        ],
+        "num_heads": [
+          6,
+          12,
+          24,
+          48
+        ],
+        "window_size": 12,
+        "mlp_ratio": 4,
+        "qkv_bias": true,
+        "hidden_dropout_prob": 0.0,
+        "attention_probs_dropout_prob": 0.0,
+        "drop_path_rate": 0.1,
+        "hidden_act": "gelu",
+        "use_absolute_embeddings": false,
+        "initializer_range": 0.02,
+        "layer_norm_eps": 1e-05,
+        "encoder_stride": 32,
+        "num_layers": 4,
+        "hidden_size": 1536,
+        "stage_names": [
+          "stem",
+          "stage1",
+          "stage2",
+          "stage3",
+          "stage4"
+        ],
+        "_name_or_path": "",
+        "model_type": "swin",
+        "output_attentions": false,
+        "out_features": [
+          "stage1",
+          "stage2",
+          "stage3",
+          "stage4"
+        ],
+        "out_indices": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "text_config": {
+        "architectures": null,
+        "output_hidden_states": false,
+        "return_dict": true,
+        "dtype": null,
+        "chunk_size_feed_forward": 0,
+        "is_encoder_decoder": false,
+        "id2label": {
+          "0": "LABEL_0",
+          "1": "LABEL_1"
+        },
+        "label2id": {
+          "LABEL_0": 0,
+          "LABEL_1": 1
+        },
+        "problem_type": null,
+        "vocab_size": 30522,
+        "hidden_size": 768,
+        "num_hidden_layers": 12,
+        "num_attention_heads": 12,
+        "intermediate_size": 3072,
+        "hidden_act": "gelu",
+        "hidden_dropout_prob": 0.1,
+        "attention_probs_dropout_prob": 0.1,
+        "max_position_embeddings": 512,
+        "type_vocab_size": 2,
+        "initializer_range": 0.02,
+        "layer_norm_eps": 1e-12,
+        "pad_token_id": 0,
+        "use_cache": true,
+        "classifier_dropout": null,
+        "is_decoder": false,
+        "add_cross_attention": false,
+        "bos_token_id": null,
+        "eos_token_id": null,
+        "tie_word_embeddings": true,
+        "_name_or_path": "",
+        "model_type": "bert",
+        "position_embedding_type": "absolute",
+        "output_attentions": false
+      },
+      "num_queries": 900,
+      "encoder_layers": 6,
+      "encoder_ffn_dim": 2048,
+      "encoder_attention_heads": 8,
+      "decoder_layers": 6,
+      "decoder_ffn_dim": 2048,
+      "decoder_attention_heads": 8,
+      "activation_function": "relu",
+      "d_model": 256,
+      "dropout": 0.1,
+      "attention_dropout": 0.0,
+      "activation_dropout": 0.0,
+      "auxiliary_loss": false,
+      "position_embedding_type": "sine",
+      "num_feature_levels": 5,
+      "encoder_n_points": 4,
+      "decoder_n_points": 4,
+      "two_stage": true,
+      "class_cost": 1.0,
+      "bbox_cost": 5.0,
+      "giou_cost": 2.0,
+      "bbox_loss_coefficient": 5.0,
+      "giou_loss_coefficient": 2.0,
+      "focal_alpha": 0.25,
+      "disable_custom_kernels": true,
+      "max_text_len": 256,
+      "text_enhancer_dropout": 0.0,
+      "fusion_droppath": 0.1,
+      "fusion_dropout": 0.0,
+      "embedding_init_target": true,
+      "query_dim": 4,
+      "positional_embedding_temperature": 20,
+      "init_std": 0.02,
+      "layer_norm_eps": 1e-05,
+      "tie_word_embeddings": true,
+      "_name_or_path": "C:\\Users\\Tyler\\Documents\\github\\Dynamic-Geospatial-Object-Search\\benchmarks\\model_selection\\cache\\models--iSEE-Laboratory--llmdet_large\\snapshots\\bec37f296f05b22f6c6b39bc05a6c611239f4e31",
+      "backbone": null,
+      "decoder_bbox_embed_share": false,
+      "decoder_cls_embed_share": false,
+      "model_type": "mm-grounding-dino",
+      "two_stage_bbox_embed_share": false,
+      "output_attentions": false
+    },
+    "disable_custom_kernels": true,
+    "use_hub_kernels": false,
+    "box_score_threshold": 0.01,
+    "nms_threshold": null,
+    "dino_text_threshold": 0.25,
+    "language_cache": {
+      "enabled": false,
+      "capacity": null,
+      "policy": "native full forward; no adapter-level text cache"
+    },
+    "score_kind": "detector_box_confidence_not_calibrated_presence_probability"
+  },
+  "resident_allocated_bytes": 1376683008,
+  "load_peak_allocated_bytes": 1376683008,
+  "parameter_count": 342392638,
+  "prediction_file": "local/llmdet-float32-numeric-check-predictions.json",
+  "prediction_count": 8
+}

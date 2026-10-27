@@ -1,0 +1,56 @@
+{
+  "peekaboolean": {
+    "status": "ok",
+    "matched_image_query_pairs": 108,
+    "artifact": "results/peekaboolean.json",
+    "revision": "081a8d4b7d8c11d525d86c30e355b4955db08844"
+  },
+  "intern": {
+    "status": "ok",
+    "matched_image_query_pairs": 108,
+    "artifact": "results/intern.json",
+    "revision": "42457fafd13d10d0b0d9be46cb30a23caa409994"
+  },
+  "d3": {
+    "status": "ok",
+    "matched_image_query_pairs": 108,
+    "artifact": "results/d3.json",
+    "revision": "03560c26f5199c3c04129a2ccb38960c913635e0"
+  },
+  "blip": {
+    "status": "ok",
+    "matched_image_query_pairs": 108,
+    "artifact": "results/blip.json",
+    "revision": "bed8ad38cb2d04a5a4bdf2d071b3c3c0a4aa724c"
+  },
+  "gdino": {
+    "status": "ok",
+    "matched_image_query_pairs": 108,
+    "artifact": "results/gdino.json",
+    "revision": "12bdfa3120f3e7ec7b434d90674b3396eccf88eb"
+  },
+  "owlv2": {
+    "status": "ok",
+    "matched_image_query_pairs": 108,
+    "artifact": "results/owlv2.json",
+    "revision": "cfd3195ba4ea9592eec887ded089f4c08eff231d"
+  },
+  "llmdet": {
+    "status": "ok",
+    "matched_image_query_pairs": 108,
+    "artifact": "results/llmdet.json",
+    "revision": "bec37f296f05b22f6c6b39bc05a6c611239f4e31"
+  },
+  "omdet": {
+    "status": "ok",
+    "matched_image_query_pairs": 108,
+    "artifact": "results/omdet.json",
+    "revision": "7fe93cecfb770c4d76cf71163956221249cab566"
+  },
+  "sam3lite": {
+    "status": "ok",
+    "matched_image_query_pairs": 108,
+    "artifact": "results/sam3lite.json",
+    "revision": "b09766e54f5d2eba021119ec7feff13e74c0f8fc"
+  }
+}

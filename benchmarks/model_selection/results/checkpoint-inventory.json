@@ -1,0 +1,118 @@
+{
+  "peekaboolean": {
+    "repo_id": "bykof/peekaboolean-450m",
+    "revision": "081a8d4b7d8c11d525d86c30e355b4955db08844",
+    "files": {
+      "adapter_model.safetensors": {
+        "bytes": 47999568,
+        "sha256": "8daa89b094c10bfe8823b34e635469ffa6efd8b6f79cd6ccd211cc0a117cbe17"
+      },
+      "head.pt": {
+        "bytes": 5901,
+        "sha256": "ad477868d4917894b4b24389c2e58991a6242131504f11030020a313d1b122c4"
+      }
+    }
+  },
+  "intern": {
+    "repo_id": "internlm/Intern-Decision-0.8B",
+    "revision": "42457fafd13d10d0b0d9be46cb30a23caa409994",
+    "files": {
+      "model-language-0001-save_rank0.safetensors": {
+        "bytes": 1504832320,
+        "sha256": "4acc4bd67febb2466ef7c282099fd05ee0ba47b853b6c49b9e763fb642957820"
+      },
+      "model-projector-0001-save_rank0.safetensors": {
+        "bytes": 25177720,
+        "sha256": "7f81b4ab1b4434c4d0322c849525337c1746f0ca4b9beac107a94e23b2952fee"
+      },
+      "model-vision-0001-save_rank0.safetensors": {
+        "bytes": 176024696,
+        "sha256": "bf8e03e3be40018e51037b46bb8ebe0471e2aceb394ad988632cce2c87d2e177"
+      }
+    }
+  },
+  "d3": {
+    "repo_id": "vllm-sr/d3-lite",
+    "revision": "03560c26f5199c3c04129a2ccb38960c913635e0",
+    "files": {
+      "model-00001-of-00001.safetensors": {
+        "bytes": 1706027688,
+        "sha256": "ca6222dbf2b72899ae45580ed84d26d1f0e69a8de212edda295072000e34a4c2"
+      },
+      "readout.safetensors": {
+        "bytes": 1044560,
+        "sha256": "fe11cfac5c79b6a83e35b707581b1260214279bb22b003c215c62719186ef629"
+      }
+    }
+  },
+  "blip": {
+    "repo_id": "Salesforce/blip-itm-base-coco",
+    "revision": "bed8ad38cb2d04a5a4bdf2d071b3c3c0a4aa724c",
+    "files": {
+      "pytorch_model.bin": {
+        "bytes": 895139697,
+        "sha256": "017fb3e7f4e125f13a8a4717f1402dbe0d0bb877474b4a203db13a4447b0227f"
+      }
+    }
+  },
+  "gdino": {
+    "repo_id": "IDEA-Research/grounding-dino-base",
+    "revision": "12bdfa3120f3e7ec7b434d90674b3396eccf88eb",
+    "files": {
+      "model.safetensors": {
+        "bytes": 933400872,
+        "sha256": "5548f844c928c4b6f411fa8cbcc2bfa8dbbba437cb1d513975519f93c2a9ed21"
+      }
+    }
+  },
+  "owlv2": {
+    "repo_id": "google/owlv2-base-patch16-ensemble",
+    "revision": "cfd3195ba4ea9592eec887ded089f4c08eff231d",
+    "files": {
+      "model.safetensors": {
+        "bytes": 619918824,
+        "sha256": "e1e130b9e404cf91a75ad45644c1da9d7fa5284085eecc864266a6923efb99e7"
+      }
+    }
+  },
+  "llmdet": {
+    "repo_id": "iSEE-Laboratory/llmdet_large",
+    "revision": "bec37f296f05b22f6c6b39bc05a6c611239f4e31",
+    "files": {
+      "model.safetensors": {
+        "bytes": 1376363740,
+        "sha256": "6799bea5a4fe67ddda9ba55cf46cff06ae82653f3415e2d7d08428e02f3a0766"
+      }
+    }
+  },
+  "omdet": {
+    "repo_id": "omlab/omdet-turbo-swin-tiny-hf",
+    "revision": "7fe93cecfb770c4d76cf71163956221249cab566",
+    "files": {
+      "model.safetensors": {
+        "bytes": 461822656,
+        "sha256": "439d1575d7e237ad565ed6969ea2a2dfcedf2086155e9ca3ac96cd6180a48cfd"
+      }
+    }
+  },
+  "lfm_base": {
+    "repo_id": "LiquidAI/LFM2.5-VL-450M",
+    "revision": "fc6221ca597f3315e4f82fc2df606783267b34ba",
+    "files": {
+      "model.safetensors": {
+        "bytes": 897484568,
+        "sha256": "2f6deb5dd43707de5cfe3c59470d3bccf4c3112a810a74570499f4728d412eea"
+      }
+    }
+  },
+  "sam3lite": {
+    "repo_id": "vil-uob/sam3-litetext-s0",
+    "revision": "b09766e54f5d2eba021119ec7feff13e74c0f8fc",
+    "files": {
+      "model.safetensors": {
+        "bytes": 2117074488,
+        "sha256": "69c86fda4d53492cca2a362dae050f3c2b92afa4faedf44262a6b6d082da9906"
+      }
+    }
+  }
+}

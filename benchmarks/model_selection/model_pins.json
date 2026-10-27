@@ -1,0 +1,347 @@
+{
+  "peekaboolean": {
+    "repo_id": "bykof/peekaboolean-450m",
+    "revision": "081a8d4b7d8c11d525d86c30e355b4955db08844",
+    "files": [
+      ".gitattributes",
+      "README.md",
+      "adapter_config.json",
+      "adapter_model.safetensors",
+      "calibration-256.json",
+      "calibration-384.json",
+      "calibration-512.json",
+      "head.pt",
+      "scorer_config.json"
+    ],
+    "source_sha256": {
+      "README.md": "535126d07962c70e7a451f08f0e15f55dc13d4373f96966c9bafb5a5290c7e4d",
+      "adapter_config.json": "c7af5d29f7228bdb30fc0ce12a8d9820e89305a5351e5ee867066177712162d5",
+      "calibration-256.json": "1f6813da2ed3bb21011f04a1ed91fc8968cb9b28c737c48a000ae902415be5db",
+      "scorer_config.json": "c1dd0d5ac0dfaddb9d2ab52101b14201e29b12b46e42a3e0c67bb7ffaba9a5b5"
+    }
+  },
+  "intern": {
+    "repo_id": "internlm/Intern-Decision-0.8B",
+    "revision": "42457fafd13d10d0b0d9be46cb30a23caa409994",
+    "files": [
+      ".gitattributes",
+      "LICENSE",
+      "LICENSE-QWEN",
+      "README.md",
+      "added_tokens.json",
+      "chat_template.jinja",
+      "config.json",
+      "inference.py",
+      "merges.txt",
+      "model-language-0001-save_rank0.safetensors",
+      "model-projector-0001-save_rank0.safetensors",
+      "model-vision-0001-save_rank0.safetensors",
+      "model.safetensors.index.json",
+      "preprocessor_config.json",
+      "requirements.txt",
+      "special_tokens_map.json",
+      "tokenizer.json",
+      "tokenizer_config.json",
+      "video_preprocessor_config.json",
+      "vocab.json"
+    ],
+    "source_sha256": {
+      "README.md": "87c59a5bbf2db5e3101986806fe3d5da1d4a48e439cc3eb52f98538b21755ce2",
+      "chat_template.jinja": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80",
+      "config.json": "b90b86f35c8e6925ef74ee04d0e758f0a845c83a42089ad82bbaa948de9b4204",
+      "inference.py": "62664f5bebb593e825370f82b2733edd13b16118b436d09db2f0c36405b9b4ea",
+      "preprocessor_config.json": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516"
+    }
+  },
+  "d3": {
+    "repo_id": "vllm-sr/d3-lite",
+    "revision": "03560c26f5199c3c04129a2ccb38960c913635e0",
+    "files": [
+      ".eval_results/vllm-sr__d3-lite.yaml",
+      ".gitattributes",
+      "LICENSE",
+      "MODEL_MANIFEST.json",
+      "NOTICE",
+      "README.md",
+      "assets/banner.png",
+      "assets/example-receipt.png",
+      "assets/example-video.mp4",
+      "assets/index-areas.png",
+      "assets/index-pareto.png",
+      "assets/serving-throughput.png",
+      "chat_template.jinja",
+      "config.json",
+      "d3_engine.py",
+      "d3_fast.py",
+      "d3_format.py",
+      "d3_kernels.py",
+      "d3_runtime.py",
+      "d3_server.py",
+      "decision_config.json",
+      "merges.txt",
+      "model-00001-of-00001.safetensors",
+      "model.safetensors.index.json",
+      "modeling_d3.py",
+      "pipeline_d3.py",
+      "preprocessor_config.json",
+      "readout.safetensors",
+      "requirements.txt",
+      "tokenizer.json",
+      "tokenizer_config.json",
+      "video_preprocessor_config.json",
+      "vocab.json"
+    ],
+    "source_sha256": {
+      "README.md": "6cc8a41274e59946159e0d4ec92cb4ef8fee7fac3d7fdfbbc8b8d84ec933137a",
+      "chat_template.jinja": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80",
+      "config.json": "a9071195384e1fc2c68f9fe0fae007a22182ab77eb14fe8228a1a24b37d3cee9",
+      "d3_engine.py": "086238942762df45047a32cd9a8e2bedd9b63167eb40be260c776de567979f53",
+      "d3_fast.py": "68a1fb9a2c3bde9ac2763bf504decae592ca12722698fbde1b39a31262955535",
+      "d3_format.py": "3badfbc70561bb3f5b8ec16a11d2c455b96ddb32caace0a8a54ca102eae1f3fa",
+      "d3_kernels.py": "8f7534ca1e1846ebf7c4c73058002f3be4dbf0d5d426f0815150ae0cbe7677bd",
+      "d3_runtime.py": "adf7f7aa085674b5682e492d8b2e3cc4f11c67b0d153515c742e907e9b550917",
+      "d3_server.py": "766a20a69101e36ab0535a1ec683379db422380a83091f0eccd7e82edb6a02de",
+      "decision_config.json": "30b6095b945d5a93697868afdf9be9123ea892085fbaff3078112c48da20dc6b",
+      "modeling_d3.py": "f8f8db23ff58f1a990ffa24977d744a50e1b4446d02a64c22070967705b6dbef",
+      "pipeline_d3.py": "4f9297c7c74e596e9b67df91a1e6823cfada48bf781336f141974ff6a2f1038e",
+      "preprocessor_config.json": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516"
+    }
+  },
+  "imajev": {
+    "repo_id": "mohit67890/imajev-2b",
+    "revision": "e8cb9fc6e054a61ee3fdcff3cd20005ea6194588",
+    "files": [
+      ".gitattributes",
+      "README.md",
+      "RELEASE-SPEC.md",
+      "adapter_config.json",
+      "adapter_model.safetensors",
+      "assets/highlights-dark.png",
+      "assets/highlights.png",
+      "assets/logo-dark.png",
+      "assets/logo-light.png",
+      "assets/proof-decisionbench.png",
+      "assets/proof-image-jevbench.png",
+      "assets/proof-jevbench-score.png",
+      "assets/ranks-dark.png",
+      "assets/ranks-light.png",
+      "assets/request-listing-dark.png",
+      "assets/request-listing.png",
+      "assets/request-ticket-dark.png",
+      "assets/request-ticket.png",
+      "calibration.json",
+      "decision_readout.json",
+      "decision_readout.safetensors",
+      "mlx/adapter_config.json",
+      "mlx/adapters.safetensors",
+      "mlx/decision_readout.json",
+      "mlx/decision_readout.safetensors"
+    ],
+    "source_sha256": {
+      "README.md": "6b3e157fb234e1cccb12547307899bc13c2a2951aebe0e28cb2124be5d139d27",
+      "adapter_config.json": "89d5967cc107fbe9b3dc6a37ffdd14da87c1caa6cfe5a72c0286b86b65996f74",
+      "calibration.json": "9a5ff7dd30f3c0a6b456b619929fe6f42693c71f62a2c231caee84e021dc8cc8"
+    }
+  },
+  "blip": {
+    "repo_id": "Salesforce/blip-itm-base-coco",
+    "revision": "bed8ad38cb2d04a5a4bdf2d071b3c3c0a4aa724c",
+    "files": [
+      ".gitattributes",
+      "README.md",
+      "config.json",
+      "preprocessor_config.json",
+      "pytorch_model.bin",
+      "special_tokens_map.json",
+      "tf_model.h5",
+      "tokenizer.json",
+      "tokenizer_config.json",
+      "vocab.txt"
+    ],
+    "source_sha256": {
+      "README.md": "db2e7ff1e647bc42d8b0d4cd3653ad65c1d24b5559a153e6e6ea2f3c12edd978",
+      "config.json": "3e6464c2ce7c54512ddb101c5e9a8e77f4c2d637be9e3d005667ccd4a34c6ef2",
+      "preprocessor_config.json": "0aa66e2e9ac3ea3b5cd4388c35072e22db4e1cc1f96c7872bed07749c712ade1"
+    }
+  },
+  "gdino": {
+    "repo_id": "IDEA-Research/grounding-dino-base",
+    "revision": "12bdfa3120f3e7ec7b434d90674b3396eccf88eb",
+    "files": [
+      ".gitattributes",
+      "README.md",
+      "config.json",
+      "model.safetensors",
+      "preprocessor_config.json",
+      "pytorch_model.bin",
+      "special_tokens_map.json",
+      "tokenizer.json",
+      "tokenizer_config.json",
+      "vocab.txt"
+    ],
+    "source_sha256": {
+      "README.md": "a0d03193076262a585dcb1edfe4b3b72fac678055008b688feb188cceb7f977d",
+      "config.json": "eda416dae6f49419ff831b1c190ec430a060b19aae688dbaf2425a075b650608",
+      "preprocessor_config.json": "8454179ba95e2ad22947835aad7b45862a601fc0055ab88bf1ee70892d3aea60"
+    }
+  },
+  "owlv2": {
+    "repo_id": "google/owlv2-base-patch16-ensemble",
+    "revision": "cfd3195ba4ea9592eec887ded089f4c08eff231d",
+    "files": [
+      ".gitattributes",
+      "README.md",
+      "added_tokens.json",
+      "config.json",
+      "merges.txt",
+      "model.safetensors",
+      "preprocessor_config.json",
+      "pytorch_model.bin",
+      "special_tokens_map.json",
+      "tokenizer_config.json",
+      "vocab.json"
+    ],
+    "source_sha256": {
+      "README.md": "7c7426bc5ec939a42d1f96fb093031b6263400cceac4129ebb941a0c8c11b9b9",
+      "config.json": "ba9df8c25a4b8461887dd0a93d9252c9cd84697fe8d49a9d8794ce409af9acb2",
+      "preprocessor_config.json": "cf3e396635b797ee1a464e1b2836e98748f8edac19e89aaa2c93b55ac15b0064"
+    }
+  },
+  "llmdet": {
+    "repo_id": "iSEE-Laboratory/llmdet_large",
+    "revision": "bec37f296f05b22f6c6b39bc05a6c611239f4e31",
+    "files": [
+      ".gitattributes",
+      "README.md",
+      "config.json",
+      "model.safetensors",
+      "preprocessor_config.json",
+      "special_tokens_map.json",
+      "tokenizer_config.json",
+      "vocab.txt"
+    ],
+    "source_sha256": {
+      "README.md": "7d371f1772a7c592f0d131cf31ec08bf4f0c482f72ed7ece32fa376b9d017786",
+      "config.json": "7669f371f9ae2d642881ecd7b1769095384439c8a9e01b5f958eaed298919cb2",
+      "preprocessor_config.json": "c17fd68afb1f124bfb87a494d409925eec4201b3487c8a694dde64d9ce7109a3"
+    }
+  },
+  "omdet": {
+    "repo_id": "omlab/omdet-turbo-swin-tiny-hf",
+    "revision": "7fe93cecfb770c4d76cf71163956221249cab566",
+    "files": [
+      ".gitattributes",
+      "README.md",
+      "config.json",
+      "merges.txt",
+      "model.safetensors",
+      "preprocessor_config.json",
+      "special_tokens_map.json",
+      "tokenizer_config.json",
+      "vocab.json"
+    ],
+    "source_sha256": {
+      "README.md": "81b5b3ad13360e919cffbd80c24421c038e97c334d67636e7cb148d586591c90",
+      "config.json": "c0d6546428c6dd7e72d9c8e2123cdd7ff24925dfbff9b535b66cd2f19ca65c46",
+      "preprocessor_config.json": "cc6c8ac92ba1a8a62065f3439ebb58f01e4895fa038901e1df14c3427a617e23"
+    }
+  },
+  "sam3lite": {
+    "repo_id": "vil-uob/sam3-litetext-s0",
+    "revision": "b09766e54f5d2eba021119ec7feff13e74c0f8fc",
+    "files": [
+      ".gitattributes",
+      "README.md",
+      "config.json",
+      "model.safetensors",
+      "processor_config.json",
+      "tokenizer.json",
+      "tokenizer_config.json"
+    ],
+    "source_sha256": {
+      "README.md": "c9a60d622cd059a45230889d5ca526f39e52eb433dd99e41609b6780c5180d43",
+      "config.json": "4a6ba34a1207178159263faba9077f79d5ffe5a9ae7f49d66328dcdfaa965659",
+      "processor_config.json": "55ce4ea72cf502f3598f9077865e7f4966a211cc0edb95ff144b47dc08c9d61e"
+    }
+  },
+  "peekaboolean_source": {
+    "repo": "bykof/peekaboolean",
+    "revision": "7d5ace7e7cfa5401770363059d9ba500b38877c0",
+    "sha256": {
+      "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "README.md": "b651a6d625534c8b41441b20699f65eb0d9b5b8ae959acce083b10516d4f0758",
+      "pyproject.toml": "3d9c8b99779976109ccf5861b8079ceaa4dc7d2c2f26364081c3db5e7481d1e5",
+      "src/peekaboolean/__init__.py": "2325082c779d4dd0dd2407a4e06fd16cf12039ac0185d22fc1be2b7a3fb620d5",
+      "src/peekaboolean/background.py": "587d5f0ad17eebf50dc94199a5612ea021c6e082248392de985a5338b2e8f5fb",
+      "src/peekaboolean/baselines.py": "a3772cf962223a5e54eeb999438890cc4a8115f3ec92ff911198587c56c6e35c",
+      "src/peekaboolean/benchmark.py": "1e4f287ee80b9329b0ef7b5e728a284d340a6bd6cf4436f7f9e98f46a88c69c1",
+      "src/peekaboolean/calibrate.py": "0863a7221c837560fac779006e3ebc2cd71db4c629ceb26e89580a157efac22d",
+      "src/peekaboolean/data.py": "91c0743fa3e510b0fe83f21fea34125e3d60d069f8171071394233d62926bf62",
+      "src/peekaboolean/full_test.py": "92815e7701f8b8b6c9880704810d470fdc031e7fd7ff11b48e0931d453fd5d7b",
+      "src/peekaboolean/model.py": "a20821032cc82111f46bbec702960f1abf5c0fadbc48cf29e3b6f03f19859f06",
+      "src/peekaboolean/pipeline.py": "7eea25f9d2708d243120629148ff6f93588ad8697130810ecf148dcbb72aaacc",
+      "src/peekaboolean/postprocess.py": "638122b95b81a158fada74f5f044472cf52f2e7ada6d4ea89934a5b84d287a24",
+      "src/peekaboolean/prepare_aadb.py": "955f98fb252ca525a0fe4c75334c22ca6b659848b3e0c9d681ba4ed0f754a089",
+      "src/peekaboolean/prepare_age.py": "64f29599dd3db71f8214435d79c562100ba4a82031f46c7bf357458e238b9f42",
+      "src/peekaboolean/prepare_ava.py": "42bb1443763d8fc5b6de92f4b49639a87a7f771af009b92e6f736d323852eb27",
+      "src/peekaboolean/prepare_derived.py": "9d8a8a1c5b052dea1382fa9ec5df71b0d93222756072d7761b2d0ce0c4b48083",
+      "src/peekaboolean/prepare_general.py": "3e8cb46e2f21d8de108c22a7f220a615e4efec8fdcc5778f9d4d61f365af60a6",
+      "src/peekaboolean/prepare_mix.py": "30c6e8b19a6631c3426407d616cf96422ee4a3d32f07a7e3f75ec42b0c78f9e1",
+      "src/peekaboolean/prepare_teacher.py": "80cf3371b26fb1dbb33093e347b12e0335e0044d83b40c1bafbc57b48606d6b4",
+      "src/peekaboolean/prepare_v6.py": "c01ea3aabba869a2eb1a0ef0a72ac97fd4c99e27be444e3ea46b81750fc1ca83",
+      "src/peekaboolean/robustness.py": "3109db9c1273e21eb93c9558dbe968e3623b2d8f388cfde33491dbbc1a61887e",
+      "src/peekaboolean/serve.py": "9178b63f51de6200121e1ebaddf64e749411ebbf8211bec83d02345352b940d0",
+      "src/peekaboolean/train.py": "6a2795b8638e4f17027c4c1121c8b03883b4a5f906306a58cefd7e11483ce7c5",
+      "src/peekaboolean/train_general.py": "e3935048741bbc36aaf3096480dae7167286e25da7308c45c613b1a7e9e95fbf",
+      "src/peekaboolean/ui.py": "fe96538bd15814f8561d40b4b906863c2ede2bccc1dc0e61cec50abe91b53ba6",
+      "src/peekaboolean/wait_then.py": "210a065b7635a4546e783b7a8764588e933c5d6f30e1c98a2753d9fd4cd50b71",
+      "tests/test_image_size.py": "7aa4bedfccbbf90369d387d08e434db5b8a9a11a9cfde59c3275839ad106837f",
+      "tests/test_prepare_teacher.py": "db18b37ecbf32b2bb1fcb0e84984032ca530f55ce33c674afa6bd5e3e28046b5",
+      "tests/test_ui.py": "180b319f3dca9b44eab0463c576205a21c9a5049558f76dbde7d945ea7154660",
+      "tests/test_unknown.py": "562ccadb0dc5fb253df83d7db8aff641ffdede2ec03be3fa898a54cf7d0b459c",
+      "think/calib.py": "47ba0e53de68d0d13f7169cb238ed9a219d1dfc9306c7ef51d60f28c3069dfa0",
+      "think/charts.py": "0cbfb60ff3ab82ab32a064585c949c935d61ec6991f66a2ab045a44ee551e5dc",
+      "think/datagen/audit_wrong.py": "475844ca63ff53447fac53598813b838a5581cdb3fbb791701a0cb80b8211dd2",
+      "think/datagen/build_items.py": "861fbed9acaca40111f33fcfed78900eead52cc04ca44dff8c56b3e9c41bb37c",
+      "think/datagen/decontam.py": "196e3cf92b768b08b00b3101d0b915b20cd8d689e3d7645f8fa6dc0d1eb85498",
+      "think/datagen/export_sft.py": "5bf1d8e01c43aa35c17eae7d0b4b869db8eb867520e2a00a814f8a0d1b3ee0d2",
+      "think/datagen/rft.py": "57eeb6d65e9aa3375874dca0b4d1a495f97e277d40e10f1ee026c376a51b87ba",
+      "think/datagen/select_items.py": "024045f8d63b62fc7f1105aed6d205b4b002eec9b2512e98742f9a154e59b132",
+      "think/evals/build_realjev.py": "95c909734f5fa7f190b5299f8e1385fe2866db41b0b2f3c2449dfdb9147715ae",
+      "think/evals/build_realjev_calib.py": "17fae0b2857f975c696becf17b2d10944dc96a0e3cceeca585ac182568c21a79",
+      "think/evals/collect.py": "7a68a1992a8e9bd07b1c4561557868cb6c3c1f510fcd8b68196265cd8137136d",
+      "think/evals/convert_heldout.py": "89dc0ccf3a84df5d89895e39bc87f83440c417676ceb296f02ac178c2287281a",
+      "think/evals/jrun.py": "2752fc14357210acf961d70ef8ea1a1573d95c5fa0e210e11f5d78a16a2d4906",
+      "think/evals/jscore.py": "0915bb5277299ad3225710416bf3ebb9fde382ae3ed0b1f1b090ad7fa8954359",
+      "think/evals/retry_small.py": "3e49354d9e6327d3e0ea573bd243e355fec68be572dc4bf7cfddea41f990321e",
+      "think/evals/test_jeval.py": "00c95fccbd184f07a84b488132191870beda475a351d994756dbf7992a545fad",
+      "think/jevmlx.py": "79426d45f5710e51f7b76620b67f6872214c6cdeb8799e564d4da79ae244bb16",
+      "think/jevsrv.py": "717cebea6b9f73491906bafd404d41d2b105d870aa0fd284bedeb444cfac12bd",
+      "think/lat6.py": "038d4c49afd5ebd06f9c4646f646eda6e09c09ff8eee0738c3282df2e551fcd2",
+      "think/prun.py": "eeee98f72a3e8c0326f58a88f59cf1d5b52be3b7c98009936d192a23506f37c8",
+      "think/test_calib.py": "bdbe2beaf4fa9ed4c3f618a44219443398265925e745d9b0f2d1ada767b2c6c9",
+      "think/train/check_fla.py": "e025b119fb2b0bc7fb26e97c3766d2186681a0e7d6ec63b6358962ac555a56e8",
+      "think/train/check_template.py": "29f44ceeca5c3e91afe09e2ea929e99c66ce25b9f4f4cd93a33398615627d4ac",
+      "think/train/generate.py": "ad207a1064067c78926bdbcf539d5e3b477463469bb4b45e8e07095fc58b6754",
+      "think/train/merge.py": "e094e31a185aac67c85cdea4e43a3e1ae8876d8597d0806fb752af3f1bf81000",
+      "think/train/train_lora.py": "6bd1c954e8caacf5b75d3fb17f2f5b2b0cee24bdb21d8a37e1ef4e9bf99dfd2a",
+      "think/train/vllm_check.py": "fea4772c26886d3d835171f3db6ba3270fbd3c59718605b4c68554d79f6788b6"
+    }
+  },
+  "lfm_base": {
+    "repo_id": "LiquidAI/LFM2.5-VL-450M",
+    "revision": "fc6221ca597f3315e4f82fc2df606783267b34ba",
+    "files": [
+      ".gitattributes",
+      "LICENSE",
+      "README.md",
+      "chat_template.jinja",
+      "config.json",
+      "generation_config.json",
+      "model.safetensors",
+      "processor_config.json",
+      "tokenizer.json",
+      "tokenizer_config.json"
+    ]
+  }
+}

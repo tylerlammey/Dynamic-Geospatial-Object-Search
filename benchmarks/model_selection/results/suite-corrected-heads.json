@@ -1,0 +1,9 @@
+[
+  {
+    "model": "llmdet",
+    "exit_code": 0,
+    "wall_seconds": 94.36755680001806,
+    "benchmark_status": "ok",
+    "log": "local/llmdet.log"
+  }
+]
