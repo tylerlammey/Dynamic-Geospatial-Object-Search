@@ -21,13 +21,15 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 REPOSITORY = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPOSITORY / "scripts"))
 sys.path.insert(0, str(REPOSITORY / "src"))
 from create_synthetic_job import COLLECTION, DATASET_ID, isolated_path, verify_job
 from imagery import Inventory, TileRenderer
-from retrieval import validate_query, validate_search_options
+from retrieval import validate_detection_request, validate_query, validate_search_options
+from search_chips import box_geometry
 from server import Application, Server
 from storage import DiskCache, atomic_json, contained, frontend_ownership
 
@@ -169,6 +171,7 @@ class SyntheticApplication(Application):
 
         query, top_k, _ = validate_query(value)
         _, _, seen = validate_search_options(value)
+        options = validate_detection_request(value, top_k)
         if type(value.get("include_supplements", True)) is not bool:
             raise ValueError("include_supplements must be boolean")
         identifier = uuid.uuid4().hex
@@ -208,7 +211,82 @@ class SyntheticApplication(Application):
                         }
                     )
             results.sort(key=lambda row: (-row["score"], row["shard_id"], row["embedding_id"]))
-            results = [{**row, "rank": rank} for rank, row in enumerate(results[:top_k], 1)]
+            search = {
+                "backend": "synthetic-mocked-text",
+                "approximate": False,
+                "search_seconds": 0,
+            }
+            diagnostics = {}
+            if options.enabled:
+                from geospatial_search.adaptive_detection import adaptive_search, match_identity
+
+                dataset = SimpleNamespace(dataset_id=DATASET_ID)
+                matches = [(dataset, r["shard_id"], r["embedding_id"], r["score"]) for r in results]
+                rows = {
+                    match_identity(match): row for match, row in zip(matches, results, strict=True)
+                }
+                # A fixed fake miss and small synthetic pages exercise adaptive
+                # continuation. These boxes never describe real objects.
+                missing = match_identity(matches[0]) if matches else None
+                strongest = match_identity(matches[-1]) if matches else None
+
+                def fetch(count, excluded):
+                    seen_keys = set(excluded)
+                    return [m for m in matches if match_identity(m) not in seen_keys][
+                        : min(count, 3)
+                    ], search
+
+                def evaluate(batch):
+                    output = []
+                    for match in batch:
+                        key = match_identity(match)
+                        edge = key == strongest
+                        score = 0.92 if edge else 0.8
+                        has_box = key != missing and score > options.box_threshold
+                        boxes = (
+                            [
+                                {
+                                    "box": [0, 52, 140, 142] if edge else [40, 52, 180, 142],
+                                    "score": score,
+                                    "text_label": "Mock object",
+                                    "touches_tile_edge": edge,
+                                }
+                            ]
+                            if has_box
+                            else []
+                        )
+                        if edge and has_box and options.box_threshold < 0.70:
+                            boxes.append(
+                                {
+                                    "box": [0, 120, 200, 256],
+                                    "score": 0.70,
+                                    "text_label": "Mock object",
+                                    "touches_tile_edge": True,
+                                }
+                            )
+                        output.append(
+                            {
+                                "predictions": boxes,
+                                "maximum_box_score": score if has_box else 0.0,
+                                "score_kind": "synthetic_fixture",
+                            }
+                        )
+                    return output
+
+                accepted, detections, search, diagnostics = adaptive_search(
+                    fetch, evaluate, top_k=top_k, options=options
+                )
+                diagnostics["model_id"] = "synthetic-mocked-detector"
+                results = []
+                for match in accepted:
+                    key = match_identity(match)
+                    row = rows[key]
+                    detection = detections[key]
+                    for prediction in detection["predictions"]:
+                        prediction["geometry"] = box_geometry(row, prediction["box"])
+                    results.append({**row, "detection": detection})
+            visible = results if options.enabled else results[:top_k]
+            results = [{**row, "rank": rank} for rank, row in enumerate(visible, 1)]
             data = {
                 "query": query,
                 "result_id": identifier,
@@ -222,11 +300,8 @@ class SyntheticApplication(Application):
                 "searched_source_uris": [shard["source_uri"] for shard in self.catalog["shards"]],
                 "partial_collection": False,
                 "created_utc": time.time(),
-                "search": {
-                    "backend": "synthetic-mocked-text",
-                    "approximate": False,
-                    "search_seconds": 0,
-                },
+                "search": search,
+                **({"detection": diagnostics} if options.enabled else {}),
             }
             atomic_json(
                 self.frontend / "state/searches" / f"{identifier}.json", data, self.frontend

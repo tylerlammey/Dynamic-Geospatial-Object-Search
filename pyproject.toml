@@ -15,6 +15,12 @@ include = [
   "frontend/service/dev_server.py",
   "frontend/tests/test_dev_server.py",
   "tests/test_synthetic_job.py",
+  "src/geospatial_search/adaptive_detection.py",
+  "src/geospatial_search/detection_model.py",
+  "tests/test_adaptive_detection.py",
+  "tests/test_detection_model.py",
+  "frontend/service/search_chips.py",
+  "frontend/tests/test_detection_retrieval.py",
 ]
 
 [tool.ruff.lint]

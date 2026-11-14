@@ -1,5 +1,6 @@
 """Authenticated loopback service, bounded map work, serialized owned search."""
 import argparse
+from dataclasses import asdict
 from contextlib import ExitStack
 import hashlib
 from concurrent.futures import ThreadPoolExecutor,TimeoutError as FutureTimeout,CancelledError
@@ -19,7 +20,7 @@ import uuid
 
 from http_server import Handler, Server  # Preserve the existing server module imports.
 from imagery import Inventory, TileRenderer
-from retrieval import BUSY_MESSAGE, status_snapshot, validate_query, validate_search_options
+from retrieval import BUSY_MESSAGE, status_snapshot, validate_detection_request, validate_query, validate_search_options
 from storage import DiskCache, atomic_json, contained, frontend_ownership, retry_windows_file_operation
 from overview import prepare_overview
 
@@ -143,10 +144,13 @@ class Application:
             return {'state':'unloaded'}
 
     def config(self,base_only=False):
+        from geospatial_search.adaptive_detection import DetectionOptions
+
         inventory=self.base_inventory if base_only else self.inventory
         sources=[] if not inventory else [{'uri':s.uri,'bounds':s.bounds,'dataset_id':s.dataset_id,'release_year':s.release_year,'acquisition_date':s.acquisition_date} for s in inventory.sources]
         return {'imagery':inventory.public() if inventory else None,'imagery_error':self.imagery_error,'sources':sources,
-                'tile_size':256,'native_resolution':.6,'attribution':'Courtesy USDA-FSA; distributed by NOAA Digital Coast'}
+                'tile_size':256,'native_resolution':.6,'attribution':'Courtesy USDA-FSA; distributed by NOAA Digital Coast',
+                'detection_defaults':asdict(DetectionOptions())}
 
     def map_work(self,operation,*args,connection=None,tile=False):
         if not self.renderer:raise ValueError(self.imagery_error or 'Imagery unavailable')
@@ -343,6 +347,7 @@ class Application:
     def start_search(self,value):
         query,top_k,allow_partial=validate_query(value)
         backend,effort,seen=validate_search_options(value)
+        detection=validate_detection_request(value,top_k)
         with self.search_lock:
             if self.query_running():raise RuntimeError('A frontend search is already running')
             # Refresh the read-only status before creating any query process.
@@ -359,6 +364,7 @@ class Application:
                      'offline_model':self.settings.get('offline_model',True),'search_backend':backend,'search_effort':effort,'exclude_ids':seen}
             if type(value.get('include_supplements',True)) is not bool:raise ValueError('include_supplements must be boolean')
             request['include_supplements']=value.get('include_supplements',True)
+            request['detection']=asdict(detection)
             atomic_json(folder/'request.json',request,self.frontend)
             atomic_json(folder/'status.json',{'state':'starting','task_id':identifier},self.frontend)
             if model['state']=='ready':

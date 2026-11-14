@@ -15,6 +15,9 @@ flowchart LR
   Retrieval --> Search[Federated exact / CPU IVF-PQ + rescore]
   Display --> Sources[Immutable native TIFFs]
   Search --> Bundles[Immutable published bundles]
+  Retrieval --> Detector[LLMDet native chip detections]
+  Detector --> Sources
+  Detector -. Recent detection yield .-> Retrieval
   Display --> Cache[Derived frontend cache]
 ```
 
@@ -54,6 +57,12 @@ model loading, validates the pinned contract, encodes or reuses a compatible
 query vector, searches compatible dataset snapshots, resolves original metadata,
 and verifies matched source hashes. Search progress is passed through an explicit
 callback; frontend requests do not replace backend module-global progress tools.
+When requested, LLMDet reads only candidate windows under these same locks. The
+adaptive controller uses recent tile yield to decide whether to fetch more,
+excludes every evaluated qualified ID, and bounds evaluation by candidate count.
+It returns all qualifying tiles from the evaluated prefix.
+The selected boxes use the published chip affine to locate them on the map.
+See [detector setup and behavior](nys-object-detection.md).
 Results and worker status publish atomically. One-shot completion is acknowledged
 after process teardown so the next query cannot race lock release.
 

@@ -146,11 +146,41 @@ waiting for local results and exact-pushed-revision GitHub test outcomes.
 - 2026-10-26: standalone model research/benchmarks live in
   [../benchmarks/model_selection/README.md](../benchmarks/model_selection/README.md).
   They reference existing embedded native windows and isolate new dependencies,
-  checkpoints, scripts and results. Decision gating, adaptive ANN feedback and
-  bounding-box detection remain planned, not application functionality. The
-  small assistant-created annotation audit is exploratory and not human-verified
+  checkpoints, scripts and results. At the time of measurement these stages
+  were not application functionality. The small assistant-created annotation
+  audit is exploratory and not human-verified
   accuracy/calibration evidence; see its report for measured compatibility and
   limitations. No production recipe, retrieval defaults or environment changed.
+
+- 2026-11-14: Desktop search adds [LLMDet Large detection](nys-object-detection.md)
+  and detector-driven candidate requests. The worker checks the original embedded
+  RGB windows, publishes native boxes and map polygons, and uses recent detection
+  yield to fill the requested chip count within a configured budget. Similarity-only
+  search remains selectable. On the RX 9070 XT, a stricter airplane query
+  checked four real tiles in two retrieval rounds to return two detected chips.
+  A second query reused the resident detector and confirmed the default cutoff.
+  Both models held the existing locks; peak allocated/reserved memory was
+  8.32/8.58 GiB in that smoke. Offline validation passed 101 backend and 64
+  frontend tests, plus lint, formatting, and the UI build. The synthetic Edge
+  smoke exercised a refill, chip and map boxes, and the similarity-only toggle.
+  Decision-model gating is still standalone research.
+
+- 2026-11-14 follow-up: Detection now returns a variable number of qualifying
+  tiles and continues while recent candidates yield matches, bounded by a
+  256-tile default limit. The box cutoff is 0.30 with within-tile overlap
+  suppression. The RX 9070 XT ran 864 tile/query pairs across nine ranked
+  searches. In the 104 reviewed pairs (four ambiguous left out), the new
+  defaults retained 68/69 positives and accepted 23/35 negatives, compared
+  with 69/69 and 35/35 before. The [detection guide](nys-object-detection.md)
+  records the score sweep and remaining semantic confusions. The 110 backend
+  and 64 frontend tests, UI build, docs and synthetic Edge smoke passed.
+
+- 2026-11-14 follow-up: Detection results rank by strongest box confidence
+  with similarity as the tie breaker. The map hides tile outlines and large
+  partial boxes by default, and containment suppression removes nested
+  duplicates. Verified the exact saved race-track tile with the RX 9070 XT
+  and the actual UI with saved results and live map imagery. Offline validation
+  passed 113 backend and 64 frontend tests; the synthetic browser flow passed.
 
 - Data paths are checkout-relative, not yet a configurable external job root.
   A fresh clone/worktree lacks local imagery, vectors, weights, environments,
@@ -166,8 +196,8 @@ waiting for local results and exact-pushed-revision GitHub test outcomes.
 - If Windows reports `WinError 4551` loading ROCm, use
   [../frontend/SEARCH_TROUBLESHOOTING.md](../frontend/SEARCH_TROUBLESHOOTING.md).
   Historical security-setting observations are not a current machine diagnosis.
-- The decision-model feedback loop is planned, not implemented. Before building
-  it, agree on relevance evaluation, additional-match requests, and stopping
-  criteria. Read-only environment diagnostics are now implemented through
-  `scripts/doctor.ps1`; they do not perform full integrity scans or reserve locks.
-  Configurable production data-root support remains discussed future work.
+- A separate decision model and calibrated presence estimates remain research
+  topics. The detector feedback loop uses observed box yield from inspected
+  candidates; it cannot estimate statewide object prevalence. `scripts/doctor.ps1`
+  provides read-only environment diagnostics. Configurable production data-root
+  support remains discussed future work.

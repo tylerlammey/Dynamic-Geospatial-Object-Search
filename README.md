@@ -81,6 +81,8 @@ in float32 and stored as float16. Search uses a compatible CPU IVF-PQ index to
 find candidates, then scores those candidates from the original vectors. Exact
 full-scan search remains available. See the [search index guide](docs/nys-search-index.md)
 for measured speed, recall, and controls for requesting more matches.
+The desktop can also run [LLMDet object detection](docs/nys-object-detection.md)
+on retrieved chips and fetch more neighbors while recent tiles yield detections.
 All geographic footprints use WGS84, while pixel windows
 retain their original raster CRS and transform.
 

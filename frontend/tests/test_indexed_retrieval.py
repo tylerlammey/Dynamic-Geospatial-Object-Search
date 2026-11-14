@@ -1,4 +1,4 @@
-"""Frontend request compatibility and later decision-model query controls."""
+"""Frontend retrieval and detection request compatibility."""
 import json
 from pathlib import Path
 import tempfile
@@ -41,13 +41,18 @@ class IndexedRetrievalContract(unittest.TestCase):
             try:
                 with patch('server.subprocess.Popen',return_value=worker) as launch:
                     started=app.start_search({'query':' fighter jet ','top_k':200,
-                        'search_backend':'ann','search_effort':'thorough','exclude_ids':[['source-a',7]]})
+                        'search_backend':'ann','search_effort':'thorough','exclude_ids':[['source-a',7]],
+                        'detection':{'enabled':True,'box_threshold':.2,'max_candidates':300}})
                 request=json.loads((app.frontend/'logs/search'/started['task_id']/'request.json').read_text())
                 self.assertEqual(request['query'],'fighter jet')
                 self.assertEqual(request['top_k'],200)
                 self.assertEqual(request['search_backend'],'ann')
                 self.assertEqual(request['search_effort'],'thorough')
                 self.assertEqual(request['exclude_ids'],[['source-a',7]])
+                self.assertTrue(request['detection']['enabled'])
+                self.assertEqual(request['detection']['box_threshold'],.2)
+                self.assertEqual(request['detection']['max_candidates'],300)
+                self.assertEqual(request['detection']['batch_size'],2)
                 self.assertIn('search_worker.py',str(launch.call_args.args[0]))
                 with self.assertRaisesRegex(RuntimeError,'already running'):
                     app.start_search({'query':'another query'})

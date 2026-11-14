@@ -7,7 +7,9 @@ from pathlib import Path
 import sys
 import time
 from contextlib import ExitStack, nullcontext
+from functools import partial
 
+from search_chips import SearchChips, identity
 from storage import atomic_json, contained
 
 MODEL_KEYS=('model_id','model_revision','arch','model_fingerprint','preprocess_fingerprint','embedding_dim')
@@ -60,6 +62,23 @@ def validate_search_options(value):
     return backend,effort,seen
 
 
+def validate_detection_request(value, top_k):
+    from geospatial_search.adaptive_detection import validate_options
+
+    detection = value.get("detection", {"enabled": False})
+    if not isinstance(detection, dict):
+        raise ValueError("detection must be an object")
+    return validate_options(detection, top_k)
+
+
+def _page_exact_pool(pool, details, count, exclusions):
+    excluded=set(exclusions)
+    page=[match for match in pool if identity(match) not in excluded][:count]
+    # The pool's exact scan ran once. Later pages only walk cached matches.
+    first=not pool or identity(pool[0]) not in excluded
+    return page,{**details,'search_seconds':details['search_seconds'] if first else 0.0}
+
+
 def status_snapshot(collection,job,include_supplements=True):
     collection=Path(collection);job=Path(job)
     try:
@@ -109,6 +128,12 @@ class ExactRetrieval:
         self.collection=self.job/'embeddings/georsclip-vith14-s256-st192'
         self.resident_model=None;self.resident_device=None;self.resident_contract=None
         self.resident_fingerprint=None;self.resident_locks=None;self.resident_collections=set()
+        self.resident_detector=None
+
+    def load_detector(self, offline):
+        from geospatial_search.detection_model import LLMDetector
+
+        return LLMDetector(offline=offline, cache_dir=self.repository/'model-cache/llmdet')
 
     def preload(self,allow_partial=False,offline=True,progress=lambda value:None):
         """Keep the pinned model and both OS locks until explicitly closed."""
@@ -146,6 +171,9 @@ class ExactRetrieval:
         self.resident_model=None;self.resident_device=None;self.resident_contract=None;self.resident_fingerprint=None
         self.resident_collections=set()
         try:
+            if self.resident_detector is not None:
+                detector, self.resident_detector = self.resident_detector, None
+                detector.close()
             gc.collect()
             torch=sys.modules.get('torch')
             if torch is not None and torch.cuda.is_available():torch.cuda.empty_cache()
@@ -156,15 +184,15 @@ class ExactRetrieval:
     def text(self,request,progress):
         query,top_k,allow_partial=validate_query(request)
         backend,effort,seen=validate_search_options(request)
+        options=validate_detection_request(request,top_k)
         from geospatial_search import search_text
         from geospatial_search.embedding_control import idle_collection,gpu_access
         from geospatial_search.model import load_model,encode_text
-        from geospatial_search.bundles import selected_rows
-        from geospatial_search.download_nys_naip import sha256
+        from geospatial_search.search_index import describe_index
         resident=self.resident_locks is not None
         if not resident and status_snapshot(self.collection,self.job)['busy']:raise RuntimeError(BUSY_MESSAGE)
         with (nullcontext() if resident else idle_collection(self.collection)), (nullcontext() if resident else gpu_access(self.job)), ExitStack() as extra_locks:
-            model=None;query_vector=None
+            model=None;query_vector=None;detector=None
             try:
                 root,collection=search_text.read_collection(self.collection,allow_partial)
                 if resident:
@@ -187,7 +215,7 @@ class ExactRetrieval:
                     entries.append((dataset,other_root,catalog))
                 total=sum(len(catalog['shards']) for _,_,catalog in entries)
                 total_sources=sum(catalog.get('total_sources',3805) for _,_,catalog in entries)
-                progress({'state':'encoding','scanned_sources':0,'searched_source_tiles':total,'total_source_tiles':collection.get('total_sources',3805)})
+                progress({'state':'encoding','scanned_sources':0,'searched_source_tiles':total,'total_source_tiles':total_sources})
                 stored=root['model_contract'];config={**root['recipe']['model'],'amp':stored['amp']}
                 key=hashlib.sha256((root['run_fingerprint']+'\0'+query).encode()).hexdigest()
                 import numpy as np
@@ -204,36 +232,78 @@ class ExactRetrieval:
                         verify_model_contract(stored,loaded)
                     query_vector=encode_text(model,query,config['arch'],device,config['amp'])
                     atomic_json(vector_path,{'run_fingerprint':root['run_fingerprint'],'vector':query_vector.tolist()},self.frontend)
-                matches,search_details=federated_search(entries,query_vector,top_k,
-                    backend=backend,effort=effort,exclude_ids=seen,
-                    progress=lambda value:progress({'searched_source_tiles':total,'total_source_tiles':collection.get('total_sources',3805),**value}))
-                by_shard={}
-                for dataset,shard,row_id,_ in matches:by_shard.setdefault((dataset.dataset_id,shard),[]).append(row_id)
-                by_dataset={dataset.dataset_id:dataset for dataset in datasets}
-                metadata={(dataset_id,shard):selected_rows(contained(by_dataset[dataset_id].directory/'shards',by_dataset[dataset_id].directory/'shards'/shard)/'chips.geoparquet',ids)
-                    for (dataset_id,shard),ids in by_shard.items()}
-                from shapely import from_wkb
-                verified=set();results=[]
-                for rank,(dataset,shard,row_id,score) in enumerate(matches,1):
-                    row=metadata[(dataset.dataset_id,shard)][row_id]
-                    source=contained(dataset.imagery,dataset.imagery/row['source_uri'])
-                    if source not in verified:
-                        if sha256(source)!=row['source_sha256']:raise ValueError('Result source checksum differs')
-                        verified.add(source)
-                    fields=('embedding_id','chip_id','source_uri','source_sha256','pixel_x','pixel_y','pixel_width','pixel_height','centroid_lon','centroid_lat','west','south','east','north','crs_wkt','scale_id','window_transform')
-                    results.append({'rank':rank,'score':score,'shard_id':shard,**{name:row[name] for name in fields},
-                        'dataset_id':dataset.dataset_id,'dataset_source_uri':row['source_uri'],'source_uri':dataset.qualify(row['source_uri']),
-                        'release_year':dataset.release_year,'acquisition_date':dataset.acquisition_date(row['source_uri']),
-                        'geometry':from_wkb(row['geometry']).__geo_interface__})
+
+                def fetch(count, exclusions):
+                    return federated_search(
+                        entries, query_vector, count, backend=backend, effort=effort,
+                        exclude_ids=exclusions, progress=lambda value: progress({
+                            'searched_source_tiles':total,'total_source_tiles':total_sources,**value,
+                        }),
+                    )
+
+                chips=SearchChips()
+                detections={};detection_details=None
+                if options.enabled:
+                    from geospatial_search.adaptive_detection import adaptive_search
+
+                    # A one-shot query has finished encoding; release the query weights
+                    # before allocating detector activations. A resident owner keeps them.
+                    if model is not None and not resident:
+                        model=None
+                        sys.modules['torch'].cuda.empty_cache()
+                    detector=self.resident_detector if resident else None
+
+                    def evaluate(matches):
+                        nonlocal detector
+                        if detector is None:
+                            progress({'state':'loading_detector','max_candidates':options.max_candidates})
+                            detector=self.load_detector(request.get('offline_model',True))
+                            progress({'state':'detecting','max_candidates':options.max_candidates,
+                                      'evaluated_candidates':0,'accepted_candidates':0,
+                                      'retrieval_round':1})
+                            if resident:
+                                self.resident_detector=detector
+                        return detector.predict(
+                            chips.images(matches), query, box_threshold=options.box_threshold,
+                            text_threshold=options.text_threshold,nms_iou=options.nms_iou,
+                        )
+
+                    qualified=[(datasets[0].dataset_id,*item) if len(item)==2 else tuple(item)
+                               for item in seen]
+                    adaptive_fetch=fetch
+                    exact_only=backend=='exact' or (backend=='auto' and not any(
+                        describe_index(dataset.directory,catalog)['ready']
+                        for dataset,_,catalog in entries
+                    ))
+                    if exact_only:
+                        # A full exact scan can collect the bounded candidate pool once
+                        # and page through it. Do not rescan all vectors for each miss.
+                        pool,details=fetch(options.max_candidates,qualified)
+
+                        adaptive_fetch=partial(_page_exact_pool,pool,details)
+
+                    matches,detections,search_details,detection_details=adaptive_search(
+                        adaptive_fetch,evaluate,top_k=top_k,options=options,exclude_ids=qualified,
+                        progress=progress,
+                    )
+                    if detector is not None:
+                        # Score interpretation and provenance travel with saved results.
+                        detection_details={**detector.info,**detection_details}
+                else:
+                    matches,search_details=fetch(top_k,seen)
+                results=chips.results(matches,detections)
                 return {'query':query,'run_fingerprint':collection['run_fingerprint'],'collection_state':collection['state'],
                         'partial_collection':any(catalog['state']!='complete' for _,_,catalog in entries),'searched_source_tiles':total,'total_source_tiles':total_sources,
                         'collection_fingerprints':{dataset.dataset_id:recipe['run_fingerprint'] for dataset,recipe,_ in entries},
                         'searched_chip_count':sum(catalog['chip_count'] for _,_,catalog in entries),
                         'searched_source_uris':[dataset.qualify(s['source_uri']) for dataset,_,catalog in entries for s in catalog['shards']],
-                        'created_utc':time.time(),'search':search_details,'results':results}
+                        'created_utc':time.time(),'search':search_details,'results':results,
+                        **({'detection':detection_details} if detection_details is not None else {})}
             finally:
                 model=None;query_vector=None
                 if not resident:
+                    if detector is not None:
+                        detector.close()
                     gc.collect()
                     torch=sys.modules.get('torch')
                     if torch is not None and torch.cuda.is_available():torch.cuda.empty_cache()

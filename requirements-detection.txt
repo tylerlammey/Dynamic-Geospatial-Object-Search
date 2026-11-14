@@ -1,0 +1,4 @@
+# Optional LLMDet runtime. Keep the existing GPU torch/torchvision pair installed.
+transformers==5.17.0
+safetensors==0.8.0
+huggingface-hub==1.32.0

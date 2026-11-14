@@ -117,7 +117,7 @@ machine previously blocked that unsigned DLL through Smart App Control. Resolvin
 it requires a Windows security decision or a compatible trusted signed runtime;
 frontend setup and imagery preparation do not change those settings.
 
-Enter a phrase and a result count (1–5,000). **Balanced** uses the compatible
+Enter a phrase. A fixed result count (1–5,000) is available with detection off. **Balanced** uses the compatible
 CPU IVF-PQ index and rescores candidates from original vectors. **Thorough**
 expands both the indexed search and candidate pool; **Exact** scans all vectors.
 A missing or stale index falls back to exact search. The collection/model
@@ -128,6 +128,22 @@ rendering are separate. Clusters retain all overlapping matches. Select a
 cluster rank or card to synchronize the footprint and inspector. Use previous/
 next and **Fit all matches** to navigate. Similarity is a ranking score, not
 object-detection confidence.
+
+Desktop searches enable **Detect objects** by default. LLMDet Large checks
+the native chips returned by GeoRSCLIP and keeps a chip if it has at least one
+box above the configured confidence cutoff. The inspector draws boxes
+over the native preview and on the map when you select a match. The highest
+box confidence ranks detection results; similarity breaks ties. Detection
+mode hides tile outlines and large boxes that meet a chip edge by default.
+Use **Tile outlines** or **Show large partial boxes** to inspect them.
+
+Search checks a minimum set of neighbors when available, then fetches more
+while recent tiles still yield detections. It excludes every tile already
+checked and returns every tile with a qualifying box from that run, including
+zero if none qualify. The result panel shows how many tiles were checked and
+why the search stopped. Turn off **Detect objects** for similarity-only searches,
+or adjust the box cutoff and candidate limit in **Settings**. See the
+[detector setup and defaults](../docs/nys-object-detection.md).
 
 Search history includes **compatible existing CLI searches** from the
 NYS `search-results/` folder and new frontend searches. You can open their real
@@ -175,9 +191,11 @@ result chips resolve by `(shard_id, embedding_id)` back to original pixel window
 Bookmarks live under `frontend/state/`. The latest 30 frontend searches and 200
 CPU text vectors are retained. Clear all search history also removes backend
 saved searches.
-The retrieval boundary is `service/retrieval.py`; future consumers can request
-more results without changing the renderer. Requests accept search quality
-and qualified already-seen IDs; the future decision model has not been added.
+The retrieval boundary is `service/retrieval.py`. Detection and additional
+retrieval run inside the same search worker and own the same GPU and collection
+locks. The resident worker loads LLMDet lazily on the first detection search
+and keeps it until **Unload model**. Without preload, each detection search
+releases the text encoder before loading the detector.
 
 ## Cache and process limits
 

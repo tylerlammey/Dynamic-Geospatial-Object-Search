@@ -54,8 +54,8 @@ runtime input validation.
 | Route | Input/output contract owner |
 | --- | --- |
 | `GET /api/config`, `/api/status` | `Application.config/status`, `retrieval.status_snapshot`; map inventory, coverage, model/cache/overview state |
-| `POST /api/search` | `retrieval.validate_query/validate_search_options`, `Application.start_search`; task ID response |
-| `GET /api/search-progress?id=...` | `Application.search_progress`; loading/encoding/searching/metadata/finishing/complete/error states |
+| `POST /api/search` | `retrieval.validate_query/validate_search_options/validate_detection_request`, `Application.start_search`; task ID response |
+| `GET /api/search-progress?id=...` | `Application.search_progress`; loading/encoding/searching/metadata/loading_detector/detecting/finishing/complete/error states |
 | `GET /api/results?id=...`, `/api/history` | `Application.saved/saved_backend/history`; compatible persisted results and history records |
 | `POST /api/model/load`, `/api/model/unload` | `Application.start_model/stop_model`; owned resident lifecycle |
 | Tile/preview/inspect GET routes | `TileRenderer`, HTTP routing; finite coordinates, source inventory, native window containment |
@@ -71,6 +71,28 @@ Scores are float32 dot products against original normalized float16 vectors;
 they rank semantic chip similarity and are not object-detection confidence.
 ANN candidate selection is approximate; exact search remains the baseline.
 Missing/stale optional indexes can fall back to exact search in automatic mode.
+
+`POST /api/search` accepts an optional `detection` object. Omit it or send
+`{"enabled": false}` to retain similarity-only behavior. The desktop sends
+`enabled: true` by default and omits `top_k`; when present, the fixed count
+only applies to similarity search. `GET /api/config` exposes
+`detection_defaults`. The validator in `adaptive_detection.py` bounds box and
+text thresholds, `nms_iou`, batch and page sizes, `window_size`,
+`min_candidates`, `min_detection_rate`, and `max_candidates`; unknown fields
+are rejected. During inference, `detecting` updates report evaluated/accepted
+tiles, box count, recent detection rate, candidate limit and round.
+
+A detection search saves top-level `detection` diagnostics (checkpoint revision
+if loaded, thresholds, counts, recent detection rate, candidate limit and stop
+reason). The result count can range from zero to all evaluated chips.
+Detection results rank by maximum retained box confidence, then by their
+original similarity score. ANN evaluation order is unchanged. Stop reasons are `low_detection_yield`, `candidate_limit`, and `no_new_candidates`.
+Each accepted row adds `detection.predictions` with `box` in original
+chip-relative `[left, top, right, bottom]` pixels, `score`, `text_label`, and a
+longitude-first EPSG:4326 `geometry` polygon. `touches_tile_edge` marks a box
+within two native pixels of a tile edge. `maximum_box_score` is the strongest
+retained box confidence; it must equal the maximum of the returned scores. These scores describe box confidence, not calibrated
+presence probability. Existing results without this optional field remain valid.
 
 ## Synthetic and diagnostic contracts
 

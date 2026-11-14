@@ -137,6 +137,68 @@ class SyntheticServiceTests(unittest.TestCase):
         with self.assertRaises(FileExistsError):
             SyntheticApplication(self.job, self.app.frontend, self.app.build)
 
+    def test_mock_detection_refills_and_returns_native_pixel_boxes(self):
+        query = {"query": "synthetic fixture", "top_k": 3}
+        original = self.app.saved(self.app.start_search(query)["task_id"])
+        status, body = self.request("/api/search", {**query, "detection": {"enabled": True}})
+        self.assertEqual(status, 202)
+        detected = self.app.saved(json.loads(body)["task_id"])
+        self.assertEqual(detected["detection"]["model_id"], "synthetic-mocked-detector")
+        self.assertGreater(detected["detection"]["rounds"], 1)
+        self.assertEqual(detected["detection"]["evaluated"], 7)
+        self.assertEqual(detected["detection"]["stop_reason"], "no_new_candidates")
+        self.assertEqual(len(detected["results"]), 6)
+        self.assertNotIn(
+            original["results"][0]["chip_id"], [r["chip_id"] for r in detected["results"]]
+        )
+        self.assertEqual(detected["results"][0]["detection"]["maximum_box_score"], 0.92)
+        self.assertLess(detected["results"][0]["score"], detected["results"][1]["score"])
+        for result in detected["results"]:
+            self.assertEqual(result["detection"]["score_kind"], "synthetic_fixture")
+            box = result["detection"]["predictions"][0]
+            self.assertEqual(
+                box["box"], [0, 52, 140, 142] if result["rank"] == 1 else [40, 52, 180, 142]
+            )
+            self.assertEqual(box["touches_tile_edge"], result["rank"] == 1)
+            self.assertEqual(box["geometry"]["type"], "Polygon")
+            for lon, lat in box["geometry"]["coordinates"][0]:
+                self.assertTrue(result["west"] <= lon <= result["east"])
+                self.assertTrue(result["south"] < lat < result["north"])
+
+        status, body = self.request(
+            "/api/search",
+            {
+                **query,
+                "detection": {"enabled": True, "max_candidates": 2},
+            },
+        )
+        self.assertEqual(status, 202)
+        capped = self.app.saved(json.loads(body)["task_id"])
+        self.assertEqual(len(capped["results"]), 1)
+        self.assertEqual(capped["detection"]["evaluated"], 2)
+        self.assertEqual(capped["detection"]["stop_reason"], "candidate_limit")
+
+        status, body = self.request(
+            "/api/search",
+            {
+                **query,
+                "detection": {
+                    "enabled": True,
+                    "box_threshold": 1,
+                    "window_size": 2,
+                    "min_candidates": 4,
+                },
+            },
+        )
+        self.assertEqual(status, 202)
+        filtered = self.app.saved(json.loads(body)["task_id"])
+        self.assertEqual(filtered["results"], [])
+        self.assertEqual(filtered["detection"]["evaluated"], 5)
+        self.assertEqual(filtered["detection"]["stop_reason"], "low_detection_yield")
+        self.assertEqual(
+            self.request("/api/search", {**query, "detection": {"enabled": 1}})[0], 400
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
